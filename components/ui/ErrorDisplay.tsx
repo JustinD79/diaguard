@@ -73,13 +73,16 @@ export default function ErrorDisplay({
           )}
           
           {onDismiss && (
-            <TouchableOpacity style={styles.dismissButton} onPress={onDismiss}>
-              <X size={16} color="#6B7280" />
-            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.dismissButton} 
+              onPress={onDismiss}
               accessibilityRole="button"
               accessible={true}
               accessibilityLabel="Dismiss error"
               accessibilityHint="Tap to dismiss this error message"
+            >
+              <X size={16} color="#6B7280" />
+            </TouchableOpacity>
           )}
         </View>
       </View>
