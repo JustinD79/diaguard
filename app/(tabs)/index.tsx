@@ -26,6 +26,10 @@ import { MedicalComplianceAgent } from '@/services/MedicalComplianceAgent';
 import { useErrorHandler, useMedicalErrorHandler, useNetworkErrorHandler } from '@/hooks/useErrorHandler';
 import ErrorDisplay from '@/components/ui/ErrorDisplay';
 import { OfflineService } from '@/services/OfflineService';
+import { useScanLimit } from '@/contexts/ScanLimitContext';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import ScanLimitBanner from '@/components/notifications/ScanLimitBanner';
+import SubscriptionNotification from '@/components/notifications/SubscriptionNotification';
 
 interface FoodItem {
   id: string;
@@ -58,6 +62,10 @@ export default function FoodScanScreen() {
   const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  
+  const { scansRemaining, canScan, useScan } = useScanLimit();
+  const { hasActiveSubscription } = useSubscription();
+  const [showScanLimitNotification, setShowScanLimitNotification] = useState(false);
   
   const { error, clearError } = useErrorHandler();
   const { handleMedicalError } = useMedicalErrorHandler();
@@ -212,6 +220,19 @@ export default function FoodScanScreen() {
   };
 
   const processImageWithAI = async (imageUri: string) => {
+    // Check scan limit before processing
+    if (!canScan) {
+      setShowScanLimitNotification(true);
+      return;
+    }
+
+    // Use a scan
+    const scanUsed = await useScan();
+    if (!scanUsed) {
+      setShowScanLimitNotification(true);
+      return;
+    }
+
     setIsProcessing(true);
     clearError();
     
@@ -329,6 +350,19 @@ export default function FoodScanScreen() {
   };
 
   const simulateBarcodeScanning = async () => {
+    // Check scan limit before processing
+    if (!canScan) {
+      setShowScanLimitNotification(true);
+      return;
+    }
+
+    // Use a scan
+    const scanUsed = await useScan();
+    if (!scanUsed) {
+      setShowScanLimitNotification(true);
+      return;
+    }
+
     setIsProcessing(true);
     clearError();
     
@@ -477,33 +511,39 @@ export default function FoodScanScreen() {
   const renderQuickActions = () => (
     <View style={styles.quickActions} accessibilityRole="group" accessible={true} accessibilityLabel="Food tracking action buttons">
       <TouchableOpacity 
-        style={styles.actionButton}
+        style={[styles.actionButton, !canScan && styles.actionButtonDisabled]}
         onPress={() => setShowCamera(true)}
+        disabled={!canScan}
         accessibilityRole="button"
         accessible={true}
         accessibilityLabel="AI Scan"
         accessibilityHint="Use AI to scan and recognize food items"
       >
         <View style={styles.actionIconContainer}>
-          <Brain size={24} color="#2563EB" />
+          <Brain size={24} color={canScan ? "#2563EB" : "#9CA3AF"} />
         </View>
-        <Text style={styles.actionText}>AI Scan</Text>
-        <Text style={styles.actionSubtext}>Smart Recognition</Text>
+        <Text style={[styles.actionText, !canScan && styles.actionTextDisabled]}>AI Scan</Text>
+        <Text style={[styles.actionSubtext, !canScan && styles.actionTextDisabled]}>
+          {canScan ? 'Smart Recognition' : `${scansRemaining} left`}
+        </Text>
       </TouchableOpacity>
       
       <TouchableOpacity 
-        style={styles.actionButton}
+        style={[styles.actionButton, !canScan && styles.actionButtonDisabled]}
         onPress={simulateBarcodeScanning}
+        disabled={!canScan}
         accessibilityRole="button"
         accessible={true}
         accessibilityLabel="Barcode Scanner"
         accessibilityHint="Scan product barcodes for nutrition information"
       >
         <View style={styles.actionIconContainer}>
-          <Barcode size={24} color="#2563EB" />
+          <Barcode size={24} color={canScan ? "#2563EB" : "#9CA3AF"} />
         </View>
-        <Text style={styles.actionText}>Barcode</Text>
-        <Text style={styles.actionSubtext}>Product Scan</Text>
+        <Text style={[styles.actionText, !canScan && styles.actionTextDisabled]}>Barcode</Text>
+        <Text style={[styles.actionSubtext, !canScan && styles.actionTextDisabled]}>
+          {canScan ? 'Product Scan' : 'Upgrade needed'}
+        </Text>
       </TouchableOpacity>
       
       <TouchableOpacity 
@@ -717,6 +757,7 @@ export default function FoodScanScreen() {
       </View>
 
       <View accessibilityRole="navigation" accessible={true} accessibilityLabel="Quick action buttons for food tracking">
+        <ScanLimitBanner />
         {renderQuickActions()}
       </View>
 
@@ -738,6 +779,12 @@ export default function FoodScanScreen() {
         </View>
       </ScrollView>
       </View>
+
+      <SubscriptionNotification
+        visible={showScanLimitNotification}
+        onClose={() => setShowScanLimitNotification(false)}
+        trigger="scan_limit"
+      />
 
       {/* Manual Entry Modal */}
       <Modal
@@ -959,10 +1006,16 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 2,
   },
+  actionTextDisabled: {
+    color: '#9CA3AF',
+  },
   actionSubtext: {
     fontSize: 10,
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
+  },
+  actionButtonDisabled: {
+    opacity: 0.6,
   },
   dailySummary: {
     margin: 20,

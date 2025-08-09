@@ -5,9 +5,19 @@ interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
   containerStyle?: ViewStyle;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
 }
 
-export default function Input({ label, error, containerStyle, style, ...props }: InputProps) {
+export default function Input({ 
+  label, 
+  error, 
+  containerStyle, 
+  leftIcon, 
+  rightIcon, 
+  style, 
+  ...props 
+}: InputProps) {
   return (
     <View style={[styles.container, containerStyle]}>
       {label && (
@@ -20,15 +30,32 @@ export default function Input({ label, error, containerStyle, style, ...props }:
           {label}
         </Text>
       )}
-      <TextInput
-        style={[styles.input, error && styles.inputError, style]}
-        placeholderTextColor="#9CA3AF"
-        accessibilityRole="textbox"
-        accessible={true}
-        accessibilityLabel={label || 'Text input field'}
-        accessibilityState={{ invalid: !!error }}
-        {...props}
-      />
+      <View style={[styles.inputContainer, error && styles.inputContainerError]}>
+        {leftIcon && (
+          <View style={styles.leftIcon}>
+            {leftIcon}
+          </View>
+        )}
+        <TextInput
+          style={[
+            styles.input, 
+            leftIcon && styles.inputWithLeftIcon,
+            rightIcon && styles.inputWithRightIcon,
+            style
+          ]}
+          placeholderTextColor="#9CA3AF"
+          accessibilityRole="textbox"
+          accessible={true}
+          accessibilityLabel={label || 'Text input field'}
+          accessibilityState={{ invalid: !!error }}
+          {...props}
+        />
+        {rightIcon && (
+          <View style={styles.rightIcon}>
+            {rightIcon}
+          </View>
+        )}
+      </View>
       {error && (
         <Text 
           style={styles.error}
@@ -53,17 +80,34 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 8,
   },
-  input: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#D1D5DB',
     borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+  },
+  inputContainerError: {
+    borderColor: '#DC2626',
+  },
+  input: {
+    flex: 1,
     padding: 12,
     fontSize: 16,
     fontFamily: 'Inter-Regular',
-    backgroundColor: '#FFFFFF',
   },
-  inputError: {
-    borderColor: '#DC2626',
+  inputWithLeftIcon: {
+    paddingLeft: 8,
+  },
+  inputWithRightIcon: {
+    paddingRight: 8,
+  },
+  leftIcon: {
+    paddingLeft: 12,
+  },
+  rightIcon: {
+    paddingRight: 12,
   },
   error: {
     fontSize: 12,

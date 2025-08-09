@@ -5,6 +5,10 @@ import { useFonts, Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/in
 import * as SplashScreen from 'expo-splash-screen';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
+import { ScanLimitProvider } from '@/contexts/ScanLimitContext';
+import AuthGate from '@/components/auth/AuthGate';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,7 +33,15 @@ export default function RootLayout() {
   return (
     <>
       <ErrorBoundary>
-        <Slot />
+        <AuthProvider>
+          <SubscriptionProvider>
+            <ScanLimitProvider>
+              <AuthGate>
+                <Slot />
+              </AuthGate>
+            </ScanLimitProvider>
+          </SubscriptionProvider>
+        </AuthProvider>
       </ErrorBoundary>
       <StatusBar style="auto" />
     </>
