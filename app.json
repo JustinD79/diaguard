@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "diabetes-care-app",
+    "slug": "diabetes-care-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "supabaseUrl": "https://kmlhyqusrxqkmaaefbhs.supabase.co",
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtemdkdmtncGR6a2Z6emNmdnZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2NTExNDMsImV4cCI6MjA2OTIyNzE0M30.a64PoQb3Uth-GxsdHEMfJdqD6Nv1j1kH35uHW_O_2kI"
+    }
+  }
+}
