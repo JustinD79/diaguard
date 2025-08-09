@@ -46,7 +46,13 @@ export default function ErrorDisplay({
   };
 
   return (
-    <View style={[styles.container, getErrorStyle()]}>
+    <View 
+      style={[styles.container, getErrorStyle()]}
+      accessibilityRole="alert"
+      accessible={true}
+      accessibilityLabel={`Error message: ${error}`}
+      accessibilityLiveRegion="assertive"
+    >
       <View style={styles.content}>
         <View style={styles.iconContainer}>
           {getIcon()}
@@ -59,6 +65,10 @@ export default function ErrorDisplay({
             <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
               <RefreshCw size={16} color="#2563EB" />
               <Text style={styles.retryText}>Retry</Text>
+              accessibilityRole="button"
+              accessible={true}
+              accessibilityLabel="Retry action"
+              accessibilityHint="Tap to retry the failed operation"
             </TouchableOpacity>
           )}
           
@@ -66,6 +76,10 @@ export default function ErrorDisplay({
             <TouchableOpacity style={styles.dismissButton} onPress={onDismiss}>
               <X size={16} color="#6B7280" />
             </TouchableOpacity>
+              accessibilityRole="button"
+              accessible={true}
+              accessibilityLabel="Dismiss error"
+              accessibilityHint="Tap to dismiss this error message"
           )}
         </View>
       </View>

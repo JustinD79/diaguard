@@ -95,13 +95,17 @@ export default function EmergencyScreen() {
   };
 
   const renderQuickActions = () => (
-    <Card style={styles.quickActionsCard}>
+    <Card style={styles.quickActionsCard} accessibilityRole="group" accessible={true} accessibilityLabel="Emergency action buttons">
       <Text style={styles.sectionTitle}>Emergency Actions</Text>
       
       <View style={styles.quickActionsGrid}>
         <TouchableOpacity
           style={[styles.quickAction, styles.emergencyAction]}
           onPress={() => makeCall('911')}
+          accessibilityRole="button"
+          accessible={true}
+          accessibilityLabel="Call 911"
+          accessibilityHint="Emergency call to 911 for immediate medical assistance"
         >
           <Phone size={24} color="#FFFFFF" />
           <Text style={styles.quickActionText}>Call 911</Text>
@@ -110,6 +114,10 @@ export default function EmergencyScreen() {
         <TouchableOpacity
           style={[styles.quickAction, styles.doctorAction]}
           onPress={() => makeCall(medicalInfo.doctorPhone)}
+          accessibilityRole="button"
+          accessible={true}
+          accessibilityLabel="Call Doctor"
+          accessibilityHint="Call your primary healthcare provider"
         >
           <Heart size={24} color="#FFFFFF" />
           <Text style={styles.quickActionText}>Call Doctor</Text>
@@ -123,6 +131,10 @@ export default function EmergencyScreen() {
               makeCall(primaryContact.phone);
             }
           }}
+          accessibilityRole="button"
+          accessible={true}
+          accessibilityLabel="Call Emergency Contact"
+          accessibilityHint="Call your primary emergency contact"
         >
           <User size={24} color="#FFFFFF" />
           <Text style={styles.quickActionText}>Call Contact</Text>
@@ -136,6 +148,10 @@ export default function EmergencyScreen() {
               sendSMS(primaryContact.phone);
             }
           }}
+          accessibilityRole="button"
+          accessible={true}
+          accessibilityLabel="Send Emergency Alert"
+          accessibilityHint="Send emergency text message to your emergency contact"
         >
           <AlertTriangle size={24} color="#FFFFFF" />
           <Text style={styles.quickActionText}>Send Alert</Text>
@@ -266,24 +282,39 @@ export default function EmergencyScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <View accessibilityRole="banner" accessible={true} accessibilityLabel="Emergency page header">
         <View style={styles.header}>
           <Text style={styles.title}>Emergency</Text>
           <Text style={styles.subtitle}>Quick access to emergency information and contacts</Text>
         </View>
+      </View>
 
-        {renderQuickActions()}
-        {renderMedicalID()}
-        {renderEmergencyContacts()}
-        {renderEmergencyGuidelines()}
+      <View accessibilityRole="main" accessible={true} accessibilityLabel="Emergency information and actions">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View accessibilityRole="navigation" accessible={true} accessibilityLabel="Emergency action buttons">
+          {renderQuickActions()}
+        </View>
+        
+        <View accessibilityRole="complementary" accessible={true} accessibilityLabel="Medical identification information">
+          {renderMedicalID()}
+        </View>
+        
+        <View accessibilityRole="region" accessible={true} accessibilityLabel="Emergency contacts list">
+          {renderEmergencyContacts()}
+        </View>
+        
+        <View accessibilityRole="region" accessible={true} accessibilityLabel="Emergency guidelines and procedures">
+          {renderEmergencyGuidelines()}
+        </View>
 
-        <View style={styles.disclaimer}>
+        <View style={styles.disclaimer} accessibilityRole="contentinfo" accessible={true} accessibilityLabel="Medical emergency disclaimer">
           <AlertTriangle size={20} color="#DC2626" />
           <Text style={styles.disclaimerText}>
             In case of a medical emergency, always call 911 first. This app is not a substitute for professional medical care.
           </Text>
         </View>
       </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }

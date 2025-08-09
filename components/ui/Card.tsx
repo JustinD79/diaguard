@@ -5,11 +5,26 @@ interface CardProps {
   children: React.ReactNode;
   style?: ViewStyle;
   padding?: number;
+  accessibilityRole?: string;
+  accessible?: boolean;
+  accessibilityLabel?: string;
 }
 
-export default function Card({ children, style, padding = 16 }: CardProps) {
+export default function Card({ 
+  children, 
+  style, 
+  padding = 16, 
+  accessibilityRole,
+  accessible,
+  accessibilityLabel 
+}: CardProps) {
   return (
-    <View style={[styles.card, { padding }, style]}>
+    <View 
+      style={[styles.card, { padding }, style]}
+      accessibilityRole={accessibilityRole}
+      accessible={accessible}
+      accessibilityLabel={accessibilityLabel}
+    >
       {children}
     </View>
   );

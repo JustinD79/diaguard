@@ -143,27 +143,42 @@ export default function HealthMonitoringScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <View accessibilityRole="banner" accessible={true} accessibilityLabel="Health monitoring page header">
         <View style={styles.header}>
           <Text style={styles.title}>Health Monitor</Text>
           <Text style={styles.subtitle}>Track your vital health metrics</Text>
         </View>
+      </View>
 
-        {renderQuickStats()}
+      <View accessibilityRole="main" accessible={true} accessibilityLabel="Health monitoring main content">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View accessibilityRole="complementary" accessible={true} accessibilityLabel="Quick health statistics">
+          {renderQuickStats()}
+        </View>
 
-        <View style={styles.section}>
+        <View style={styles.section} accessibilityRole="region" accessible={true} accessibilityLabel="Health readings section">
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Readings</Text>
             <TouchableOpacity
               style={styles.addButton}
               onPress={() => setShowAddModal(true)}
+              accessibilityRole="button"
+              accessible={true}
+              accessibilityLabel="Add new health reading"
+              accessibilityHint="Tap to add a new health measurement"
             >
               <Plus size={20} color="#2563EB" />
             </TouchableOpacity>
           </View>
 
           {readings.map((reading) => (
-            <View key={reading.id} style={styles.readingItem}>
+            <View 
+              key={reading.id} 
+              style={styles.readingItem}
+              accessibilityRole="listitem"
+              accessible={true}
+              accessibilityLabel={`${reading.type === 'glucose' ? 'Blood glucose' : reading.type} reading: ${reading.value}, recorded ${formatDate(reading.timestamp)} at ${formatTime(reading.timestamp)}`}
+            >
               <View style={styles.readingIcon}>
                 {getReadingIcon(reading.type)}
               </View>
@@ -196,10 +211,10 @@ export default function HealthMonitoringScreen() {
           ))}
         </View>
 
-        <View style={styles.alertsSection}>
+        <View style={styles.alertsSection} accessibilityRole="region" accessible={true} accessibilityLabel="Health alerts and reminders">
           <Text style={styles.sectionTitle}>Health Alerts</Text>
           
-          <View style={styles.alertItem}>
+          <View style={styles.alertItem} accessibilityRole="alert" accessible={true} accessibilityLabel="Medication reminder alert">
             <AlertCircle size={20} color="#D97706" />
             <View style={styles.alertContent}>
               <Text style={styles.alertTitle}>Medication Reminder</Text>
@@ -208,7 +223,7 @@ export default function HealthMonitoringScreen() {
             </View>
           </View>
 
-          <View style={styles.alertItem}>
+          <View style={styles.alertItem} accessibilityRole="status" accessible={true} accessibilityLabel="Exercise goal achievement">
             <AlertCircle size={20} color="#059669" />
             <View style={styles.alertContent}>
               <Text style={styles.alertTitle}>Exercise Goal</Text>
@@ -218,6 +233,7 @@ export default function HealthMonitoringScreen() {
           </View>
         </View>
       </ScrollView>
+      </View>
 
       <Modal
         visible={showAddModal}

@@ -82,20 +82,23 @@ export default function InsulinCalculatorScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <View accessibilityRole="banner" accessible={true} accessibilityLabel="Insulin calculator page header">
         <View style={styles.header}>
           <Text style={styles.title}>Insulin Calculator</Text>
           <Text style={styles.subtitle}>Calculate your insulin dose based on blood glucose and carbs</Text>
         </View>
+      </View>
 
-        <View style={styles.disclaimer}>
+      <View accessibilityRole="main" accessible={true} accessibilityLabel="Insulin calculator main content">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.disclaimer} accessibilityRole="alert" accessible={true} accessibilityLabel="Medical disclaimer and safety warning">
           <AlertTriangle size={20} color="#DC2626" />
           <Text style={styles.disclaimerText}>
             This calculator is for educational purposes only. Always consult with your healthcare provider before making insulin dosing decisions.
           </Text>
         </View>
 
-        <View style={styles.inputSection}>
+        <View style={styles.inputSection} accessibilityRole="form" accessible={true} accessibilityLabel="Blood glucose and carbohydrate input form">
           <Text style={styles.sectionTitle}>Current Readings</Text>
           
           <View style={styles.inputGroup}>
@@ -107,6 +110,8 @@ export default function InsulinCalculatorScreen() {
               placeholder="Enter current BG"
               keyboardType="numeric"
               placeholderTextColor="#9CA3AF"
+              accessibilityLabel="Blood glucose input"
+              accessibilityHint="Enter your current blood glucose reading in milligrams per deciliter"
             />
           </View>
 
@@ -119,14 +124,16 @@ export default function InsulinCalculatorScreen() {
               placeholder="Enter carbs to consume"
               keyboardType="numeric"
               placeholderTextColor="#9CA3AF"
+              accessibilityLabel="Carbohydrates input"
+              accessibilityHint="Enter the grams of carbohydrates you plan to consume"
             />
           </View>
         </View>
 
-        <View style={styles.settingsSection}>
+        <View style={styles.settingsSection} accessibilityRole="complementary" accessible={true} accessibilityLabel="Your insulin calculation settings">
           <Text style={styles.sectionTitle}>Your Settings</Text>
           
-          <View style={styles.settingItem}>
+          <View style={styles.settingItem} accessibilityRole="text" accessible={true} accessibilityLabel={`Carb ratio setting: 1 unit per ${insulinSettings.carbRatio} grams carbs`}>
             <View style={styles.settingIcon}>
               <Target size={20} color="#2563EB" />
             </View>
@@ -136,7 +143,7 @@ export default function InsulinCalculatorScreen() {
             </View>
           </View>
 
-          <View style={styles.settingItem}>
+          <View style={styles.settingItem} accessibilityRole="text" accessible={true} accessibilityLabel={`Correction factor: 1 unit per ${insulinSettings.correctionFactor} milligrams per deciliter`}>
             <View style={styles.settingIcon}>
               <Calculator size={20} color="#2563EB" />
             </View>
@@ -146,7 +153,7 @@ export default function InsulinCalculatorScreen() {
             </View>
           </View>
 
-          <View style={styles.settingItem}>
+          <View style={styles.settingItem} accessibilityRole="text" accessible={true} accessibilityLabel={`Target blood glucose: ${insulinSettings.targetBG} milligrams per deciliter`}>
             <View style={styles.settingIcon}>
               <Target size={20} color="#2563EB" />
             </View>
@@ -157,10 +164,14 @@ export default function InsulinCalculatorScreen() {
           </View>
         </View>
 
-        <View style={styles.buttonContainer}>
+        <View style={styles.buttonContainer} accessibilityRole="group" accessible={true} accessibilityLabel="Calculator action buttons">
           <TouchableOpacity
             style={[styles.button, styles.calculateButton]}
             onPress={calculateInsulin}
+            accessibilityRole="button"
+            accessible={true}
+            accessibilityLabel="Calculate insulin dose"
+            accessibilityHint="Calculate educational insulin dose based on entered values"
           >
             <Calculator size={20} color="#FFFFFF" />
             <Text style={styles.calculateButtonText}>Calculate Dose</Text>
@@ -169,13 +180,22 @@ export default function InsulinCalculatorScreen() {
           <TouchableOpacity
             style={[styles.button, styles.clearButton]}
             onPress={clearCalculation}
+            accessibilityRole="button"
+            accessible={true}
+            accessibilityLabel="Clear calculator"
+            accessibilityHint="Clear all entered values and reset calculator"
           >
             <Text style={styles.clearButtonText}>Clear</Text>
           </TouchableOpacity>
         </View>
 
         {calculatedDose !== null && (
-          <View style={[styles.resultSection, showWarning && styles.warningResult]}>
+          <View 
+            style={[styles.resultSection, showWarning && styles.warningResult]}
+            accessibilityRole="alert"
+            accessible={true}
+            accessibilityLabel={`Calculated educational insulin dose: ${calculatedDose} units. Remember this is for educational purposes only`}
+          >
             <Text style={styles.resultTitle}>Calculated Insulin Dose</Text>
             <Text style={styles.resultDose}>{calculatedDose} units</Text>
             <Text style={styles.resultNote}>
@@ -184,10 +204,10 @@ export default function InsulinCalculatorScreen() {
           </View>
         )}
 
-        <View style={styles.recentDoses}>
+        <View style={styles.recentDoses} accessibilityRole="region" accessible={true} accessibilityLabel="Recent insulin dose history">
           <Text style={styles.sectionTitle}>Recent Doses</Text>
           
-          <View style={styles.doseItem}>
+          <View style={styles.doseItem} accessibilityRole="listitem" accessible={true} accessibilityLabel="Recent dose: 4.5 units at 2:30 PM, blood glucose 145, carbs 45 grams">
             <View style={styles.doseInfo}>
               <Text style={styles.doseAmount}>4.5 units</Text>
               <Text style={styles.doseDetails}>BG: 145 mg/dL • Carbs: 45g</Text>
@@ -198,7 +218,7 @@ export default function InsulinCalculatorScreen() {
             </View>
           </View>
 
-          <View style={styles.doseItem}>
+          <View style={styles.doseItem} accessibilityRole="listitem" accessible={true} accessibilityLabel="Recent dose: 3.0 units at 8:15 AM, blood glucose 120, carbs 30 grams">
             <View style={styles.doseInfo}>
               <Text style={styles.doseAmount}>3.0 units</Text>
               <Text style={styles.doseDetails}>BG: 120 mg/dL • Carbs: 30g</Text>
@@ -210,6 +230,7 @@ export default function InsulinCalculatorScreen() {
           </View>
         </View>
       </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }

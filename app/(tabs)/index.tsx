@@ -475,10 +475,14 @@ export default function FoodScanScreen() {
   };
 
   const renderQuickActions = () => (
-    <View style={styles.quickActions}>
+    <View style={styles.quickActions} accessibilityRole="group" accessible={true} accessibilityLabel="Food tracking action buttons">
       <TouchableOpacity 
         style={styles.actionButton}
         onPress={() => setShowCamera(true)}
+        accessibilityRole="button"
+        accessible={true}
+        accessibilityLabel="AI Scan"
+        accessibilityHint="Use AI to scan and recognize food items"
       >
         <View style={styles.actionIconContainer}>
           <Brain size={24} color="#2563EB" />
@@ -490,6 +494,10 @@ export default function FoodScanScreen() {
       <TouchableOpacity 
         style={styles.actionButton}
         onPress={simulateBarcodeScanning}
+        accessibilityRole="button"
+        accessible={true}
+        accessibilityLabel="Barcode Scanner"
+        accessibilityHint="Scan product barcodes for nutrition information"
       >
         <View style={styles.actionIconContainer}>
           <Barcode size={24} color="#2563EB" />
@@ -501,6 +509,10 @@ export default function FoodScanScreen() {
       <TouchableOpacity 
         style={styles.actionButton}
         onPress={() => setShowManualEntry(true)}
+        accessibilityRole="button"
+        accessible={true}
+        accessibilityLabel="Manual Entry"
+        accessibilityHint="Manually add food information"
       >
         <View style={styles.actionIconContainer}>
           <Plus size={24} color="#2563EB" />
@@ -512,6 +524,10 @@ export default function FoodScanScreen() {
       <TouchableOpacity 
         style={styles.actionButton}
         onPress={() => setShowSearch(true)}
+        accessibilityRole="button"
+        accessible={true}
+        accessibilityLabel="Search Food Database"
+        accessibilityHint="Search for food items in the database"
       >
         <View style={styles.actionIconContainer}>
           <Search size={24} color="#2563EB" />
@@ -530,28 +546,36 @@ export default function FoodScanScreen() {
     const avgGlycemicLoad = recentFoods.reduce((sum, food) => sum + (food.glycemicLoad || 0), 0) / recentFoods.length;
 
     return (
-      <Card style={styles.dailySummary}>
+      <Card style={styles.dailySummary} accessibilityRole="summary" accessible={true} accessibilityLabel="Today's nutrition summary">
         <Text style={styles.summaryTitle}>Today's AI-Powered Summary</Text>
-        <View style={styles.summaryGrid}>
+        <View style={styles.summaryGrid} accessibilityRole="group" accessible={true} accessibilityLabel="Nutrition totals">
           <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>{Math.round(totalCalories)}</Text>
+            <Text style={styles.summaryValue} accessibilityLabel={`${Math.round(totalCalories)} calories consumed today`}>
+              {Math.round(totalCalories)}
+            </Text>
             <Text style={styles.summaryLabel}>Calories</Text>
           </View>
           <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>{Math.round(totalCarbs)}g</Text>
+            <Text style={styles.summaryValue} accessibilityLabel={`${Math.round(totalCarbs)} grams of carbohydrates`}>
+              {Math.round(totalCarbs)}g
+            </Text>
             <Text style={styles.summaryLabel}>Carbs</Text>
           </View>
           <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>{Math.round(totalProtein)}g</Text>
+            <Text style={styles.summaryValue} accessibilityLabel={`${Math.round(totalProtein)} grams of protein`}>
+              {Math.round(totalProtein)}g
+            </Text>
             <Text style={styles.summaryLabel}>Protein</Text>
           </View>
           <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>{Math.round(totalFat)}g</Text>
+            <Text style={styles.summaryValue} accessibilityLabel={`${Math.round(totalFat)} grams of fat`}>
+              {Math.round(totalFat)}g
+            </Text>
             <Text style={styles.summaryLabel}>Fat</Text>
           </View>
         </View>
         
-        <View style={styles.insulinInsight}>
+        <View style={styles.insulinInsight} accessibilityRole="alert" accessible={true} accessibilityLabel="Insulin calculation insight">
           <Target size={16} color="#DC2626" />
           <Text style={styles.insulinText}>
             Avg Glycemic Load: {Math.round(avgGlycemicLoad)} | Est. Insulin: {Math.round(totalCarbs / 15 * 10) / 10} units
@@ -562,18 +586,30 @@ export default function FoodScanScreen() {
   };
 
   const renderRecentFoods = () => (
-    <View style={styles.section}>
+    <View style={styles.section} accessibilityRole="region" accessible={true} accessibilityLabel="Recent food entries">
       <Text style={styles.sectionTitle}>Recent AI-Analyzed Foods</Text>
       {recentFoods.map((food) => (
-        <Card key={food.id} style={styles.foodItem}>
+        <Card 
+          key={food.id} 
+          style={styles.foodItem}
+          accessibilityRole="listitem"
+          accessible={true}
+          accessibilityLabel={`${food.name}, ${food.calories} calories, ${food.carbs} grams carbs, logged at ${food.time}`}
+        >
           {food.image && (
-            <Image source={{ uri: food.image }} style={styles.foodImage} />
+            <Image 
+              source={{ uri: food.image }} 
+              style={styles.foodImage}
+              accessibilityRole="image"
+              accessible={true}
+              accessibilityLabel={`Image of ${food.name}`}
+            />
           )}
           <View style={styles.foodInfo}>
             <View style={styles.foodHeader}>
               <Text style={styles.foodName}>{food.name}</Text>
               {food.confidence && (
-                <View style={styles.confidenceContainer}>
+                <View style={styles.confidenceContainer} accessibilityRole="text" accessible={true} accessibilityLabel={`AI confidence ${Math.round(food.confidence * 100)} percent`}>
                   <Zap size={12} color="#059669" />
                   <Text style={styles.confidenceText}>{Math.round(food.confidence * 100)}%</Text>
                 </View>
@@ -601,7 +637,13 @@ export default function FoodScanScreen() {
               )}
             </View>
           </View>
-          <TouchableOpacity style={styles.addButton}>
+          <TouchableOpacity 
+            style={styles.addButton}
+            accessibilityRole="button"
+            accessible={true}
+            accessibilityLabel={`Add ${food.name} to meal plan`}
+            accessibilityHint="Tap to add this food item to your meal plan"
+          >
             <Plus size={20} color="#2563EB" />
           </TouchableOpacity>
         </Card>
@@ -661,7 +703,7 @@ export default function FoodScanScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <View accessibilityRole="banner" accessible={true} accessibilityLabel="App header with title and status">
         <View style={styles.header}>
           <Text style={styles.title}>AI Food Tracker</Text>
           <Text style={styles.subtitle}>Powered by advanced AI for diabetes management</Text>
@@ -672,7 +714,14 @@ export default function FoodScanScreen() {
             </View>
           )}
         </View>
+      </View>
 
+      <View accessibilityRole="navigation" accessible={true} accessibilityLabel="Quick action buttons for food tracking">
+        {renderQuickActions()}
+      </View>
+
+      <View accessibilityRole="main" accessible={true} accessibilityLabel="Main content area with food tracking and summary">
+      <ScrollView showsVerticalScrollIndicator={false}>
         <ErrorDisplay
           error={error}
           type={isOffline ? 'network' : 'general'}
@@ -680,18 +729,24 @@ export default function FoodScanScreen() {
           isOffline={isOffline}
         />
 
-        {renderQuickActions()}
-        {renderDailySummary()}
-        {renderRecentFoods()}
+        <View accessibilityRole="complementary" accessible={true} accessibilityLabel="Daily nutrition summary">
+          {renderDailySummary()}
+        </View>
+        
+        <View accessibilityRole="region" accessible={true} accessibilityLabel="Recent food entries list">
+          {renderRecentFoods()}
+        </View>
       </ScrollView>
+      </View>
 
       {/* Manual Entry Modal */}
       <Modal
         visible={showManualEntry}
         animationType="slide"
         presentationStyle="pageSheet"
+        accessibilityViewIsModal={true}
       >
-        <SafeAreaView style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} accessibilityRole="dialog" accessible={true} accessibilityLabel="Add food manually form">
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setShowManualEntry(false)}>
               <Text style={styles.modalCancel}>Cancel</Text>
@@ -702,12 +757,13 @@ export default function FoodScanScreen() {
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.modalContent}>
+          <ScrollView style={styles.modalContent} accessibilityRole="form" accessible={true} accessibilityLabel="Food entry form fields">
             <Input
               label="Food Name"
               value={newFood.name}
               onChangeText={(text) => setNewFood({ ...newFood, name: text })}
               placeholder="e.g., Grilled Chicken"
+              accessibilityHint="Enter the name of the food item"
             />
 
             <Input
@@ -716,6 +772,7 @@ export default function FoodScanScreen() {
               onChangeText={(text) => setNewFood({ ...newFood, calories: text })}
               placeholder="e.g., 200"
               keyboardType="numeric"
+              accessibilityHint="Enter the number of calories"
             />
 
             <Input
@@ -724,6 +781,7 @@ export default function FoodScanScreen() {
               onChangeText={(text) => setNewFood({ ...newFood, carbs: text })}
               placeholder="e.g., 15"
               keyboardType="numeric"
+              accessibilityHint="Enter carbohydrates in grams"
             />
 
             <Input
@@ -732,6 +790,7 @@ export default function FoodScanScreen() {
               onChangeText={(text) => setNewFood({ ...newFood, protein: text })}
               placeholder="e.g., 25"
               keyboardType="numeric"
+              accessibilityHint="Enter protein in grams"
             />
 
             <Input
@@ -740,6 +799,7 @@ export default function FoodScanScreen() {
               onChangeText={(text) => setNewFood({ ...newFood, fat: text })}
               placeholder="e.g., 5"
               keyboardType="numeric"
+              accessibilityHint="Enter fat in grams"
             />
 
             <Input
@@ -747,6 +807,7 @@ export default function FoodScanScreen() {
               value={newFood.servingSize}
               onChangeText={(text) => setNewFood({ ...newFood, servingSize: text })}
               placeholder="e.g., 1 cup, 6 oz"
+              accessibilityHint="Enter the serving size description"
             />
           </ScrollView>
         </SafeAreaView>
@@ -757,8 +818,9 @@ export default function FoodScanScreen() {
         visible={showSearch}
         animationType="slide"
         presentationStyle="pageSheet"
+        accessibilityViewIsModal={true}
       >
-        <SafeAreaView style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} accessibilityRole="dialog" accessible={true} accessibilityLabel="Search food database">
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setShowSearch(false)}>
               <Text style={styles.modalCancel}>Cancel</Text>
@@ -773,9 +835,15 @@ export default function FoodScanScreen() {
               value={searchQuery}
               onChangeText={searchFoods}
               placeholder="Type food name..."
+              accessibilityHint="Type to search for food items in the database"
             />
 
-            <ScrollView style={styles.searchResults}>
+            <ScrollView 
+              style={styles.searchResults} 
+              accessibilityRole="list" 
+              accessible={true} 
+              accessibilityLabel="Search results list"
+            >
               {searchResults.map((food) => (
                 <TouchableOpacity
                   key={food.id}
@@ -786,9 +854,19 @@ export default function FoodScanScreen() {
                     setSearchQuery('');
                     setSearchResults([]);
                   }}
+                  accessibilityRole="button"
+                  accessible={true}
+                  accessibilityLabel={`Add ${food.name} to food log`}
+                  accessibilityHint={`${food.calories} calories, ${food.carbs} grams of carbs`}
                 >
                   {food.image && (
-                    <Image source={{ uri: food.image }} style={styles.searchResultImage} />
+                    <Image 
+                      source={{ uri: food.image }} 
+                      style={styles.searchResultImage}
+                      accessibilityRole="image"
+                      accessible={true}
+                      accessibilityLabel={`Image of ${food.name}`}
+                    />
                   )}
                   <View style={styles.searchResultInfo}>
                     <Text style={styles.searchResultName}>{food.name}</Text>

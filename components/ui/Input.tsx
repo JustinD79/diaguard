@@ -10,13 +10,35 @@ interface InputProps extends TextInputProps {
 export default function Input({ label, error, containerStyle, style, ...props }: InputProps) {
   return (
     <View style={[styles.container, containerStyle]}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && (
+        <Text 
+          style={styles.label}
+          accessibilityRole="text"
+          accessible={true}
+          accessibilityLabel={`Input field label: ${label}`}
+        >
+          {label}
+        </Text>
+      )}
       <TextInput
         style={[styles.input, error && styles.inputError, style]}
         placeholderTextColor="#9CA3AF"
+        accessibilityRole="textbox"
+        accessible={true}
+        accessibilityLabel={label || 'Text input field'}
+        accessibilityState={{ invalid: !!error }}
         {...props}
       />
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && (
+        <Text 
+          style={styles.error}
+          accessibilityRole="alert"
+          accessible={true}
+          accessibilityLabel={`Input error: ${error}`}
+        >
+          {error}
+        </Text>
+      )}
     </View>
   );
 }

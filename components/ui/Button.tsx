@@ -31,6 +31,11 @@ export default function Button({
       ]}
       onPress={onPress}
       disabled={disabled}
+      accessibilityRole="button"
+      accessible={true}
+      accessibilityLabel={title}
+      accessibilityState={{ disabled }}
+      accessibilityHint={disabled ? 'Button is currently disabled' : 'Tap to activate'}
     >
       <Text style={[styles.text, styles[`${variant}Text`], styles[`${size}Text`], textStyle]}>
         {title}

@@ -11,6 +11,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: '#2563EB',
         tabBarInactiveTintColor: '#6B7280',
         tabBarLabelStyle: styles.tabBarLabel,
+        tabBarAccessibilityLabel: 'Main navigation tabs',
       }}>
       <Tabs.Screen
         name="index"
@@ -19,6 +20,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <Camera size={size} color={color} />
           ),
+          tabBarAccessibilityLabel: 'Food scanning tab',
         }}
       />
       <Tabs.Screen
@@ -28,6 +30,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <Calculator size={size} color={color} />
           ),
+          tabBarAccessibilityLabel: 'Insulin calculator tab',
         }}
       />
       <Tabs.Screen
@@ -37,6 +40,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <Heart size={size} color={color} />
           ),
+          tabBarAccessibilityLabel: 'Health monitoring tab',
         }}
       />
       <Tabs.Screen
@@ -46,6 +50,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <ChefHat size={size} color={color} />
           ),
+          tabBarAccessibilityLabel: 'Diabetes-friendly recipes tab',
         }}
       />
       <Tabs.Screen
@@ -55,6 +60,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <Pill size={size} color={color} />
           ),
+          tabBarAccessibilityLabel: 'Medication tracking tab',
         }}
       />
       <Tabs.Screen
@@ -64,6 +70,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <BarChart3 size={size} color={color} />
           ),
+          tabBarAccessibilityLabel: 'Health reports and analytics tab',
         }}
       />
       <Tabs.Screen
@@ -73,6 +80,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <Shield size={size} color={color} />
           ),
+          tabBarAccessibilityLabel: 'Emergency contacts and medical information tab',
         }}
       />
       <Tabs.Screen
@@ -82,6 +90,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <CreditCard size={size} color={color} />
           ),
+          tabBarAccessibilityLabel: 'Subscription management tab',
         }}
       />
       <Tabs.Screen
@@ -91,6 +100,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <User size={size} color={color} />
           ),
+          tabBarAccessibilityLabel: 'User profile and settings tab',
         }}
       />
       <Tabs.Screen
@@ -100,6 +110,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <Settings size={size} color={color} />
           ),
+          tabBarAccessibilityLabel: 'App settings and preferences tab',
         }}
       />
     </Tabs>

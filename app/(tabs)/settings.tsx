@@ -75,13 +75,17 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <View accessibilityRole="banner" accessible={true} accessibilityLabel="Settings page header">
         <View style={styles.header}>
           <Text style={styles.title}>Settings</Text>
           <Text style={styles.subtitle}>Manage your app preferences and health settings</Text>
         </View>
+      </View>
 
-        {renderSection('Profile', (
+      <View accessibilityRole="main" accessible={true} accessibilityLabel="Settings and preferences">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View accessibilityRole="region" accessible={true} accessibilityLabel="Profile settings section">
+          {renderSection('Profile', (
           <View>
             {renderSettingItem(
               <User size={20} color="#2563EB" />,
@@ -101,9 +105,11 @@ export default function SettingsScreen() {
               userProfile.phone
             )}
           </View>
-        ))}
+          ))}
+        </View>
 
-        {renderSection('Insulin Calculator Settings', (
+        <View accessibilityRole="region" accessible={true} accessibilityLabel="Insulin calculator settings section">
+          {renderSection('Insulin Calculator Settings', (
           <View>
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Carb Ratio (1 unit per X grams)</Text>
@@ -113,6 +119,8 @@ export default function SettingsScreen() {
                 onChangeText={(text) => setInsulinSettings({ ...insulinSettings, carbRatio: text })}
                 keyboardType="numeric"
                 placeholder="15"
+                accessibilityLabel="Carbohydrate ratio setting"
+                accessibilityHint="Enter how many grams of carbs one unit of insulin covers"
               />
             </View>
 
@@ -124,6 +132,8 @@ export default function SettingsScreen() {
                 onChangeText={(text) => setInsulinSettings({ ...insulinSettings, correctionFactor: text })}
                 keyboardType="numeric"
                 placeholder="50"
+                accessibilityLabel="Correction factor setting"
+                accessibilityHint="Enter how many milligrams per deciliter one unit of insulin lowers blood glucose"
               />
             </View>
 
@@ -135,6 +145,8 @@ export default function SettingsScreen() {
                 onChangeText={(text) => setInsulinSettings({ ...insulinSettings, targetBG: text })}
                 keyboardType="numeric"
                 placeholder="100"
+                accessibilityLabel="Target blood glucose setting"
+                accessibilityHint="Enter your target blood glucose level in milligrams per deciliter"
               />
             </View>
 
@@ -146,12 +158,16 @@ export default function SettingsScreen() {
                 onChangeText={(text) => setInsulinSettings({ ...insulinSettings, maxInsulin: text })}
                 keyboardType="numeric"
                 placeholder="10"
+                accessibilityLabel="Maximum insulin dose setting"
+                accessibilityHint="Enter the maximum insulin units for a single dose"
               />
             </View>
           </View>
-        ))}
+          ))}
+        </View>
 
-        {renderSection('Notifications', (
+        <View accessibilityRole="region" accessible={true} accessibilityLabel="Notification preferences section">
+          {renderSection('Notifications', (
           <View>
             {renderSettingItem(
               <Bell size={20} color="#2563EB" />,
@@ -165,6 +181,8 @@ export default function SettingsScreen() {
                 }
                 trackColor={{ false: '#E5E7EB', true: '#93C5FD' }}
                 thumbColor={notifications.glucoseAlerts ? '#2563EB' : '#9CA3AF'}
+                accessibilityLabel="Glucose alerts toggle"
+                accessibilityHint="Enable or disable high and low blood sugar warnings"
               />
             )}
 
@@ -180,6 +198,8 @@ export default function SettingsScreen() {
                 }
                 trackColor={{ false: '#E5E7EB', true: '#93C5FD' }}
                 thumbColor={notifications.medicationReminders ? '#2563EB' : '#9CA3AF'}
+                accessibilityLabel="Medication reminders toggle"
+                accessibilityHint="Enable or disable medication reminder notifications"
               />
             )}
 
@@ -195,6 +215,8 @@ export default function SettingsScreen() {
                 }
                 trackColor={{ false: '#E5E7EB', true: '#93C5FD' }}
                 thumbColor={notifications.mealReminders ? '#2563EB' : '#9CA3AF'}
+                accessibilityLabel="Meal reminders toggle"
+                accessibilityHint="Enable or disable meal logging reminder notifications"
               />
             )}
 
@@ -210,12 +232,16 @@ export default function SettingsScreen() {
                 }
                 trackColor={{ false: '#E5E7EB', true: '#93C5FD' }}
                 thumbColor={notifications.exerciseReminders ? '#2563EB' : '#9CA3AF'}
+                accessibilityLabel="Exercise reminders toggle"
+                accessibilityHint="Enable or disable exercise reminder notifications"
               />
             )}
           </View>
-        ))}
+          ))}
+        </View>
 
-        {renderSection('Health & Safety', (
+        <View accessibilityRole="region" accessible={true} accessibilityLabel="Health and safety settings section">
+          {renderSection('Health & Safety', (
           <View>
             {renderSettingItem(
               <Shield size={20} color="#DC2626" />,
@@ -236,9 +262,11 @@ export default function SettingsScreen() {
               () => Alert.alert('Healthcare Provider', 'Provider contact options would appear here')
             )}
           </View>
-        ))}
+          ))}
+        </View>
 
-        {renderSection('Support', (
+        <View accessibilityRole="region" accessible={true} accessibilityLabel="Support and help section">
+          {renderSection('Support', (
           <View>
             {renderSettingItem(
               <HelpCircle size={20} color="#6B7280" />,
@@ -259,20 +287,22 @@ export default function SettingsScreen() {
               () => Alert.alert('Privacy Policy', 'Privacy policy would be displayed here')
             )}
           </View>
-        ))}
+          ))}
+        </View>
 
-        <View style={styles.disclaimer}>
+        <View style={styles.disclaimer} accessibilityRole="contentinfo" accessible={true} accessibilityLabel="Medical disclaimer">
           <Text style={styles.disclaimerTitle}>Medical Disclaimer</Text>
           <Text style={styles.disclaimerText}>
             This app is for educational and tracking purposes only. It is not intended to replace professional medical advice, diagnosis, or treatment. Always consult with your healthcare provider before making any decisions about your diabetes management.
           </Text>
         </View>
 
-        <View style={styles.version}>
+        <View style={styles.version} accessibilityRole="contentinfo" accessible={true} accessibilityLabel="App version information">
           <Text style={styles.versionText}>DiabetesCare v1.0.0</Text>
           <Text style={styles.versionSubtext}>Last updated: December 2024</Text>
         </View>
       </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
