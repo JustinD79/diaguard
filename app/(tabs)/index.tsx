@@ -63,7 +63,12 @@ export default function FoodScanScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isOffline, setIsOffline] = useState(typeof window !== 'undefined' ? !navigator.onLine : false);
+  const [isOffline, setIsOffline] = useState(() => {
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+      return !navigator.onLine;
+    }
+    return false;
+  });
   
   const { scansRemaining, canScan, useScan } = useScanLimit();
   const { hasActiveSubscription } = useSubscription();

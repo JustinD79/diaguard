@@ -362,7 +362,7 @@ export class ErrorHandlingService {
            error.code === 'NETWORK_ERROR' ||
            error.message?.includes('fetch') ||
            error.message?.includes('network') ||
-           (typeof window !== 'undefined' && !navigator.onLine);
+           (typeof window !== 'undefined' && typeof navigator !== 'undefined' && !navigator.onLine);
   }
 
   private static isAPIError(error: any): boolean {

@@ -82,7 +82,7 @@ export class OfflineService {
    * Process queued operations when back online
    */
   static async processQueue(): Promise<void> {
-    if (Platform.OS !== 'web' || typeof navigator === 'undefined' || !navigator.onLine) return;
+    if (Platform.OS !== 'web' || typeof window === 'undefined' || typeof navigator === 'undefined' || !navigator.onLine) return;
 
     try {
       const queue = await this.getOperationQueue();
