@@ -23,9 +23,11 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const refreshSubscription = async () => {
     setIsLoading(true);
     try {
-      // In a real app, get the customer ID from user authentication
-      const customerId = 'cus_test_customer';
-      const status = await StripeService.getSubscriptionStatus(customerId);
+      // For development, simulate subscription status
+      const status = {
+        hasActiveSubscription: false,
+        subscription: null
+      };
       
       setHasActiveSubscription(status.hasActiveSubscription);
       if (status.subscription) {

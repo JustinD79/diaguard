@@ -1,7 +1,7 @@
 import { products } from '@/src/stripe-config';
 
 export class StripeService {
-  private static readonly API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || '';
+  private static readonly API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8081';
 
   static readonly subscriptionPlans = products.map(product => ({
     id: product.priceId,
@@ -13,6 +13,14 @@ export class StripeService {
 
   static async getSubscriptionStatus(customerId: string): Promise<SubscriptionStatus> {
     try {
+      // Return mock data if no valid API URL configured
+      if (!this.API_BASE_URL || this.API_BASE_URL === 'http://localhost:8081') {
+        return {
+          hasActiveSubscription: false,
+          subscription: null,
+        };
+      }
+
       const response = await fetch(`${this.API_BASE_URL}/subscription-status/${customerId}`, {
         method: 'GET',
         headers: {
