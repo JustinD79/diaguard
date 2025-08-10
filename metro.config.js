@@ -5,6 +5,12 @@ const { getDefaultConfig } = require('expo/metro-config');
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
 
+// Add resolver alias to prevent stripe from being bundled on web
+config.resolver.alias = {
+  ...config.resolver.alias,
+  'stripe': require.resolve('./metro-shims/stripe-shim.js'),
+};
+
 // Add support for web platform
 config.resolver.platforms = ['ios', 'android', 'native', 'web'];
 
