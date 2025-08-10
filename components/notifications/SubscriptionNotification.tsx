@@ -11,6 +11,7 @@ import { Crown, X, Star, Zap } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useScanLimit } from '@/contexts/ScanLimitContext';
+import { products } from '@/src/stripe-config';
 
 interface SubscriptionNotificationProps {
   visible: boolean;
@@ -27,6 +28,7 @@ export default function SubscriptionNotification({
   const { hasActiveSubscription } = useSubscription();
   const { scansRemaining } = useScanLimit();
   const [slideAnim] = useState(new Animated.Value(300));
+  const product = products[0]; // Diagaurd Diamond Plan
 
   useEffect(() => {
     if (visible) {
@@ -54,9 +56,9 @@ export default function SubscriptionNotification({
     switch (trigger) {
       case 'login':
         return {
-          title: '🎉 Welcome to DiabetesCare!',
+          title: `🎉 Welcome to ${product.name}!`,
           subtitle: 'You have 30 free AI scans this month',
-          description: 'Upgrade to Premium for unlimited scans and advanced features',
+          description: `Upgrade to ${product.name} for unlimited scans and advanced features`,
           buttonText: 'Explore Premium',
           urgency: 'low',
         };
@@ -64,14 +66,14 @@ export default function SubscriptionNotification({
         return {
           title: '📸 Scan Limit Reached',
           subtitle: `You've used all ${30 - scansRemaining}/30 free scans`,
-          description: 'Upgrade to Premium for unlimited AI food scanning',
+          description: `Upgrade to ${product.name} for unlimited AI food scanning`,
           buttonText: 'Upgrade Now',
           urgency: 'high',
         };
       case 'feature_gate':
         return {
           title: '✨ Premium Feature',
-          subtitle: 'This feature requires a Premium subscription',
+          subtitle: `This feature requires a ${product.name} subscription`,
           description: 'Unlock advanced AI analysis and personalized insights',
           buttonText: 'Get Premium',
           urgency: 'medium',
@@ -145,15 +147,15 @@ export default function SubscriptionNotification({
             <View style={styles.features}>
               <View style={styles.featureItem}>
                 <Zap size={16} color="#059669" />
-                <Text style={styles.featureText}>Unlimited AI scans</Text>
+                <Text style={styles.featureText}>Unlimited AI food recognition</Text>
               </View>
               <View style={styles.featureItem}>
                 <Star size={16} color="#059669" />
-                <Text style={styles.featureText}>Advanced analytics</Text>
+                <Text style={styles.featureText}>Advanced health analytics</Text>
               </View>
               <View style={styles.featureItem}>
                 <Crown size={16} color="#059669" />
-                <Text style={styles.featureText}>Priority support</Text>
+                <Text style={styles.featureText}>Premium diabetes management</Text>
               </View>
             </View>
 

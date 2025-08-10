@@ -10,7 +10,11 @@ import { Check, Star } from 'lucide-react-native';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 
+import { products } from '@/src/stripe-config';
+
 export default function SubscriptionSuccessScreen() {
+  const product = products[0]; // Diagaurd Diamond Plan
+
   useEffect(() => {
     // Auto-redirect after 10 seconds
     const timer = setTimeout(() => {
@@ -37,13 +41,13 @@ export default function SubscriptionSuccessScreen() {
 
           <Text style={styles.title}>Welcome to Diamond!</Text>
           <Text style={styles.subtitle}>
-            Your subscription has been activated successfully. You now have access to all premium features.
+            Your {product.name} subscription has been activated successfully. You now have access to all premium features for just ${product.price?.toFixed(2) || '15.00'}/month.
           </Text>
 
           <View style={styles.featuresList}>
             <View style={styles.featureItem}>
               <Check size={16} color="#059669" />
-              <Text style={styles.featureText}>AI-powered food recognition</Text>
+              <Text style={styles.featureText}>Unlimited AI-powered food recognition</Text>
             </View>
             <View style={styles.featureItem}>
               <Check size={16} color="#059669" />
@@ -51,11 +55,11 @@ export default function SubscriptionSuccessScreen() {
             </View>
             <View style={styles.featureItem}>
               <Check size={16} color="#059669" />
-              <Text style={styles.featureText}>Comprehensive health reports</Text>
+              <Text style={styles.featureText}>Comprehensive health analytics</Text>
             </View>
             <View style={styles.featureItem}>
               <Check size={16} color="#059669" />
-              <Text style={styles.featureText}>24/7 emergency support</Text>
+              <Text style={styles.featureText}>Emergency medical information access</Text>
             </View>
           </View>
 

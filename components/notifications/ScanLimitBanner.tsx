@@ -4,11 +4,13 @@ import { Crown, Camera } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useScanLimit } from '@/contexts/ScanLimitContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { products } from '@/src/stripe-config';
 
 export default function ScanLimitBanner() {
   const router = useRouter();
   const { scansRemaining, totalScans } = useScanLimit();
   const { hasActiveSubscription } = useSubscription();
+  const product = products[0]; // Diagaurd Diamond Plan
 
   if (hasActiveSubscription || scansRemaining > 10) return null;
 
@@ -42,8 +44,8 @@ export default function ScanLimitBanner() {
           </Text>
           <Text style={styles.subtitle}>
             {isExhausted 
-              ? 'Upgrade for unlimited scanning' 
-              : 'Upgrade to Premium for unlimited'
+              ? `Upgrade to ${product.name} for unlimited scanning` 
+              : `Upgrade to ${product.name} for unlimited`
             }
           </Text>
         </View>

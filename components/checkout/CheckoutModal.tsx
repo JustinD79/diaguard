@@ -37,7 +37,7 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'card' | 'apple_pay' | 'google_pay'>('card');
 
   const plan = products.find(p => p.priceId === selectedPlan) || products[0];
-  const basePrice = 15.00;
+  const basePrice = plan.price || 15.00;
   
   const calculateDiscount = (promo: PromoCode | null) => {
     if (!promo) return 0;
@@ -235,7 +235,7 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
             <View style={styles.featuresList}>
               <View style={styles.featureItem}>
                 <Check size={16} color="#059669" />
-                <Text style={styles.featureText}>Unlimited AI food scanning</Text>
+                <Text style={styles.featureText}>Unlimited AI-powered food recognition</Text>
               </View>
               <View style={styles.featureItem}>
                 <Check size={16} color="#059669" />
@@ -243,15 +243,15 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
               </View>
               <View style={styles.featureItem}>
                 <Check size={16} color="#059669" />
-                <Text style={styles.featureText}>Personalized health reports</Text>
+                <Text style={styles.featureText}>Comprehensive health analytics</Text>
               </View>
               <View style={styles.featureItem}>
                 <Check size={16} color="#059669" />
-                <Text style={styles.featureText}>Recipe recommendations</Text>
+                <Text style={styles.featureText}>Personalized diabetes-friendly recipes</Text>
               </View>
               <View style={styles.featureItem}>
                 <Check size={16} color="#059669" />
-                <Text style={styles.featureText}>24/7 emergency support</Text>
+                <Text style={styles.featureText}>Emergency medical information access</Text>
               </View>
               <View style={styles.featureItem}>
                 <Check size={16} color="#059669" />
@@ -392,7 +392,7 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
             
             <Text style={styles.termsText}>
               By continuing, you agree to our Terms of Service and Privacy Policy. 
-              You can cancel anytime.
+              {plan.description}
             </Text>
           </View>
         </ScrollView>

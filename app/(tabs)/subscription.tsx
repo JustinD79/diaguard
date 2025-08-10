@@ -122,7 +122,7 @@ export default function SubscriptionScreen() {
             <Star size={24} color="#2563EB" />
           </View>
           <Text style={styles.planName}>{product.name}</Text>
-          <Text style={styles.planPrice}>$15.00<Text style={styles.planPeriod}>/month</Text></Text>
+          <Text style={styles.planPrice}>${product.price?.toFixed(2) || '15.00'}<Text style={styles.planPeriod}>/month</Text></Text>
         </View>
 
         <Text style={styles.planDescription}>{product.description}</Text>
@@ -130,7 +130,7 @@ export default function SubscriptionScreen() {
         <View style={styles.featuresList}>
           <View style={styles.featureItem}>
             <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>AI-powered food recognition</Text>
+            <Text style={styles.featureText}>Unlimited AI-powered food recognition</Text>
           </View>
           <View style={styles.featureItem}>
             <Check size={16} color="#059669" />
@@ -138,19 +138,27 @@ export default function SubscriptionScreen() {
           </View>
           <View style={styles.featureItem}>
             <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Comprehensive health reports</Text>
+            <Text style={styles.featureText}>Comprehensive health analytics</Text>
           </View>
           <View style={styles.featureItem}>
             <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Personalized recipe recommendations</Text>
+            <Text style={styles.featureText}>Personalized diabetes-friendly recipes</Text>
           </View>
           <View style={styles.featureItem}>
             <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>24/7 emergency support</Text>
+            <Text style={styles.featureText}>Emergency medical information access</Text>
           </View>
           <View style={styles.featureItem}>
             <Check size={16} color="#059669" />
             <Text style={styles.featureText}>Medication tracking & reminders</Text>
+          </View>
+          <View style={styles.featureItem}>
+            <Check size={16} color="#059669" />
+            <Text style={styles.featureText}>Seamless monthly billing system</Text>
+          </View>
+          <View style={styles.featureItem}>
+            <Check size={16} color="#059669" />
+            <Text style={styles.featureText}>Multiple subscription tier options</Text>
           </View>
         </View>
 

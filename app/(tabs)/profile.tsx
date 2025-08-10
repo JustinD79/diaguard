@@ -14,6 +14,8 @@ import { User, CreditCard as Edit, Camera, Calendar, Target, Activity, TrendingU
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { Crown } from 'lucide-react-native';
 
 interface UserProfile {
   name: string;
@@ -38,6 +40,7 @@ interface Achievement {
 }
 
 export default function ProfileScreen() {
+  const { hasActiveSubscription, subscriptionPlanName } = useSubscription();
   const [profile, setProfile] = useState<UserProfile>({
     name: 'John Doe',
     email: 'john.doe@email.com',
@@ -135,6 +138,12 @@ export default function ProfileScreen() {
           <Text style={styles.profileDetail}>
             {profile.diabetesType} • {calculateDiabetesDuration(profile.diagnosisDate)}
           </Text>
+          {hasActiveSubscription && subscriptionPlanName && (
+            <View style={styles.subscriptionBadge}>
+              <Crown size={12} color="#2563EB" />
+              <Text style={styles.subscriptionText}>{subscriptionPlanName}</Text>
+            </View>
+          )}
         </View>
         
         <TouchableOpacity
@@ -402,6 +411,22 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
     marginBottom: 2,
+  },
+  subscriptionBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EBF4FF',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginTop: 8,
+    gap: 4,
+    alignSelf: 'flex-start',
+  },
+  subscriptionText: {
+    fontSize: 11,
+    fontFamily: 'Inter-SemiBold',
+    color: '#2563EB',
   },
   editButton: {
     backgroundColor: '#EBF4FF',

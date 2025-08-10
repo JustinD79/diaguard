@@ -10,6 +10,8 @@ export class StripeService {
     description: product.description,
     stripePriceId: product.priceId,
     mode: product.mode,
+    price: product.price,
+    productId: product.productId,
   }));
 
   static async getSubscriptionStatus(customerId: string): Promise<SubscriptionStatus> {

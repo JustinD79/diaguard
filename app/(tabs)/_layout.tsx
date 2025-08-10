@@ -3,12 +3,25 @@ import { Tabs } from 'expo-router';
 import { Camera, Calculator, Heart, ChartBar as BarChart3, Settings, Pill, Shield, User, ChefHat, CreditCard, LogIn } from 'lucide-react-native';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 import { router } from 'expo-router';
+import { Crown } from 'lucide-react-native';
 
 function AuthPrompt() {
+  const { hasActiveSubscription, subscriptionPlanName } = useSubscription();
   const handleSignIn = () => {
     router.push('/(auth)/login');
   };
+
+  // Show subscription status for authenticated users
+  if (hasActiveSubscription && subscriptionPlanName) {
+    return (
+      <View style={styles.subscriptionStatus}>
+        <Crown size={16} color="#2563EB" />
+        <Text style={styles.subscriptionStatusText}>{subscriptionPlanName} Active</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.authPrompt}>
@@ -23,13 +36,14 @@ function AuthPrompt() {
 
 export default function TabLayout() {
   const { user, isGuest, isLoading } = useAuth();
+  const { hasActiveSubscription } = useSubscription();
 
   // Show auth prompt for guests
-  const showAuthPrompt = !user && !isGuest && !isLoading;
+  const showStatusBar = !isLoading && ((!user && !isGuest) || (user && hasActiveSubscription));
 
   return (
     <>
-      {showAuthPrompt && <AuthPrompt />}
+      {showStatusBar && <AuthPrompt />}
       <Tabs
         screenOptions={{
           headerShown: false,
@@ -183,6 +197,22 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   authPromptButtonText: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#2563EB',
+  },
+  subscriptionStatus: {
+    backgroundColor: '#EBF4FF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    gap: 6,
+  },
+  subscriptionStatusText: {
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
     color: '#2563EB',

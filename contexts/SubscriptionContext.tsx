@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { StripeService } from '@/services/StripeService';
 import { useAuth } from '@/contexts/AuthContext';
+import { products } from '@/src/stripe-config';
 
 interface SubscriptionContextType {
   hasActiveSubscription: boolean;
   subscriptionPlan: string | null;
+  subscriptionPlanName: string | null;
   isLoading: boolean;
   refreshSubscription: () => Promise<void>;
   isPremiumFeature: (feature: string) => boolean;
@@ -21,6 +23,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const { user, isGuest } = useAuth();
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
+  const [subscriptionPlanName, setSubscriptionPlanName] = useState<string | null>(null);
   const [hasPromoCodeAccess, setHasPromoCodeAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -39,13 +42,16 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
           p => p.stripePriceId === status.subscription?.priceId
         );
         setSubscriptionPlan(plan?.id || null);
+        setSubscriptionPlanName(plan?.name || null);
       } else {
         setSubscriptionPlan(hasPromoCodeAccess ? 'promo_premium' : null);
+        setSubscriptionPlanName(hasPromoCodeAccess ? products[0].name : null);
       }
     } catch (error) {
       console.error('Error refreshing subscription:', error);
       setHasActiveSubscription(false);
       setSubscriptionPlan(null);
+      setSubscriptionPlanName(null);
       setHasPromoCodeAccess(false);
     } finally {
       setIsLoading(false);
@@ -84,16 +90,19 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       setIsLoading(false);
       setHasActiveSubscription(true);
       setHasPromoCodeAccess(true);
+      setSubscriptionPlanName(products[0].name);
     } else if (isGuest) {
       // Guest users have limited access
       setIsLoading(false);
       setHasActiveSubscription(false);
       setHasPromoCodeAccess(false);
+      setSubscriptionPlanName(null);
     } else {
       // Not logged in, redirect to auth
       setIsLoading(false);
       setHasActiveSubscription(false);
       setHasPromoCodeAccess(false);
+      setSubscriptionPlanName(null);
     }
   }, [user, isGuest]);
 
@@ -102,6 +111,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       value={{
         hasActiveSubscription,
         subscriptionPlan,
+        subscriptionPlanName,
         isLoading,
         refreshSubscription,
         isPremiumFeature,
