@@ -15,6 +15,8 @@ import { Heart, X, Mail, Lock, Eye, EyeOff, User } from 'lucide-react-native';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { Alert } from 'react-native';
 
 interface SignupModalProps {
   visible: boolean;
@@ -52,19 +54,36 @@ export default function SignupModal({ visible, onClose, onSwitchToLogin }: Signu
     setLoading(true);
     setError('');
 
-    const result = await signUp(email, password);
-    
-    if (result.error) {
-      setError(result.error);
-    } else {
-      // Check if promo code was entered
-      if (promoCode.trim()) {
-        await handlePromoCodeRedemption(promoCode.trim());
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo: undefined,
+        },
+      });
+
+      if (error) {
+        console.error('Signup error:', error);
+        setError(error.message);
+      } else {
+        // Check if promo code was entered
+        if (promoCode.trim()) {
+          await handlePromoCodeRedemption(promoCode.trim());
+        }
+        onClose();
+        // Clear form
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setPromoCode('');
       }
-      onClose();
+    } catch (err) {
+      console.error('Signup exception:', err);
+      setError('An unexpected error occurred');
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   const handlePromoCodeRedemption = async (code: string) => {
@@ -72,7 +91,8 @@ export default function SignupModal({ visible, onClose, onSwitchToLogin }: Signu
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const response = await fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/redeem-promo-code`, {
+      const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://kmlhyqusrxqkmaaefbhs.supabase.co';
+      const response = await fetch(`${supabaseUrl}/functions/v1/redeem-promo-code`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

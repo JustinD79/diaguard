@@ -17,6 +17,7 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { Alert } from 'react-native';
 
 interface LoginModalProps {
   visible: boolean;
@@ -41,15 +42,27 @@ export default function LoginModal({ visible, onClose, onSwitchToSignup }: Login
     setLoading(true);
     setError('');
 
-    const result = await signIn(email, password);
-    
-    if (result.error) {
-      setError(result.error);
-    } else {
-      onClose();
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (error) {
+        console.error('Login error:', error);
+        setError(error.message);
+      } else {
+        onClose();
+        // Clear form
+        setEmail('');
+        setPassword('');
+      }
+    } catch (err) {
+      console.error('Login exception:', err);
+      setError('An unexpected error occurred');
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {

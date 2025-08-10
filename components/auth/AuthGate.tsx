@@ -22,11 +22,11 @@ export default function AuthGate({ children }: AuthGateProps) {
         // Reset previous user when logged out
         setPreviousUser(null);
         // Show login modal when not authenticated
-        setShowLogin(true);
+        setTimeout(() => setShowLogin(true), 100);
       } else if (user && previousUser !== user.id) {
         // Show subscription notification after login/signup
         setPreviousUser(user.id);
-        setShowSubscriptionNotification(true);
+        setTimeout(() => setShowSubscriptionNotification(true), 500);
       }
     }
   }, [user, loading, previousUser]);
