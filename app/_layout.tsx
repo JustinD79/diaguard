@@ -10,8 +10,6 @@ import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 import { ScanLimitProvider } from '@/contexts/ScanLimitContext';
 import AuthGate from '@/components/auth/AuthGate';
 
-SplashScreen.preventAutoHideAsync();
-
 export default function RootLayout() {
   useFrameworkReady();
   
@@ -19,6 +17,10 @@ export default function RootLayout() {
     'Inter-Regular': Inter_400Regular,
     'Inter-Bold': Inter_700Bold,
   });
+
+  useEffect(() => {
+    SplashScreen.preventAutoHideAsync();
+  }, []);
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
