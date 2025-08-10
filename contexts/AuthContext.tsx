@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Platform } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { Session, User } from '@supabase/supabase-js';
 
@@ -85,7 +86,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/(tabs)`,
+          redirectTo: Platform.OS === 'web' && typeof window !== 'undefined' 
+            ? `${window.location.origin}/(tabs)` 
+            : undefined,
         },
       });
 

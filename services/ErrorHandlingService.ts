@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 export class ErrorHandlingService {
   private static errorLog: ErrorLogEntry[] = [];
   private static maxLogSize = 1000;
@@ -311,8 +313,8 @@ export class ErrorHandlingService {
   private static async logError(errorInfo: ErrorInfo): Promise<void> {
     const logEntry: ErrorLogEntry = {
       ...errorInfo,
-      userAgent: navigator.userAgent,
-      url: window.location.href,
+      userAgent: Platform.OS === 'web' && typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+      url: Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.href : 'unknown',
       userId: await this.getCurrentUserId(),
       sessionId: this.getSessionId(),
       deviceInfo: this.getDeviceInfo()
@@ -384,16 +386,18 @@ export class ErrorHandlingService {
   }
 
   private static getSessionId(): string {
-    return sessionStorage.getItem('sessionId') || 'unknown';
+    return Platform.OS === 'web' && typeof sessionStorage !== 'undefined' 
+      ? sessionStorage.getItem('sessionId') || 'unknown'
+      : 'unknown';
   }
 
   private static getDeviceInfo(): DeviceInfo {
     return {
-      platform: navigator.platform,
-      userAgent: navigator.userAgent,
-      language: navigator.language,
-      cookieEnabled: navigator.cookieEnabled,
-      onLine: navigator.onLine
+      platform: Platform.OS === 'web' && typeof navigator !== 'undefined' ? navigator.platform : Platform.OS,
+      userAgent: Platform.OS === 'web' && typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+      language: Platform.OS === 'web' && typeof navigator !== 'undefined' ? navigator.language : 'unknown',
+      cookieEnabled: Platform.OS === 'web' && typeof navigator !== 'undefined' ? navigator.cookieEnabled : false,
+      onLine: Platform.OS === 'web' && typeof navigator !== 'undefined' ? navigator.onLine : true
     };
   }
 
@@ -409,14 +413,19 @@ export class ErrorHandlingService {
 
   private static async enableOfflineMode(): Promise<void> {
     // Enable offline functionality
-    localStorage.setItem('offlineMode', 'true');
+    if (Platform.OS === 'web' && typeof localStorage !== 'undefined') {
+      localStorage.setItem('offlineMode', 'true');
+    }
   }
 
   private static async requestCameraPermission(): Promise<boolean> {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop());
-      return true;
+      if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.mediaDevices) {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream.getTracks().forEach(track => track.stop());
+        return true;
+      }
+      return false;
     } catch {
       return false;
     }
@@ -434,7 +443,7 @@ export class ErrorHandlingService {
 
   private static async sendToRemoteLogging(logEntry: ErrorLogEntry): Promise<void> {
     // Send to your logging service (Sentry, LogRocket, etc.)
-    if (navigator.onLine) {
+    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.onLine) {
       await fetch('/api/errors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -444,9 +453,11 @@ export class ErrorHandlingService {
   }
 
   private static async storeErrorLocally(logEntry: ErrorLogEntry): Promise<void> {
-    const errors = JSON.parse(localStorage.getItem('errorLog') || '[]');
-    errors.unshift(logEntry);
-    localStorage.setItem('errorLog', JSON.stringify(errors.slice(0, 100)));
+    if (Platform.OS === 'web' && typeof localStorage !== 'undefined') {
+      const errors = JSON.parse(localStorage.getItem('errorLog') || '[]');
+      errors.unshift(logEntry);
+      localStorage.setItem('errorLog', JSON.stringify(errors.slice(0, 100)));
+    }
   }
 
   /**
@@ -458,7 +469,9 @@ export class ErrorHandlingService {
 
   static clearErrorLog(): void {
     this.errorLog = [];
-    localStorage.removeItem('errorLog');
+    if (Platform.OS === 'web' && typeof localStorage !== 'undefined') {
+      localStorage.removeItem('errorLog');
+    }
   }
 
   static getErrorStats(): ErrorStats {
