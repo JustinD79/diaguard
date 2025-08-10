@@ -121,7 +121,7 @@ export default function FoodScanScreen() {
 
   // Monitor network status
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return;
     
     const handleOnline = () => {
       setIsOffline(false);
@@ -131,7 +131,9 @@ export default function FoodScanScreen() {
     const handleOffline = () => setIsOffline(true);
     
     // Set initial state
-    setIsOffline(!navigator.onLine);
+    if (typeof navigator !== 'undefined') {
+      setIsOffline(!navigator.onLine);
+    }
     
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);

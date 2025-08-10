@@ -8,11 +8,9 @@ declare global {
 }
 
 export function useFrameworkReady() {
-  if (typeof window !== 'undefined') {
-    useEffect(() => {
-      if (Platform.OS === 'web') {
-        window.frameworkReady?.();
-      }
-    })
-  }
+  useEffect(() => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      window.frameworkReady?.();
+    }
+  }, []);
 }
