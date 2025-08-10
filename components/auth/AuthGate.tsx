@@ -14,20 +14,22 @@ export default function AuthGate({ children }: AuthGateProps) {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [showSubscriptionNotification, setShowSubscriptionNotification] = useState(false);
-  const [hasShownWelcome, setHasShownWelcome] = useState(false);
+  const [previousUser, setPreviousUser] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
+        // Reset previous user when logged out
+        setPreviousUser(null);
         // Show login modal when not authenticated
         setShowLogin(true);
-      } else if (!hasShownWelcome) {
+      } else if (user && previousUser !== user.id) {
         // Show subscription notification after login/signup
+        setPreviousUser(user.id);
         setShowSubscriptionNotification(true);
-        setHasShownWelcome(true);
       }
     }
-  }, [user, loading, hasShownWelcome]);
+  }, [user, loading, previousUser]);
 
   const handleCloseLogin = () => {
     setShowLogin(false);
