@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export class OfflineService {
@@ -263,13 +264,6 @@ export class OfflineService {
       return timestamp ? new Date(parseInt(timestamp)) : null;
     } catch {
       return null;
-    }
-  }
-
-  private static async enableOfflineMode(): Promise<void> {
-    // Enable offline functionality
-    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem('offlineMode', 'true');
     }
   }
 }

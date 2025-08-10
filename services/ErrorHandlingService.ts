@@ -422,7 +422,7 @@ export class ErrorHandlingService {
 
   private static async requestCameraPermission(): Promise<boolean> {
     try {
-      if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof navigator !== 'undefined' && navigator.mediaDevices) {
+      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.navigator && navigator.mediaDevices) {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         stream.getTracks().forEach(track => track.stop());
         return true;
