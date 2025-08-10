@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
-import 'react-native-url-polyfill/auto';
 
 // Get environment variables from Expo Constants for better compatibility
 const supabaseUrl = Constants.expoConfig?.extra?.supabaseUrl || process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://kmlhyqusrxqkmaaefbhs.supabase.co';
