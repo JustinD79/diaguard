@@ -22,7 +22,7 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
   const [scansRemaining, setScansRemaining] = useState(30);
   const [totalScans, setTotalScans] = useState(0);
   const { user } = useAuth();
-  const { hasActiveSubscription } = useSubscription();
+  const { hasActiveSubscription, hasPromoCodeAccess } = useSubscription();
 
   const FREE_SCAN_LIMIT = 30;
 
@@ -47,7 +47,7 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
       
       setTotalScans(usedScans);
       
-      if (hasActiveSubscription) {
+      if (hasActiveSubscription || hasPromoCodeAccess) {
         setScansRemaining(999); // Unlimited for premium users
       } else {
         setScansRemaining(Math.max(0, FREE_SCAN_LIMIT - usedScans));
@@ -58,7 +58,7 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
   };
 
   const useScan = async (): Promise<boolean> => {
-    if (hasActiveSubscription) {
+    if (hasActiveSubscription || hasPromoCodeAccess) {
       return true; // Unlimited scans for premium users
     }
 
@@ -103,7 +103,7 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
     }
   };
 
-  const canScan = hasActiveSubscription || scansRemaining > 0;
+  const canScan = hasActiveSubscription || hasPromoCodeAccess || scansRemaining > 0;
 
   return (
     <ScanLimitContext.Provider

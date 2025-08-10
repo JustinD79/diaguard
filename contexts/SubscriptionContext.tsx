@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { StripeService } from '@/services/StripeService';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from './AuthContext';
 
 interface SubscriptionContextType {
   hasActiveSubscription: boolean;
@@ -7,6 +9,7 @@ interface SubscriptionContextType {
   isLoading: boolean;
   refreshSubscription: () => Promise<void>;
   isPremiumFeature: (feature: string) => boolean;
+  hasPromoCodeAccess: boolean;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -18,30 +21,46 @@ interface SubscriptionProviderProps {
 export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
+  const [hasPromoCodeAccess, setHasPromoCodeAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
   const refreshSubscription = async () => {
     setIsLoading(true);
     try {
+      // Check for promo code access first
+      if (user) {
+        const { data: promoAccess } = await supabase
+          .from('user_promo_codes')
+          .select('promo_codes(benefits)')
+          .eq('user_id', user.id);
+
+        const hasValidPromo = promoAccess?.some((access: any) => 
+          access.promo_codes?.benefits?.premium_features === true
+        );
+        setHasPromoCodeAccess(!!hasValidPromo);
+      }
+
       // For development, simulate subscription status
       const status = {
-        hasActiveSubscription: false,
+        hasActiveSubscription: hasPromoCodeAccess,
         subscription: null
       };
       
-      setHasActiveSubscription(status.hasActiveSubscription);
+      setHasActiveSubscription(status.hasActiveSubscription || hasPromoCodeAccess);
       if (status.subscription) {
         const plan = StripeService.subscriptionPlans.find(
           p => p.stripePriceId === status.subscription?.priceId
         );
         setSubscriptionPlan(plan?.id || null);
       } else {
-        setSubscriptionPlan(null);
+        setSubscriptionPlan(hasPromoCodeAccess ? 'promo_premium' : null);
       }
     } catch (error) {
       console.error('Error refreshing subscription:', error);
       setHasActiveSubscription(false);
       setSubscriptionPlan(null);
+      setHasPromoCodeAccess(false);
     } finally {
       setIsLoading(false);
     }
@@ -60,12 +79,12 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       'priority_support'
     ];
 
-    return premiumFeatures.includes(feature) && !hasActiveSubscription;
+    return premiumFeatures.includes(feature) && !hasActiveSubscription && !hasPromoCodeAccess;
   };
 
   useEffect(() => {
     refreshSubscription();
-  }, []);
+  }, [user]);
 
   return (
     <SubscriptionContext.Provider
@@ -75,6 +94,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         isLoading,
         refreshSubscription,
         isPremiumFeature,
+        hasPromoCodeAccess,
       }}
     >
       {children}

@@ -26,6 +26,8 @@ export default function SignupModal({ visible, onClose, onSwitchToLogin }: Signu
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [promoCode, setPromoCode] = useState('');
+  const [showPromoCode, setShowPromoCode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -55,12 +57,42 @@ export default function SignupModal({ visible, onClose, onSwitchToLogin }: Signu
     if (result.error) {
       setError(result.error);
     } else {
+      // Check if promo code was entered
+      if (promoCode.trim()) {
+        await handlePromoCodeRedemption(promoCode.trim());
+      }
       onClose();
     }
     
     setLoading(false);
   };
 
+  const handlePromoCodeRedemption = async (code: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const response = await fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/redeem-promo-code`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ code }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        Alert.alert(
+          '🎉 Promo Code Redeemed!',
+          'You now have access to all premium features!',
+          [{ text: 'Awesome!' }]
+        );
+      }
+    } catch (error) {
+      console.error('Error redeeming promo code:', error);
+    }
+  };
   const handleGoogleSignup = async () => {
     setLoading(true);
     setError('');
@@ -152,6 +184,25 @@ export default function SignupModal({ visible, onClose, onSwitchToLogin }: Signu
                 leftIcon={<Lock size={20} color="#6B7280" />}
               />
 
+              {showPromoCode && (
+                <Input
+                  label="Promo Code (Optional)"
+                  value={promoCode}
+                  onChangeText={setPromoCode}
+                  placeholder="Enter promo code for premium access"
+                  autoCapitalize="characters"
+                  leftIcon={<Star size={20} color="#6B7280" />}
+                />
+              )}
+
+              <TouchableOpacity
+                style={styles.promoToggle}
+                onPress={() => setShowPromoCode(!showPromoCode)}
+              >
+                <Text style={styles.promoToggleText}>
+                  {showPromoCode ? 'Hide' : 'Have a'} promo code?
+                </Text>
+              </TouchableOpacity>
               <Button
                 title={loading ? 'Creating Account...' : 'Create Account'}
                 onPress={handleSignup}
@@ -320,6 +371,15 @@ const styles = StyleSheet.create({
   link: {
     color: '#6B4EFF',
     fontFamily: 'Inter-SemiBold',
+  },
+  promoToggle: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  promoToggleText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#6B4EFF',
   },
   featuresSection: {
     backgroundColor: '#FFFFFF',

@@ -9,12 +9,14 @@ import {
   Platform,
   ScrollView,
   Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Heart, X, Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
+import { Heart, X, Mail, Lock, Eye, EyeOff, Star } from 'lucide-react-native';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 interface LoginModalProps {
   visible: boolean;
