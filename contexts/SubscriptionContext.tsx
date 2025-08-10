@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { StripeService } from '@/services/StripeService';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from './AuthContext';
 
 interface SubscriptionContextType {
   hasActiveSubscription: boolean;
@@ -23,24 +21,10 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
   const [hasPromoCodeAccess, setHasPromoCodeAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAuth();
 
   const refreshSubscription = async () => {
     setIsLoading(true);
     try {
-      // Check for promo code access first
-      if (user) {
-        const { data: promoAccess } = await supabase
-          .from('user_promo_codes')
-          .select('promo_codes(benefits)')
-          .eq('user_id', user.id);
-
-        const hasValidPromo = promoAccess?.some((access: any) => 
-          access.promo_codes?.benefits?.premium_features === true
-        );
-        setHasPromoCodeAccess(!!hasValidPromo);
-      }
-
       // For development, simulate subscription status
       const status = {
         hasActiveSubscription: hasPromoCodeAccess,
@@ -83,8 +67,11 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   };
 
   useEffect(() => {
-    refreshSubscription();
-  }, [user]);
+    // Set default state for demo
+    setIsLoading(false);
+    setHasActiveSubscription(false);
+    setHasPromoCodeAccess(false);
+  }, []);
 
   return (
     <SubscriptionContext.Provider

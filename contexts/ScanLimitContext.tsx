@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from './AuthContext';
 import { useSubscription } from './SubscriptionContext';
 
 interface ScanLimitContextType {
@@ -21,22 +20,19 @@ interface ScanLimitProviderProps {
 export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
   const [scansRemaining, setScansRemaining] = useState(30);
   const [totalScans, setTotalScans] = useState(0);
-  const { user } = useAuth();
   const { hasActiveSubscription, hasPromoCodeAccess } = useSubscription();
 
   const FREE_SCAN_LIMIT = 30;
 
   useEffect(() => {
-    if (user) {
-      loadScanData();
-    }
-  }, [user]);
+    loadScanData();
+  }, []);
 
   const getScanKey = () => {
     const now = new Date();
     const month = now.getMonth();
     const year = now.getFullYear();
-    return `scans_${user?.id}_${year}_${month}`;
+    return `scans_demo_user_${year}_${month}`;
   };
 
   const loadScanData = async () => {

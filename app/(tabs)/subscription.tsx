@@ -5,15 +5,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
-  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CreditCard, Check, Star, Shield, Zap } from 'lucide-react-native';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { supabase } from '@/lib/supabase';
 import { products } from '@/src/stripe-config';
+import CheckoutModal from '@/components/checkout/CheckoutModal';
 
 interface Subscription {
   subscription_status: string;
@@ -25,72 +23,17 @@ interface Subscription {
 export default function SubscriptionScreen() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string>('');
 
   useEffect(() => {
-    fetchSubscription();
+    // Simulate loading
+    setTimeout(() => setLoading(false), 1000);
   }, []);
 
-  const fetchSubscription = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('stripe_user_subscriptions')
-        .select('*')
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching subscription:', error);
-      } else {
-        setSubscription(data);
-      }
-    } catch (error) {
-      console.error('Error fetching subscription:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubscribe = async (priceId: string) => {
-    setCheckoutLoading(true);
-
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        Alert.alert('Error', 'Please log in to subscribe');
-        return;
-      }
-
-      const response = await fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/stripe-checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          price_id: priceId,
-          success_url: `${window.location.origin}/subscription/success`,
-          cancel_url: `${window.location.origin}/subscription`,
-          mode: 'subscription',
-        }),
-      });
-
-      const { url, error } = await response.json();
-
-      if (error) {
-        Alert.alert('Error', error);
-        return;
-      }
-
-      if (url) {
-        Linking.openURL(url);
-      }
-    } catch (error) {
-      console.error('Error creating checkout session:', error);
-      Alert.alert('Error', 'Failed to start checkout process');
-    } finally {
-      setCheckoutLoading(false);
-    }
+  const handleSubscribe = (priceId: string) => {
+    setSelectedPlan(priceId);
+    setShowCheckout(true);
   };
 
   const getSubscriptionStatus = () => {
@@ -212,9 +155,9 @@ export default function SubscriptionScreen() {
         </View>
 
         <Button
-          title={hasActiveSubscription ? 'Already Subscribed' : (checkoutLoading ? 'Processing...' : 'Subscribe Now')}
+          title={hasActiveSubscription ? 'Already Subscribed' : 'Subscribe Now'}
           onPress={() => handleSubscribe(product.priceId)}
-          disabled={hasActiveSubscription || checkoutLoading}
+          disabled={hasActiveSubscription}
           style={[styles.subscribeButton, hasActiveSubscription && styles.disabledButton]}
         />
       </Card>
@@ -286,6 +229,12 @@ export default function SubscriptionScreen() {
         {renderCurrentSubscription()}
         {renderPricingCard()}
         {renderBenefits()}
+        
+        <CheckoutModal
+          visible={showCheckout}
+          onClose={() => setShowCheckout(false)}
+          selectedPlan={selectedPlan}
+        />
       </ScrollView>
     </SafeAreaView>
   );
