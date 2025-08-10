@@ -13,6 +13,9 @@ import Button from '@/components/ui/Button';
 import { products } from '@/src/stripe-config';
 import CheckoutModal from '@/components/checkout/CheckoutModal';
 
+// Add dynamic export to disable SSR for this component
+export const dynamic = 'force-dynamic';
+
 interface Subscription {
   subscription_status: string;
   price_id: string | null;

@@ -16,6 +16,9 @@ import Input from '@/components/ui/Input';
 import { products } from '@/src/stripe-config';
 import { CheckoutService } from '@/services/CheckoutService';
 
+// Add dynamic export to disable SSR for this component
+export const dynamic = 'force-dynamic';
+
 interface CheckoutModalProps {
   visible: boolean;
   onClose: () => void;

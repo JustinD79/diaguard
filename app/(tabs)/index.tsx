@@ -64,9 +64,6 @@ export default function FoodScanScreen() {
   const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOffline, setIsOffline] = useState(() => {
-    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
-      return !navigator.onLine;
-    }
     return false;
   });
   
@@ -124,7 +121,7 @@ export default function FoodScanScreen() {
 
   // Monitor network status
   useEffect(() => {
-    if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return;
     
     const handleOnline = () => {
       setIsOffline(false);
@@ -132,6 +129,9 @@ export default function FoodScanScreen() {
     };
     
     const handleOffline = () => setIsOffline(true);
+    
+    // Set initial state
+    setIsOffline(!navigator.onLine);
     
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);

@@ -147,9 +147,9 @@ export class CheckoutService {
   static isPaymentMethodAvailable(method: string): boolean {
     switch (method) {
       case 'apple_pay':
-        return typeof window !== 'undefined' && 'ApplePaySession' in window;
+        return false; // Will be checked dynamically in useEffect
       case 'google_pay':
-        return typeof window !== 'undefined' && 'google' in window;
+        return false; // Will be checked dynamically in useEffect
       case 'card':
       default:
         return true;

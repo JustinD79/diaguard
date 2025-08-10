@@ -148,7 +148,7 @@ export class OfflineService {
    * Check if app can function offline
    */
   static async canFunctionOffline(): Promise<boolean> {
-    if (typeof window === 'undefined') return false;
+    if (typeof window === 'undefined') return;
     
     const essentialData = [
       'user_profile',

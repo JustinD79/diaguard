@@ -37,7 +37,7 @@ export default function ErrorDisplay({
   const getIcon = () => {
     switch (type) {
       case 'network':
-        return isOffline ? <WifiOff size={20} color="#DC2626" /> : <Wifi size={20} color="#DC2626" />;
+        return <WifiOff size={20} color="#DC2626" />;
       case 'medical':
         return <AlertTriangle size={20} color="#DC2626" />;
       default:
