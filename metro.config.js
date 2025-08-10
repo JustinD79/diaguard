@@ -12,6 +12,12 @@ config.resolver.alias = {
   'stripe': require.resolve('./metro-shims/stripe-shim.js'),
 };
 
+// Block server-side files from being bundled
+config.resolver.blockList = [
+  /supabase\/functions\/.*/,
+  /.*\+api\.ts$/,
+];
+
 // Add support for web platform
 config.resolver.platforms = ['ios', 'android', 'native', 'web'];
 
