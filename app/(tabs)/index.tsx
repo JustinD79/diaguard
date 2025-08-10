@@ -121,27 +121,25 @@ export default function FoodScanScreen() {
 
   // Monitor network status
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof navigator === 'undefined') return;
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+      const handleOnline = () => {
+        setIsOffline(false);
+        OfflineService.processQueue(); // Process queued operations
+      };
     
-    const handleOnline = () => {
-      setIsOffline(false);
-      OfflineService.processQueue(); // Process queued operations
-    };
-    
-    const handleOffline = () => setIsOffline(true);
-    
-    // Set initial state
-    if (typeof navigator !== 'undefined') {
+      const handleOffline = () => setIsOffline(true);
+      
+      // Set initial state
       setIsOffline(!navigator.onLine);
+      
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+      
+      return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      };
     }
-    
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
   }, []);
 
   // Enhanced nutrition database with AI-powered data

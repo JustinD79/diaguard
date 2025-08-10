@@ -20,14 +20,14 @@ interface ScanLimitProviderProps {
 
 export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
   const { user, isGuest } = useAuth();
-  const [scansRemaining, setScansRemaining] = useState(30);
+  const [scansRemaining, setScansRemaining] = useState(0);
   const [totalScans, setTotalScans] = useState(0);
   const { hasActiveSubscription, hasPromoCodeAccess } = useSubscription();
 
   const FREE_SCAN_LIMIT = 30;
 
   useEffect(() => {
-    if (user || isGuest) {
+    if ((user || isGuest) && typeof window !== 'undefined') {
       loadScanData();
     }
   }, [user, isGuest]);

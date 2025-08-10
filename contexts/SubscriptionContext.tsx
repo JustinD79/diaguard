@@ -85,24 +85,26 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   };
 
   useEffect(() => {
-    if (user) {
-      // Logged in users get full access for demo
-      setIsLoading(false);
-      setHasActiveSubscription(true);
-      setHasPromoCodeAccess(true);
-      setSubscriptionPlanName(products[0].name);
-    } else if (isGuest) {
-      // Guest users have limited access
-      setIsLoading(false);
-      setHasActiveSubscription(false);
-      setHasPromoCodeAccess(false);
-      setSubscriptionPlanName(null);
-    } else {
-      // Not logged in, redirect to auth
-      setIsLoading(false);
-      setHasActiveSubscription(false);
-      setHasPromoCodeAccess(false);
-      setSubscriptionPlanName(null);
+    if (typeof window !== 'undefined') {
+      if (user) {
+        // Logged in users get full access for demo
+        setIsLoading(false);
+        setHasActiveSubscription(true);
+        setHasPromoCodeAccess(true);
+        setSubscriptionPlanName(products[0].name);
+      } else if (isGuest) {
+        // Guest users have limited access
+        setIsLoading(false);
+        setHasActiveSubscription(false);
+        setHasPromoCodeAccess(false);
+        setSubscriptionPlanName(null);
+      } else {
+        // Not logged in, redirect to auth
+        setIsLoading(false);
+        setHasActiveSubscription(false);
+        setHasPromoCodeAccess(false);
+        setSubscriptionPlanName(null);
+      }
     }
   }, [user, isGuest]);
 

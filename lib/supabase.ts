@@ -13,6 +13,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: Platform.OS === 'web' && typeof window !== 'undefined',
+    detectSessionInUrl: false, // Disable to prevent SSR issues
   },
 });

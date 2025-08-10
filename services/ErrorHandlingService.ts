@@ -341,9 +341,9 @@ export class ErrorHandlingService {
    * Network connectivity check
    */
   private static async checkNetworkConnectivity(): Promise<boolean> {
+    if (typeof window === 'undefined' || typeof fetch === 'undefined') return false;
+    
     try {
-      if (typeof window === 'undefined' || typeof fetch === 'undefined') return false;
-      
       const response = await fetch('/api/health', { 
         method: 'HEAD',
         cache: 'no-cache'
@@ -362,7 +362,7 @@ export class ErrorHandlingService {
            error.code === 'NETWORK_ERROR' ||
            error.message?.includes('fetch') ||
            error.message?.includes('network') ||
-           (typeof window !== 'undefined' && !navigator.onLine);
+           (typeof window !== 'undefined' && typeof navigator !== 'undefined' && !navigator.onLine);
   }
 
   private static isAPIError(error: any): boolean {
@@ -388,16 +388,30 @@ export class ErrorHandlingService {
   }
 
   private static getSessionId(): string {
-    if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof sessionStorage !== 'undefined') {
-      return sessionStorage.getItem('sessionId') || 'unknown';
+    if (typeof window !== 'undefined' && typeof sessionStorage !== 'undefined') {
+      try {
+        return sessionStorage.getItem('sessionId') || 'unknown';
+      } catch {
+        return 'unknown';
+      }
     }
     return 'unknown';
   }
 
   private static getDeviceInfo(): DeviceInfo {
-    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    if (typeof window === 'undefined') {
       return {
         platform: Platform.OS,
+        userAgent: 'unknown',
+        language: 'unknown',
+        cookieEnabled: false,
+        onLine: true
+      };
+    }
+
+    if (typeof navigator === 'undefined') {
+      return {
+        platform: 'web',
         userAgent: 'unknown',
         language: 'unknown',
         cookieEnabled: false,
@@ -426,14 +440,22 @@ export class ErrorHandlingService {
 
   private static async enableOfflineMode(): Promise<void> {
     // Enable offline functionality
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-      localStorage.setItem('offlineMode', 'true');
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('offlineMode', 'true');
+      } catch {
+        // Ignore localStorage errors
+      }
     }
   }
 
   private static async requestCameraPermission(): Promise<boolean> {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      return false;
+    }
+    
     try {
-      if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && navigator.mediaDevices) {
+      if (navigator.mediaDevices) {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         stream.getTracks().forEach(track => track.stop());
         return true;
@@ -456,20 +478,30 @@ export class ErrorHandlingService {
 
   private static async sendToRemoteLogging(logEntry: ErrorLogEntry): Promise<void> {
     // Send to your logging service (Sentry, LogRocket, etc.)
-    if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && typeof fetch !== 'undefined' && navigator.onLine) {
-      await fetch('/api/errors', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(logEntry)
-      });
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && typeof fetch !== 'undefined') {
+      try {
+        if (navigator.onLine) {
+          await fetch('/api/errors', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(logEntry)
+          });
+        }
+      } catch {
+        // Ignore logging errors
+      }
     }
   }
 
   private static async storeErrorLocally(logEntry: ErrorLogEntry): Promise<void> {
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-      const errors = JSON.parse(localStorage.getItem('errorLog') || '[]');
-      errors.unshift(logEntry);
-      localStorage.setItem('errorLog', JSON.stringify(errors.slice(0, 100)));
+    if (typeof window !== 'undefined') {
+      try {
+        const errors = JSON.parse(localStorage.getItem('errorLog') || '[]');
+        errors.unshift(logEntry);
+        localStorage.setItem('errorLog', JSON.stringify(errors.slice(0, 100)));
+      } catch {
+        // Ignore localStorage errors
+      }
     }
   }
 
@@ -482,8 +514,12 @@ export class ErrorHandlingService {
 
   static clearErrorLog(): void {
     this.errorLog = [];
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-      localStorage.removeItem('errorLog');
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('errorLog');
+      } catch {
+        // Ignore localStorage errors
+      }
     }
   }
 
