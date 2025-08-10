@@ -8,7 +8,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#2563EB',
+        tabBarActiveTintColor: '#6B4EFF',
         tabBarInactiveTintColor: '#6B7280',
         tabBarLabelStyle: styles.tabBarLabel,
         tabBarAccessibilityLabel: 'Main navigation tabs',
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: '#EAE6F7',
     paddingBottom: 5,
     paddingTop: 5,
     height: 60,

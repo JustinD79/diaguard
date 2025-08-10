@@ -58,17 +58,17 @@ export default function ScanLimitBanner() {
 
 const styles = StyleSheet.create({
   banner: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#6B4EFF',
     marginHorizontal: 20,
     marginBottom: 16,
     borderRadius: 12,
     overflow: 'hidden',
   },
   urgentBanner: {
-    backgroundColor: '#D97706',
+    backgroundColor: '#FFB74D',
   },
   exhaustedBanner: {
-    backgroundColor: '#DC2626',
+    backgroundColor: '#FFB74D',
   },
   content: {
     flexDirection: 'row',

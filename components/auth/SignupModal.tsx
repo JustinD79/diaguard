@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 80,
     height: 80,
-    backgroundColor: '#EBF4FF',
+    backgroundColor: '#EAE6F7',
     borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: 'Inter-Bold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 8,
   },
   subtitle: {
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#DC2626',
+    color: '#FFB74D',
   },
   passwordContainer: {
     position: 'relative',
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   link: {
-    color: '#2563EB',
+    color: '#6B4EFF',
     fontFamily: 'Inter-SemiBold',
   },
   featuresSection: {
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   featuresTitle: {
     fontSize: 20,
     fontFamily: 'Inter-Bold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   featureIcon: {
     width: 48,
     height: 48,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#EAE6F7',
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 4,
   },
   featureDescription: {

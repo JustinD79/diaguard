@@ -745,6 +745,12 @@ export default function FoodScanScreen() {
     <SafeAreaView style={styles.container}>
       <View accessibilityRole="banner" accessible={true} accessibilityLabel="App header with title and status">
         <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            {/* Logo placeholder - replace with actual logo when uploaded */}
+            <View style={styles.logoPlaceholder}>
+              <Text style={styles.logoText}>🩺</Text>
+            </View>
+          </View>
           <Text style={styles.title}>AI Food Tracker</Text>
           <Text style={styles.subtitle}>Powered by advanced AI for diabetes management</Text>
           {isOffline && (
@@ -945,22 +951,41 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     paddingBottom: 10,
+    alignItems: 'center',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  logoPlaceholder: {
+    width: 60,
+    height: 60,
+    backgroundColor: '#6B4EFF',
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoText: {
+    fontSize: 32,
+    color: '#FFFFFF',
   },
   title: {
     fontSize: 28,
     fontFamily: 'Inter-Bold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 4,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
+    textAlign: 'center',
   },
   offlineIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#FFE0B2',
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -970,7 +995,7 @@ const styles = StyleSheet.create({
   offlineText: {
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
-    color: '#D97706',
+    color: '#FFB74D',
   },
   quickActions: {
     flexDirection: 'row',
@@ -994,7 +1019,7 @@ const styles = StyleSheet.create({
   actionIconContainer: {
     width: 48,
     height: 48,
-    backgroundColor: '#EBF4FF',
+    backgroundColor: '#EAE6F7',
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1003,7 +1028,7 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
-    color: '#374151',
+    color: '#2F3A4F',
     marginBottom: 2,
   },
   actionTextDisabled: {
@@ -1038,7 +1063,7 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontSize: 20,
     fontFamily: 'Inter-Bold',
-    color: '#2563EB',
+    color: '#6B4EFF',
     marginBottom: 4,
   },
   summaryLabel: {
@@ -1049,7 +1074,7 @@ const styles = StyleSheet.create({
   insulinInsight: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEF2F2',
+    backgroundColor: '#FFE0B2',
     borderRadius: 8,
     padding: 12,
     gap: 8,
@@ -1057,7 +1082,7 @@ const styles = StyleSheet.create({
   insulinText: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#DC2626',
+    color: '#FFB74D',
     flex: 1,
   },
   section: {
@@ -1067,7 +1092,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 16,
   },
   foodItem: {
@@ -1094,13 +1119,13 @@ const styles = StyleSheet.create({
   foodName: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
     flex: 1,
   },
   confidenceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#E0F2F1',
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -1109,7 +1134,7 @@ const styles = StyleSheet.create({
   confidenceText: {
     fontSize: 10,
     fontFamily: 'Inter-SemiBold',
-    color: '#059669',
+    color: '#1CC7A8',
   },
   foodDetails: {
     fontSize: 13,
@@ -1136,14 +1161,14 @@ const styles = StyleSheet.create({
   glycemicLoad: {
     fontSize: 11,
     fontFamily: 'Inter-SemiBold',
-    color: '#D97706',
+    color: '#FFB74D',
   },
   insulinImpact: {
     fontSize: 11,
     fontFamily: 'Inter-SemiBold',
   },
   addButton: {
-    backgroundColor: '#EBF4FF',
+    backgroundColor: '#EAE6F7',
     borderRadius: 8,
     padding: 8,
   },
@@ -1156,7 +1181,7 @@ const styles = StyleSheet.create({
   permissionTitle: {
     fontSize: 24,
     fontFamily: 'Inter-Bold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginTop: 16,
     marginBottom: 8,
   },
@@ -1245,7 +1270,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'rgba(234, 230, 247, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1281,12 +1306,12 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
   },
   modalSave: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#2563EB',
+    color: '#6B4EFF',
   },
   modalContent: {
     flex: 1,
@@ -1319,7 +1344,7 @@ const styles = StyleSheet.create({
   searchResultName: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 2,
   },
   searchResultDetails: {
@@ -1336,7 +1361,7 @@ const styles = StyleSheet.create({
   searchResultConfidence: {
     fontSize: 11,
     fontFamily: 'Inter-SemiBold',
-    color: '#059669',
+    color: '#1CC7A8',
     marginTop: 2,
   },
 });

@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   primary: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#6B4EFF',
   },
   secondary: {
     backgroundColor: '#6B7280',
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#2563EB',
+    borderColor: '#6B4EFF',
   },
   small: {
     paddingHorizontal: 12,
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   outlineText: {
-    color: '#2563EB',
+    color: '#6B4EFF',
   },
   smallText: {
     fontSize: 14,

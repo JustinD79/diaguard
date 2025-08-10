@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: 'Inter-Bold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 4,
   },
   subtitle: {
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 16,
   },
   currentSubscriptionCard: {
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   subscriptionName: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
     flex: 1,
   },
   statusBadge: {
@@ -351,20 +351,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   activeBadge: {
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#E0F2F1',
   },
   inactiveBadge: {
-    backgroundColor: '#FEF2F2',
+    backgroundColor: '#FFE0B2',
   },
   statusText: {
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
   },
   activeText: {
-    color: '#059669',
+    color: '#1CC7A8',
   },
   inactiveText: {
-    color: '#DC2626',
+    color: '#FFB74D',
   },
   subscriptionDetail: {
     fontSize: 14,
@@ -372,16 +372,16 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   cancelNotice: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#FFE0B2',
     borderRadius: 8,
     padding: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#D97706',
+    borderLeftColor: '#FFB74D',
   },
   cancelText: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#92400E',
+    color: '#FFB74D',
   },
   pricingCard: {
     margin: 20,
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
   planIcon: {
     width: 48,
     height: 48,
-    backgroundColor: '#EBF4FF',
+    backgroundColor: '#EAE6F7',
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
@@ -403,14 +403,14 @@ const styles = StyleSheet.create({
   planName: {
     fontSize: 20,
     fontFamily: 'Inter-Bold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 8,
     textAlign: 'center',
   },
   planPrice: {
     fontSize: 32,
     fontFamily: 'Inter-Bold',
-    color: '#2563EB',
+    color: '#6B4EFF',
   },
   planPeriod: {
     fontSize: 16,
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   featureText: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
-    color: '#374151',
+    color: '#2F3A4F',
     flex: 1,
   },
   subscribeButton: {
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
   benefitIcon: {
     width: 40,
     height: 40,
-    backgroundColor: '#EBF4FF',
+    backgroundColor: '#EAE6F7',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
   benefitTitle: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 4,
   },
   benefitDescription: {

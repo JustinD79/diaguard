@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: 'Inter-Bold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 4,
   },
   subtitle: {
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontFamily: 'Inter-Bold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 4,
   },
   statLabel: {
@@ -379,6 +379,7 @@ const styles = StyleSheet.create({
   statTrendText: {
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
+    color: '#1CC7A8',
   },
   section: {
     paddingHorizontal: 20,
@@ -393,10 +394,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
   },
   addButton: {
-    backgroundColor: '#EBF4FF',
+    backgroundColor: '#EAE6F7',
     borderRadius: 8,
     padding: 8,
   },
@@ -415,7 +416,7 @@ const styles = StyleSheet.create({
   readingIcon: {
     width: 40,
     height: 40,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: '#EAE6F7',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -433,7 +434,7 @@ const styles = StyleSheet.create({
   readingType: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
   },
   readingTime: {
     fontSize: 12,

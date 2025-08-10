@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 40,
     height: 40,
-    backgroundColor: '#EBF4FF',
+    backgroundColor: '#EAE6F7',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -228,13 +228,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontFamily: 'Inter-Bold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#2563EB',
+    color: '#6B4EFF',
     marginBottom: 8,
   },
   description: {
@@ -256,13 +256,13 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#DC2626',
+    backgroundColor: '#FFB74D',
     borderRadius: 4,
   },
   progressText: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#DC2626',
+    color: '#FFB74D',
     textAlign: 'center',
   },
   features: {
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   featureText: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#374151',
+    color: '#2F3A4F',
   },
   actions: {
     gap: 12,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2563EB',
+    backgroundColor: '#6B4EFF',
     borderRadius: 12,
     paddingVertical: 16,
     gap: 8,

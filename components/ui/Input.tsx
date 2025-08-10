@@ -84,12 +84,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: '#EAE6F7',
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
   },
   inputContainerError: {
-    borderColor: '#DC2626',
+    borderColor: '#FFB74D',
   },
   input: {
     flex: 1,

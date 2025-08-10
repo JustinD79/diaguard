@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: 'Inter-Bold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 4,
   },
   subtitle: {
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#DC2626',
+    color: '#FFB74D',
     marginLeft: 12,
     lineHeight: 20,
   },
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 16,
   },
   inputGroup: {
@@ -295,17 +295,17 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#374151',
+    color: '#2F3A4F',
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: '#EAE6F7',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
     fontFamily: 'Inter-Regular',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#EAE6F7',
   },
   settingsSection: {
     backgroundColor: '#FFFFFF',
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
   settingIcon: {
     width: 40,
     height: 40,
-    backgroundColor: '#EBF4FF',
+    backgroundColor: '#EAE6F7',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   settingLabel: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 2,
   },
   settingValue: {
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   calculateButton: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#6B4EFF',
     flexDirection: 'row',
     gap: 8,
   },
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   clearButton: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#EAE6F7',
   },
   clearButtonText: {
     fontSize: 16,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#10B981',
+    borderColor: '#1CC7A8',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -396,18 +396,18 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   warningResult: {
-    borderColor: '#DC2626',
+    borderColor: '#FFB74D',
   },
   resultTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#111827',
+    color: '#2F3A4F',
     marginBottom: 8,
   },
   resultDose: {
     fontSize: 36,
     fontFamily: 'Inter-Bold',
-    color: '#2563EB',
+    color: '#6B4EFF',
     marginBottom: 8,
   },
   resultNote: {
