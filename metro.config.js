@@ -1,3 +1,4 @@
+global.window = global;
 global.self = global;
 
 const { getDefaultConfig } = require('expo/metro-config');
