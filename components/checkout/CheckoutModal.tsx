@@ -6,12 +6,11 @@ import {
   Modal,
   TouchableOpacity,
   ScrollView,
-  TextInput,
   Alert,
-  Linking,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { X, CreditCard, Tag, Check, Crown, Star } from 'lucide-react-native';
+import { X, CreditCard, Tag, Check, Crown, Star, Smartphone, Wallet } from 'lucide-react-native';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { products } from '@/src/stripe-config';
@@ -22,16 +21,33 @@ interface CheckoutModalProps {
   selectedPlan?: string;
 }
 
+interface PromoCode {
+  code: string;
+  description: string;
+  discount: number;
+  discountType: 'fixed' | 'percentage';
+}
+
 export default function CheckoutModal({ visible, onClose, selectedPlan }: CheckoutModalProps) {
   const [promoCode, setPromoCode] = useState('');
-  const [promoApplied, setPromoApplied] = useState(false);
-  const [discount, setDiscount] = useState(0);
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
   const [loading, setLoading] = useState(false);
   const [promoError, setPromoError] = useState('');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'card' | 'apple_pay' | 'google_pay'>('card');
 
   const plan = products.find(p => p.priceId === selectedPlan) || products[0];
   const basePrice = 15.00;
-  const finalPrice = basePrice - discount;
+  
+  const calculateDiscount = (promo: PromoCode | null) => {
+    if (!promo) return 0;
+    if (promo.discountType === 'percentage') {
+      return basePrice * (promo.discount / 100);
+    }
+    return promo.discount;
+  };
+
+  const discount = calculateDiscount(appliedPromo);
+  const finalPrice = Math.max(0, basePrice - discount);
 
   const validatePromoCode = async () => {
     if (!promoCode.trim()) {
@@ -43,24 +59,22 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
     setPromoError('');
 
     try {
-      // Simulate promo code validation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const validCodes = {
-        'SAVE20': { discount: 3.00, description: '20% off first month' },
-        'WELCOME': { discount: 5.00, description: '$5 off first month' },
-        'HEALTH50': { discount: 7.50, description: '50% off first month' },
-      };
+      const response = await fetch('/validate-promo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code: promoCode.trim() }),
+      });
 
-      const code = validCodes[promoCode.toUpperCase() as keyof typeof validCodes];
-      
-      if (code) {
-        setDiscount(code.discount);
-        setPromoApplied(true);
+      const result = await response.json();
+
+      if (result.success) {
+        setAppliedPromo(result.promoCode);
         setPromoError('');
-        Alert.alert('Promo Code Applied!', `${code.description} has been applied to your order.`);
+        Alert.alert('Promo Code Applied!', `${result.promoCode.description} has been applied to your order.`);
       } else {
-        setPromoError('Invalid promo code');
+        setPromoError(result.error || 'Invalid promo code');
       }
     } catch (error) {
       setPromoError('Failed to validate promo code');
@@ -71,8 +85,7 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
 
   const removePromoCode = () => {
     setPromoCode('');
-    setPromoApplied(false);
-    setDiscount(0);
+    setAppliedPromo(null);
     setPromoError('');
   };
 
@@ -80,37 +93,114 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
     setLoading(true);
 
     try {
-      // Simulate checkout process
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // In a real app, you would:
-      // 1. Create Stripe checkout session with promo code
-      // 2. Redirect to Stripe checkout
-      // 3. Handle success/failure callbacks
-      
-      const checkoutUrl = `https://checkout.stripe.com/pay/demo_session_${Date.now()}`;
-      
-      Alert.alert(
-        'Checkout Ready',
-        'In a real app, you would be redirected to Stripe checkout. For demo purposes, this simulates the checkout process.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Open Checkout', 
-            onPress: () => {
-              // Simulate opening Stripe checkout
-              console.log('Opening checkout URL:', checkoutUrl);
-              onClose();
+      const response = await fetch('/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          priceId: plan.priceId,
+          promoCode: appliedPromo?.code,
+          paymentMethod: selectedPaymentMethod,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // In production, redirect to Stripe checkout
+        Alert.alert(
+          'Checkout Ready',
+          `Payment method: ${selectedPaymentMethod}\nTotal: $${finalPrice.toFixed(2)}\n\nIn production, you would be redirected to secure checkout.`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { 
+              text: 'Continue', 
+              onPress: () => {
+                console.log('Checkout URL:', result.url);
+                onClose();
+              }
             }
-          }
-        ]
-      );
+          ]
+        );
+      } else {
+        Alert.alert('Error', result.error || 'Failed to create checkout session');
+      }
     } catch (error) {
       Alert.alert('Error', 'Failed to create checkout session');
     } finally {
       setLoading(false);
     }
   };
+
+  const renderPaymentMethods = () => (
+    <View style={styles.paymentMethodsSection}>
+      <Text style={styles.sectionTitle}>Payment Method</Text>
+      
+      <View style={styles.paymentMethods}>
+        <TouchableOpacity
+          style={[
+            styles.paymentMethod,
+            selectedPaymentMethod === 'card' && styles.paymentMethodSelected
+          ]}
+          onPress={() => setSelectedPaymentMethod('card')}
+        >
+          <CreditCard size={20} color={selectedPaymentMethod === 'card' ? '#2563EB' : '#6B7280'} />
+          <Text style={[
+            styles.paymentMethodText,
+            selectedPaymentMethod === 'card' && styles.paymentMethodTextSelected
+          ]}>
+            Credit Card
+          </Text>
+          {selectedPaymentMethod === 'card' && (
+            <Check size={16} color="#2563EB" />
+          )}
+        </TouchableOpacity>
+
+        {Platform.OS === 'ios' && (
+          <TouchableOpacity
+            style={[
+              styles.paymentMethod,
+              selectedPaymentMethod === 'apple_pay' && styles.paymentMethodSelected
+            ]}
+            onPress={() => setSelectedPaymentMethod('apple_pay')}
+          >
+            <Smartphone size={20} color={selectedPaymentMethod === 'apple_pay' ? '#2563EB' : '#6B7280'} />
+            <Text style={[
+              styles.paymentMethodText,
+              selectedPaymentMethod === 'apple_pay' && styles.paymentMethodTextSelected
+            ]}>
+              Apple Pay
+            </Text>
+            {selectedPaymentMethod === 'apple_pay' && (
+              <Check size={16} color="#2563EB" />
+            )}
+          </TouchableOpacity>
+        )}
+
+        {Platform.OS === 'android' && (
+          <TouchableOpacity
+            style={[
+              styles.paymentMethod,
+              selectedPaymentMethod === 'google_pay' && styles.paymentMethodSelected
+            ]}
+            onPress={() => setSelectedPaymentMethod('google_pay')}
+          >
+            <Wallet size={20} color={selectedPaymentMethod === 'google_pay' ? '#2563EB' : '#6B7280'} />
+            <Text style={[
+              styles.paymentMethodText,
+              selectedPaymentMethod === 'google_pay' && styles.paymentMethodTextSelected
+            ]}>
+              Google Pay
+            </Text>
+            {selectedPaymentMethod === 'google_pay' && (
+              <Check size={16} color="#2563EB" />
+            )}
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
 
   return (
     <Modal
@@ -137,7 +227,7 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
             <View style={styles.planInfo}>
               <Text style={styles.planName}>{plan.name}</Text>
               <Text style={styles.planDescription} numberOfLines={2}>
-                {plan.description}
+                Premium diabetes management with AI-powered insights
               </Text>
             </View>
           </View>
@@ -177,7 +267,7 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
           <View style={styles.promoSection}>
             <Text style={styles.sectionTitle}>Promo Code</Text>
             
-            {!promoApplied ? (
+            {!appliedPromo ? (
               <View style={styles.promoInputContainer}>
                 <Input
                   value={promoCode}
@@ -201,8 +291,10 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
                 <View style={styles.promoAppliedContent}>
                   <Check size={20} color="#059669" />
                   <View style={styles.promoAppliedText}>
-                    <Text style={styles.promoCodeText}>Code: {promoCode}</Text>
-                    <Text style={styles.promoSavings}>You save ${discount.toFixed(2)}</Text>
+                    <Text style={styles.promoCodeText}>Code: {appliedPromo.code}</Text>
+                    <Text style={styles.promoSavings}>
+                      {appliedPromo.description}
+                    </Text>
                   </View>
                 </View>
                 <TouchableOpacity onPress={removePromoCode}>
@@ -236,6 +328,9 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
             </View>
           </View>
 
+          {/* Payment Methods */}
+          {renderPaymentMethods()}
+
           {/* Price Summary */}
           <View style={styles.priceSection}>
             <Text style={styles.sectionTitle}>Order Summary</Text>
@@ -245,13 +340,13 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
               <Text style={styles.priceValue}>${basePrice.toFixed(2)}</Text>
             </View>
             
-            {promoApplied && (
+            {appliedPromo && discount > 0 && (
               <View style={styles.priceRow}>
                 <Text style={[styles.priceLabel, styles.discountLabel]}>
-                  Promo discount ({promoCode})
+                  Promo discount ({appliedPromo.code})
                 </Text>
                 <Text style={[styles.priceValue, styles.discountValue]}>
-                  -${discount.toFixed(2)}
+                  -{appliedPromo.discountType === 'percentage' ? `${appliedPromo.discount}%` : `$${discount.toFixed(2)}`}
                 </Text>
               </View>
             )}
@@ -267,10 +362,14 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
           {/* Payment Button */}
           <View style={styles.checkoutSection}>
             <Button
-              title={loading ? 'Processing...' : 'Continue to Payment'}
+              title={loading ? 'Processing...' : getPaymentButtonText()}
               onPress={handleCheckout}
               disabled={loading}
-              style={styles.checkoutButton}
+              style={[
+                styles.checkoutButton,
+                selectedPaymentMethod === 'apple_pay' && styles.applePayButton,
+                selectedPaymentMethod === 'google_pay' && styles.googlePayButton
+              ]}
             />
             
             <Text style={styles.secureText}>
@@ -286,6 +385,17 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
       </SafeAreaView>
     </Modal>
   );
+
+  function getPaymentButtonText(): string {
+    switch (selectedPaymentMethod) {
+      case 'apple_pay':
+        return `Pay with Apple Pay - $${finalPrice.toFixed(2)}`;
+      case 'google_pay':
+        return `Pay with Google Pay - $${finalPrice.toFixed(2)}`;
+      default:
+        return `Continue to Payment - $${finalPrice.toFixed(2)}`;
+    }
+  }
 }
 
 const styles = StyleSheet.create({
@@ -454,6 +564,42 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#6B7280',
   },
+  paymentMethodsSection: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  paymentMethods: {
+    gap: 12,
+  },
+  paymentMethod: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    gap: 12,
+  },
+  paymentMethodSelected: {
+    borderColor: '#2563EB',
+    backgroundColor: '#EBF4FF',
+  },
+  paymentMethodText: {
+    flex: 1,
+    fontSize: 16,
+    fontFamily: 'Inter-Medium',
+    color: '#374151',
+  },
+  paymentMethodTextSelected: {
+    color: '#2563EB',
+  },
   priceSection: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
@@ -513,6 +659,12 @@ const styles = StyleSheet.create({
   },
   checkoutButton: {
     marginBottom: 8,
+  },
+  applePayButton: {
+    backgroundColor: '#000000',
+  },
+  googlePayButton: {
+    backgroundColor: '#4285F4',
   },
   secureText: {
     fontSize: 12,
