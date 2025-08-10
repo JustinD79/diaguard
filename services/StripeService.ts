@@ -2,6 +2,7 @@ import { products } from '@/src/stripe-config';
 
 export class StripeService {
   private static readonly API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8081';
+  private static readonly IS_DEVELOPMENT = !process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('your_stripe_secret_key');
 
   static readonly subscriptionPlans = products.map(product => ({
     id: product.priceId,
@@ -13,8 +14,8 @@ export class StripeService {
 
   static async getSubscriptionStatus(customerId: string): Promise<SubscriptionStatus> {
     try {
-      // Return mock data if no valid API URL configured
-      if (!this.API_BASE_URL || this.API_BASE_URL === 'http://localhost:8081') {
+      // Return mock data in development mode to prevent Stripe connection errors
+      if (this.IS_DEVELOPMENT) {
         return {
           hasActiveSubscription: false,
           subscription: null,
@@ -49,6 +50,15 @@ export class StripeService {
 
   static async createCheckoutSession(priceId: string): Promise<CheckoutSessionResult> {
     try {
+      // Return mock success in development mode
+      if (this.IS_DEVELOPMENT) {
+        return {
+          success: true,
+          sessionId: 'cs_test_development_mode',
+          url: 'https://checkout.stripe.com/pay/cs_test_development_mode',
+        };
+      }
+
       const response = await fetch(`${this.API_BASE_URL}/create-checkout`, {
         method: 'POST',
         headers: {
@@ -82,6 +92,16 @@ export class StripeService {
 
   static async cancelSubscription(subscriptionId: string): Promise<CancelSubscriptionResult> {
     try {
+      // Return mock success in development mode
+      if (this.IS_DEVELOPMENT) {
+        return {
+          success: true,
+          subscriptionId,
+          cancelAtPeriodEnd: true,
+          currentPeriodEnd: Date.now() / 1000 + 30 * 24 * 60 * 60, // 30 days from now
+        };
+      }
+
       const response = await fetch(`${this.API_BASE_URL}/cancel-subscription`, {
         method: 'POST',
         headers: {

@@ -1,8 +1,12 @@
 import Stripe from 'stripe';
 
+// Check if we're in development mode
+const isDevelopment = !process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('your_stripe_secret_key');
+
+// Only initialize Stripe if we have a valid key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
-});
+}) : null;
 
 export async function POST(request: Request) {
   try {
@@ -16,6 +20,14 @@ export async function POST(request: Request) {
           headers: { 'Content-Type': 'application/json' },
         }
       );
+    }
+
+    // Return mock subscription in development mode
+    if (isDevelopment || !stripe) {
+      return Response.json({
+        subscriptionId: `sub_dev_${Date.now()}`,
+        clientSecret: `pi_dev_${Date.now()}_secret`,
+      });
     }
 
     const subscription = await stripe.subscriptions.create({
