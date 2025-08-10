@@ -1,18 +1,24 @@
 import { supabase } from '@/lib/supabase';
-import * as Crypto from 'expo-crypto';
 
 export class APIKeyManager {
   // Generate a new API key
   static async generateAPIKey(name: string): Promise<string> {
-    const apiKey = this.createRandomKey();
-    const keyHash = await this.hashKey(apiKey);
+    // Call the database function to generate a secure API key
+    const { data: keyData, error: keyError } = await supabase
+      .rpc('generate_api_key');
+
+    if (keyError) {
+      throw new Error(`Failed to generate API key: ${keyError.message}`);
+    }
+
+    const apiKey = keyData;
     
     const { error } = await supabase
       .from('api_keys')
       .insert({
-        key_hash: keyHash,
+        api_key: apiKey,
         name,
-        active: true,
+        is_active: true,
       });
 
     if (error) {
@@ -25,13 +31,11 @@ export class APIKeyManager {
   // Validate an API key
   static async validateAPIKey(apiKey: string): Promise<boolean> {
     try {
-      const keyHash = await this.hashKey(apiKey);
-      
       const { data, error } = await supabase
         .from('api_keys')
-        .select('id, active')
-        .eq('key_hash', keyHash)
-        .eq('active', true)
+        .select('id, is_active')
+        .eq('api_key', apiKey)
+        .eq('is_active', true)
         .single();
 
       if (error || !data) {
@@ -41,7 +45,7 @@ export class APIKeyManager {
       // Update last_used timestamp
       await supabase
         .from('api_keys')
-        .update({ last_used: new Date().toISOString() })
+        .update({ last_used_at: new Date().toISOString() })
         .eq('id', data.id);
 
       return true;
@@ -54,7 +58,7 @@ export class APIKeyManager {
   static async listAPIKeys(): Promise<APIKeyInfo[]> {
     const { data, error } = await supabase
       .from('api_keys')
-      .select('id, name, active, created_at, last_used')
+      .select('id, name, is_active, created_at, last_used_at, scopes, rate_limit')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -68,7 +72,7 @@ export class APIKeyManager {
   static async deactivateAPIKey(keyId: string): Promise<void> {
     const { error } = await supabase
       .from('api_keys')
-      .update({ active: false })
+      .update({ is_active: false })
       .eq('id', keyId);
 
     if (error) {
@@ -80,7 +84,7 @@ export class APIKeyManager {
   static async reactivateAPIKey(keyId: string): Promise<void> {
     const { error } = await supabase
       .from('api_keys')
-      .update({ active: true })
+      .update({ is_active: true })
       .eq('id', keyId);
 
     if (error) {
@@ -100,32 +104,11 @@ export class APIKeyManager {
     }
   }
 
-  // Private helper methods
-  private static createRandomKey(): string {
-    const prefix = 'fapi_'; // Food API prefix
-    const randomPart = Array.from(
-      { length: 32 }, 
-      () => Math.random().toString(36)[2]
-    ).join('');
-    
-    return prefix + randomPart;
-  }
-
-  private static async hashKey(key: string): Promise<string> {
-    return await Crypto.digestStringAsync(
-      Crypto.CryptoDigestAlgorithm.SHA256,
-      key,
-      { encoding: Crypto.CryptoEncoding.HEX }
-    );
-  }
-
   // Get usage statistics for an API key
-  static async getAPIKeyStats(keyId: string): Promise<APIKeyStats> {
-    // This would require additional logging tables in a production system
-    // For now, return basic info
+  static async getAPIKeyStats(keyId: string | number): Promise<APIKeyStats> {
     const { data, error } = await supabase
       .from('api_keys')
-      .select('name, created_at, last_used, active')
+      .select('name, created_at, last_used_at, is_active, scopes, rate_limit')
       .eq('id', keyId)
       .single();
 
@@ -136,8 +119,10 @@ export class APIKeyManager {
     return {
       name: data.name,
       createdAt: data.created_at,
-      lastUsed: data.last_used,
-      active: data.active,
+      lastUsed: data.last_used_at,
+      active: data.is_active,
+      scopes: data.scopes || [],
+      rateLimit: data.rate_limit,
       totalRequests: 0, // Would come from usage logs
       requestsThisMonth: 0, // Would come from usage logs
     };
@@ -146,11 +131,13 @@ export class APIKeyManager {
 
 // Type definitions
 export interface APIKeyInfo {
-  id: string;
+  id: string | number;
   name: string;
-  active: boolean;
+  is_active: boolean;
   created_at: string;
-  last_used?: string;
+  last_used_at?: string;
+  scopes?: string[];
+  rate_limit?: number;
 }
 
 export interface APIKeyStats {
@@ -158,6 +145,8 @@ export interface APIKeyStats {
   createdAt: string;
   lastUsed?: string;
   active: boolean;
+  scopes: string[];
+  rateLimit: number;
   totalRequests: number;
   requestsThisMonth: number;
 }

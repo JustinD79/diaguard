@@ -83,24 +83,27 @@ async function validateApiKey(apiKey: string): Promise<boolean> {
   try {
     const { data, error } = await supabase
       .from('api_keys')
-      .select('id, active')
-      .eq('key_hash', await hashApiKey(apiKey))
-      .eq('active', true)
+      .select('id, is_active, rate_limit, last_used_at')
+      .eq('api_key', apiKey)
+      .eq('is_active', true)
       .single();
 
-    return !error && !!data;
+    if (error || !data) {
+      return false;
+    }
+
+    // Update last_used_at timestamp
+    await supabase
+      .from('api_keys')
+      .update({ last_used_at: new Date().toISOString() })
+      .eq('id', data.id);
+
+    return true;
   } catch {
     return false;
   }
 }
 
-async function hashApiKey(key: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(key);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
 
 async function handleScan(req: Request): Promise<Response> {
   const { barcode, image } = await req.json();
