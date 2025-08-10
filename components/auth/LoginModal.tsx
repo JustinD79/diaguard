@@ -17,7 +17,6 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Alert } from 'react-native';
 
 interface LoginModalProps {
   visible: boolean;
