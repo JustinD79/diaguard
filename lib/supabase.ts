@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
+import 'react-native-url-polyfill/auto';
 
 // Get environment variables from Expo Constants for better compatibility
 const supabaseUrl = Constants.expoConfig?.extra?.supabaseUrl || process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://kmlhyqusrxqkmaaefbhs.supabase.co';
@@ -13,7 +14,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false,
-    storage: Platform.OS === 'web' ? window.localStorage : undefined,
+    detectSessionInUrl: Platform.OS === 'web',
+    storage: Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage 
+      ? window.localStorage 
+      : undefined,
   },
 });

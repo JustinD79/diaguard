@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { Platform } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
@@ -19,12 +20,18 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    SplashScreen.preventAutoHideAsync();
+    // Only prevent auto-hide on native platforms
+    if (Platform.OS !== 'web') {
+      SplashScreen.preventAutoHideAsync();
+    }
   }, []);
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync();
+      // Only hide splash screen on native platforms
+      if (Platform.OS !== 'web') {
+        SplashScreen.hideAsync();
+      }
     }
   }, [fontsLoaded, fontError]);
 

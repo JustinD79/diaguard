@@ -81,7 +81,7 @@ export class OfflineService {
    * Process queued operations when back online
    */
   static async processQueue(): Promise<void> {
-    if (!navigator.onLine) return;
+    if (Platform.OS !== 'web' || typeof navigator === 'undefined' || !navigator.onLine) return;
 
     try {
       const queue = await this.getOperationQueue();
@@ -263,6 +263,13 @@ export class OfflineService {
       return timestamp ? new Date(parseInt(timestamp)) : null;
     } catch {
       return null;
+    }
+  }
+
+  private static async enableOfflineMode(): Promise<void> {
+    // Enable offline functionality
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('offlineMode', 'true');
     }
   }
 }
