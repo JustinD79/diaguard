@@ -14,18 +14,26 @@ import { Link, router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import { Heart } from 'lucide-react-native';
+import { Heart, Key } from 'lucide-react-native';
 
 export default function SignupScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [accessCode, setAccessCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const REQUIRED_ACCESS_CODE = 'InsulinX3';
+
   const handleSignup = async () => {
-    if (!email || !password || !confirmPassword) {
+    if (!email || !password || !confirmPassword || !accessCode) {
       setError('Please fill in all fields');
+      return;
+    }
+
+    if (accessCode !== REQUIRED_ACCESS_CODE) {
+      setError('Invalid access code. Please check your access code and try again.');
       return;
     }
 
@@ -54,7 +62,11 @@ export default function SignupScreen() {
       if (error) {
         setError(error.message);
       } else {
-        router.replace('/(tabs)');
+        Alert.alert(
+          'Account Created!',
+          'Your account has been successfully created. You can now access all premium features.',
+          [{ text: 'Continue', onPress: () => router.replace('/(tabs)') }]
+        );
       }
     } catch (err) {
       setError('An unexpected error occurred');
@@ -75,7 +87,7 @@ export default function SignupScreen() {
               <Heart size={40} color="#2563EB" />
             </View>
             <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Join DiabetesCare to start managing your health</Text>
+            <Text style={styles.subtitle}>Join DiabetesCare with your access code</Text>
           </View>
 
           <View style={styles.form}>
@@ -86,13 +98,23 @@ export default function SignupScreen() {
             ) : null}
 
             <Input
-              label="Email"
+              label="Email Address"
               value={email}
               onChangeText={setEmail}
               placeholder="Enter your email"
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
+            />
+
+            <Input
+              label="Access Code"
+              value={accessCode}
+              onChangeText={setAccessCode}
+              placeholder="Enter your access code"
+              autoCapitalize="none"
+              autoCorrect={false}
+              leftIcon={<Key size={20} color="#6B7280" />}
             />
 
             <Input
@@ -110,6 +132,12 @@ export default function SignupScreen() {
               placeholder="Confirm your password"
               secureTextEntry
             />
+
+            <View style={styles.accessCodeInfo}>
+              <Text style={styles.accessCodeText}>
+                💡 Need an access code? Contact your healthcare provider or visit our website to request access.
+              </Text>
+            </View>
 
             <Button
               title={loading ? 'Creating Account...' : 'Create Account'}
@@ -186,6 +214,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-Medium',
     color: '#DC2626',
+  },
+  accessCodeInfo: {
+    backgroundColor: '#EBF4FF',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2563EB',
+  },
+  accessCodeText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#2563EB',
+    lineHeight: 16,
   },
   signupButton: {
     marginTop: 8,

@@ -28,6 +28,7 @@ import ErrorDisplay from '@/components/ui/ErrorDisplay';
 import { OfflineService } from '@/services/OfflineService';
 import { useScanLimit } from '@/contexts/ScanLimitContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useAuth } from '@/contexts/AuthContext';
 import ScanLimitBanner from '@/components/notifications/ScanLimitBanner';
 import SubscriptionNotification from '@/components/notifications/SubscriptionNotification';
 
@@ -53,6 +54,7 @@ interface NutritionDatabase {
 }
 
 export default function FoodScanScreen() {
+  const { user, isGuest } = useAuth();
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [showCamera, setShowCamera] = useState(false);
@@ -222,6 +224,19 @@ export default function FoodScanScreen() {
   };
 
   const processImageWithAI = async (imageUri: string) => {
+    // Check if user is authenticated
+    if (!user && !isGuest) {
+      Alert.alert(
+        'Sign In Required',
+        'Please sign in or continue as guest to use this feature.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Sign In', onPress: () => router.push('/(auth)/login') }
+        ]
+      );
+      return;
+    }
+
     // Check scan limit before processing
     if (!canScan) {
       setShowScanLimitNotification(true);
@@ -352,6 +367,19 @@ export default function FoodScanScreen() {
   };
 
   const simulateBarcodeScanning = async () => {
+    // Check if user is authenticated
+    if (!user && !isGuest) {
+      Alert.alert(
+        'Sign In Required',
+        'Please sign in or continue as guest to use this feature.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Sign In', onPress: () => router.push('/(auth)/login') }
+        ]
+      );
+      return;
+    }
+
     // Check scan limit before processing
     if (!canScan) {
       setShowScanLimitNotification(true);

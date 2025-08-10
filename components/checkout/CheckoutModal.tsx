@@ -14,6 +14,7 @@ import { X, CreditCard, Tag, Check, Crown, Star, Smartphone, Wallet } from 'luci
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { products } from '@/src/stripe-config';
+import { CheckoutService } from '@/services/CheckoutService';
 
 interface CheckoutModalProps {
   visible: boolean;
@@ -59,17 +60,9 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
     setPromoError('');
 
     try {
-      const response = await fetch('/validate-promo', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code: promoCode.trim() }),
-      });
+      const result = await CheckoutService.validatePromoCode(promoCode.trim());
 
-      const result = await response.json();
-
-      if (result.success) {
+      if (result.success && result.promoCode) {
         setAppliedPromo(result.promoCode);
         setPromoError('');
         Alert.alert('Promo Code Applied!', `${result.promoCode.description} has been applied to your order.`);
@@ -93,25 +86,17 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
     setLoading(true);
 
     try {
-      const response = await fetch('/create-checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          priceId: plan.priceId,
-          promoCode: appliedPromo?.code,
-          paymentMethod: selectedPaymentMethod,
-        }),
-      });
-
-      const result = await response.json();
+      const result = await CheckoutService.createCheckoutSession(
+        plan.priceId,
+        appliedPromo?.code,
+        selectedPaymentMethod
+      );
 
       if (result.success) {
         // In production, redirect to Stripe checkout
         Alert.alert(
           'Checkout Ready',
-          `Payment method: ${selectedPaymentMethod}\nTotal: $${finalPrice.toFixed(2)}\n\nIn production, you would be redirected to secure checkout.`,
+          `Payment method: ${CheckoutService.getPaymentMethodDisplayName(selectedPaymentMethod)}\nTotal: $${finalPrice.toFixed(2)}\n\nIn production, you would be redirected to secure checkout.`,
           [
             { text: 'Cancel', style: 'cancel' },
             { 
@@ -119,6 +104,7 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
               onPress: () => {
                 console.log('Checkout URL:', result.url);
                 onClose();
+                // In production: Linking.openURL(result.url);
               }
             }
           ]
@@ -202,6 +188,17 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
     </View>
   );
 
+  const getPaymentButtonText = (): string => {
+    switch (selectedPaymentMethod) {
+      case 'apple_pay':
+        return `Pay with Apple Pay - $${finalPrice.toFixed(2)}`;
+      case 'google_pay':
+        return `Pay with Google Pay - $${finalPrice.toFixed(2)}`;
+      default:
+        return `Continue to Payment - $${finalPrice.toFixed(2)}`;
+    }
+  };
+
   return (
     <Modal
       visible={visible}
@@ -263,28 +260,57 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
             </View>
           </View>
 
-          {/* Promo Code Section */}
+          {/* Promo Code Section - Main Feature */}
           <View style={styles.promoSection}>
-            <Text style={styles.sectionTitle}>Promo Code</Text>
+            <Text style={styles.sectionTitle}>🎁 Promotional Code</Text>
             
             {!appliedPromo ? (
-              <View style={styles.promoInputContainer}>
-                <Input
-                  value={promoCode}
-                  onChangeText={setPromoCode}
-                  placeholder="Enter promo code"
-                  autoCapitalize="characters"
-                  leftIcon={<Tag size={20} color="#6B7280" />}
-                  containerStyle={styles.promoInput}
-                  error={promoError}
-                />
-                <Button
-                  title={loading ? 'Validating...' : 'Apply'}
-                  onPress={validatePromoCode}
-                  disabled={loading || !promoCode.trim()}
-                  size="small"
-                  style={styles.applyButton}
-                />
+              <View>
+                <View style={styles.promoInputContainer}>
+                  <Input
+                    value={promoCode}
+                    onChangeText={setPromoCode}
+                    placeholder="Enter promotional code"
+                    autoCapitalize="characters"
+                    leftIcon={<Tag size={20} color="#6B7280" />}
+                    containerStyle={styles.promoInput}
+                    error={promoError}
+                  />
+                  <Button
+                    title={loading ? 'Validating...' : 'Apply'}
+                    onPress={validatePromoCode}
+                    disabled={loading || !promoCode.trim()}
+                    size="small"
+                    style={styles.applyButton}
+                  />
+                </View>
+
+                <View style={styles.sampleCodes}>
+                  <Text style={styles.sampleCodesTitle}>💡 Try these demo codes:</Text>
+                  <View style={styles.sampleCodesList}>
+                    <TouchableOpacity 
+                      style={styles.sampleCode}
+                      onPress={() => setPromoCode('SAVE20')}
+                    >
+                      <Text style={styles.sampleCodeText}>SAVE20</Text>
+                      <Text style={styles.sampleCodeDesc}>20% off</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={styles.sampleCode}
+                      onPress={() => setPromoCode('WELCOME')}
+                    >
+                      <Text style={styles.sampleCodeText}>WELCOME</Text>
+                      <Text style={styles.sampleCodeDesc}>$5 off</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={styles.sampleCode}
+                      onPress={() => setPromoCode('HEALTH50')}
+                    >
+                      <Text style={styles.sampleCodeText}>HEALTH50</Text>
+                      <Text style={styles.sampleCodeDesc}>50% off</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
             ) : (
               <View style={styles.promoApplied}>
@@ -295,6 +321,9 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
                     <Text style={styles.promoSavings}>
                       {appliedPromo.description}
                     </Text>
+                    <Text style={styles.promoDiscount}>
+                      Save ${discount.toFixed(2)}
+                    </Text>
                   </View>
                 </View>
                 <TouchableOpacity onPress={removePromoCode}>
@@ -302,30 +331,6 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
                 </TouchableOpacity>
               </View>
             )}
-
-            <View style={styles.sampleCodes}>
-              <Text style={styles.sampleCodesTitle}>Try these demo codes:</Text>
-              <View style={styles.sampleCodesList}>
-                <TouchableOpacity 
-                  style={styles.sampleCode}
-                  onPress={() => setPromoCode('SAVE20')}
-                >
-                  <Text style={styles.sampleCodeText}>SAVE20</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.sampleCode}
-                  onPress={() => setPromoCode('WELCOME')}
-                >
-                  <Text style={styles.sampleCodeText}>WELCOME</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.sampleCode}
-                  onPress={() => setPromoCode('HEALTH50')}
-                >
-                  <Text style={styles.sampleCodeText}>HEALTH50</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
           </View>
 
           {/* Payment Methods */}
@@ -357,6 +362,15 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
               <Text style={styles.totalLabel}>Total</Text>
               <Text style={styles.totalValue}>${finalPrice.toFixed(2)}/month</Text>
             </View>
+
+            {appliedPromo && (
+              <View style={styles.savingsHighlight}>
+                <Star size={16} color="#059669" />
+                <Text style={styles.savingsText}>
+                  You're saving ${discount.toFixed(2)} with code {appliedPromo.code}!
+                </Text>
+              </View>
+            )}
           </View>
 
           {/* Payment Button */}
@@ -385,17 +399,6 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
       </SafeAreaView>
     </Modal>
   );
-
-  function getPaymentButtonText(): string {
-    switch (selectedPaymentMethod) {
-      case 'apple_pay':
-        return `Pay with Apple Pay - $${finalPrice.toFixed(2)}`;
-      case 'google_pay':
-        return `Pay with Google Pay - $${finalPrice.toFixed(2)}`;
-      default:
-        return `Continue to Payment - $${finalPrice.toFixed(2)}`;
-    }
-  }
 }
 
 const styles = StyleSheet.create({
@@ -500,11 +503,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
+    borderWidth: 2,
+    borderColor: '#F59E0B',
   },
   promoInputContainer: {
     flexDirection: 'row',
     gap: 12,
     alignItems: 'flex-end',
+    marginBottom: 16,
   },
   promoInput: {
     flex: 1,
@@ -540,29 +546,45 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#059669',
   },
+  promoDiscount: {
+    fontSize: 12,
+    fontFamily: 'Inter-Bold',
+    color: '#059669',
+  },
   sampleCodes: {
-    marginTop: 8,
+    backgroundColor: '#FEF3C7',
+    borderRadius: 8,
+    padding: 12,
   },
   sampleCodesTitle: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#6B7280',
+    color: '#92400E',
     marginBottom: 8,
   },
   sampleCodesList: {
     flexDirection: 'row',
     gap: 8,
+    flexWrap: 'wrap',
   },
   sampleCode: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#FFFFFF',
     borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: '#F59E0B',
+    alignItems: 'center',
   },
   sampleCodeText: {
     fontSize: 11,
-    fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
+    fontFamily: 'Inter-Bold',
+    color: '#92400E',
+  },
+  sampleCodeDesc: {
+    fontSize: 9,
+    fontFamily: 'Inter-Regular',
+    color: '#92400E',
   },
   paymentMethodsSection: {
     backgroundColor: '#FFFFFF',
@@ -653,6 +675,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Inter-Bold',
     color: '#2563EB',
+  },
+  savingsHighlight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ECFDF5',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 8,
+    gap: 8,
+  },
+  savingsText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#059669',
   },
   checkoutSection: {
     gap: 12,

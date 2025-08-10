@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { StripeService } from '@/services/StripeService';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SubscriptionContextType {
   hasActiveSubscription: boolean;
@@ -17,6 +18,7 @@ interface SubscriptionProviderProps {
 }
 
 export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
+  const { user, isGuest } = useAuth();
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
   const [hasPromoCodeAccess, setHasPromoCodeAccess] = useState(false);
@@ -51,6 +53,16 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   };
 
   const isPremiumFeature = (feature: string): boolean => {
+    // Guests have very limited access
+    if (isGuest || !user) {
+      const guestFeatures = [
+        'view_recipes',
+        'basic_calculator',
+        'view_emergency_info'
+      ];
+      return !guestFeatures.includes(feature);
+    }
+
     const premiumFeatures = [
       'ai_food_recognition',
       'barcode_scanning',
@@ -67,11 +79,23 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   };
 
   useEffect(() => {
-    // Set default state for demo
-    setIsLoading(false);
-    setHasActiveSubscription(false);
-    setHasPromoCodeAccess(false);
-  }, []);
+    if (user) {
+      // Logged in users get full access for demo
+      setIsLoading(false);
+      setHasActiveSubscription(true);
+      setHasPromoCodeAccess(true);
+    } else if (isGuest) {
+      // Guest users have limited access
+      setIsLoading(false);
+      setHasActiveSubscription(false);
+      setHasPromoCodeAccess(false);
+    } else {
+      // Not logged in, redirect to auth
+      setIsLoading(false);
+      setHasActiveSubscription(false);
+      setHasPromoCodeAccess(false);
+    }
+  }, [user, isGuest]);
 
   return (
     <SubscriptionContext.Provider

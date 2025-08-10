@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSubscription } from './SubscriptionContext';
+import { useAuth } from './AuthContext';
 
 interface ScanLimitContextType {
   scansRemaining: number;
@@ -18,6 +19,7 @@ interface ScanLimitProviderProps {
 }
 
 export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
+  const { user, isGuest } = useAuth();
   const [scansRemaining, setScansRemaining] = useState(30);
   const [totalScans, setTotalScans] = useState(0);
   const { hasActiveSubscription, hasPromoCodeAccess } = useSubscription();
@@ -25,8 +27,10 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
   const FREE_SCAN_LIMIT = 30;
 
   useEffect(() => {
-    loadScanData();
-  }, []);
+    if (user || isGuest) {
+      loadScanData();
+    }
+  }, [user, isGuest]);
 
   const getScanKey = () => {
     const now = new Date();
@@ -54,6 +58,11 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
   };
 
   const useScan = async (): Promise<boolean> => {
+    // Guests cannot use scans
+    if (isGuest || !user) {
+      return false;
+    }
+
     if (hasActiveSubscription || hasPromoCodeAccess) {
       return true; // Unlimited scans for premium users
     }
@@ -99,7 +108,7 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
     }
   };
 
-  const canScan = hasActiveSubscription || hasPromoCodeAccess || scansRemaining > 0;
+  const canScan = (user || isGuest) && (hasActiveSubscription || hasPromoCodeAccess || scansRemaining > 0);
 
   return (
     <ScanLimitContext.Provider

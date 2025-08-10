@@ -49,6 +49,10 @@ export default function LoginScreen() {
     }
   };
 
+  const handleGuestAccess = () => {
+    router.replace('/(tabs)');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -95,6 +99,25 @@ export default function LoginScreen() {
               disabled={loading}
               style={styles.loginButton}
             />
+
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <Button
+              title="Continue as Guest"
+              onPress={handleGuestAccess}
+              variant="outline"
+              style={styles.guestButton}
+            />
+
+            <View style={styles.guestInfo}>
+              <Text style={styles.guestInfoText}>
+                👀 As a guest, you can explore the app with limited features. Sign up for full access to AI scanning and premium tools.
+              </Text>
+            </View>
 
             <View style={styles.footer}>
               <Text style={styles.footerText}>
@@ -167,6 +190,39 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     marginTop: 8,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E5E7EB',
+  },
+  dividerText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+    marginHorizontal: 16,
+  },
+  guestButton: {
+    marginBottom: 16,
+  },
+  guestInfo: {
+    backgroundColor: '#F0F9FF',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#0EA5E9',
+  },
+  guestInfoText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#0369A1',
+    lineHeight: 16,
   },
   footer: {
     alignItems: 'center',

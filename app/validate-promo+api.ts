@@ -1,14 +1,47 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.EXPO_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Demo promo codes for testing
+const DEMO_PROMO_CODES = {
+  'SAVE20': {
+    code: 'SAVE20',
+    description: '20% off your first month',
+    discount: 20,
+    discountType: 'percentage' as const,
+    active: true,
+    maxUses: 100,
+    currentUses: 15,
+  },
+  'WELCOME': {
+    code: 'WELCOME',
+    description: '$5 off your subscription',
+    discount: 5,
+    discountType: 'fixed' as const,
+    active: true,
+    maxUses: 50,
+    currentUses: 8,
+  },
+  'HEALTH50': {
+    code: 'HEALTH50',
+    description: '50% off first month',
+    discount: 50,
+    discountType: 'percentage' as const,
+    active: true,
+    maxUses: 25,
+    currentUses: 3,
+  },
+  'EXPIRED': {
+    code: 'EXPIRED',
+    description: 'Expired promo code',
+    discount: 10,
+    discountType: 'percentage' as const,
+    active: false,
+    maxUses: 10,
+    currentUses: 10,
+  },
 };
 
 export async function OPTIONS() {
@@ -32,19 +65,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if promo code exists and is active
-    const { data: promoCode, error: promoError } = await supabase
-      .from('promo_codes')
-      .select('*')
-      .eq('code', code.toUpperCase())
-      .eq('active', true)
-      .single();
+    const upperCode = code.toUpperCase().trim();
+    const promoData = DEMO_PROMO_CODES[upperCode as keyof typeof DEMO_PROMO_CODES];
 
-    if (promoError || !promoCode) {
+    if (!promoData) {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Invalid or expired promo code' 
+          error: 'Invalid promo code. Please check your code and try again.' 
         }),
         {
           status: 400,
@@ -53,12 +81,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if code has expired
-    if (promoCode.expires_at && new Date(promoCode.expires_at) < new Date()) {
+    if (!promoData.active) {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Promo code has expired' 
+          error: 'This promo code has expired or is no longer active.' 
         }),
         {
           status: 400,
@@ -67,12 +94,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check usage limits
-    if (promoCode.max_uses && promoCode.current_uses >= promoCode.max_uses) {
+    if (promoData.currentUses >= promoData.maxUses) {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Promo code usage limit reached' 
+          error: 'This promo code has reached its usage limit.' 
         }),
         {
           status: 400,
@@ -85,10 +111,10 @@ export async function POST(request: Request) {
       JSON.stringify({ 
         success: true, 
         promoCode: {
-          code: promoCode.code,
-          description: promoCode.description,
-          discount: promoCode.benefits?.discount || 0,
-          discountType: promoCode.benefits?.type || 'fixed',
+          code: promoData.code,
+          description: promoData.description,
+          discount: promoData.discount,
+          discountType: promoData.discountType,
         }
       }),
       {
