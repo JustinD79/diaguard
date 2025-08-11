@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { Platform } from 'react-native';
 import { Alert } from 'react-native';
 import { ErrorHandlingService, ErrorContext, ErrorHandlingOptions } from '@/services/ErrorHandlingService';
 
@@ -87,7 +88,11 @@ export function useNetworkErrorHandler() {
     return handleError(error, {
       feature: 'network',
       action,
-      additionalData: { networkStatus: navigator.onLine }
+      additionalData: { 
+        networkStatus: Platform.OS === 'web' && typeof navigator !== 'undefined' 
+          ? navigator.onLine 
+          : true 
+      }
     });
   }, [handleError]);
 

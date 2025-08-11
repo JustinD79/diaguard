@@ -82,7 +82,8 @@ export class OfflineService {
    * Process queued operations when back online
    */
   static async processQueue(): Promise<void> {
-    if (Platform.OS !== 'web' || typeof window === 'undefined' || typeof navigator === 'undefined' || !navigator.onLine) return;
+    if (Platform.OS !== 'web') return;
+    if (typeof window === 'undefined' || typeof navigator === 'undefined' || !navigator.onLine) return;
 
     try {
       const queue = await this.getOperationQueue();
@@ -248,7 +249,12 @@ export class OfflineService {
       for (const key of cacheKeys) {
         const data = await AsyncStorage.getItem(key);
         if (data) {
-          totalSize += new Blob([data]).size;
+          if (Platform.OS === 'web' && typeof Blob !== 'undefined') {
+            totalSize += new Blob([data]).size;
+          } else {
+            // Estimate size for native platforms (UTF-8 encoding)
+            totalSize += new TextEncoder().encode(data).length;
+          }
         }
       }
       
