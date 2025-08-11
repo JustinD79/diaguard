@@ -1,4 +1,5 @@
 const { getDefaultConfig } = require('expo/metro-config');
+const path = require('path');
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
@@ -9,12 +10,18 @@ config.resolver.alias = {
   'stripe': require.resolve('./metro-shims/stripe-shim.js'),
 };
 
-// Block server-side files from being bundled
+// Block server-side files from being bundled - use absolute paths for better exclusion
+const projectRoot = __dirname;
 config.resolver.blockList = [
-  /supabase\/functions\/.*$/,
-  /.*\+api\.ts$/,
-  /.*\.server\.ts$/,
-  /.*\.server\.js$/,
+  // Block all Supabase functions
+  new RegExp(path.resolve(projectRoot, 'supabase', 'functions') + '/.*'),
+  // Block all API routes
+  /.*\+api\.(ts|js)$/,
+  // Block server-only files
+  /.*\.server\.(ts|js)$/,
+  // Block specific problematic files that use window/browser APIs
+  new RegExp(path.resolve(projectRoot, 'app') + '/.*\\+api\\.(ts|js)$'),
+  new RegExp(path.resolve(projectRoot, 'supabase') + '/.*'),
 ];
 
 // Add support for web platform
