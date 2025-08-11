@@ -18,8 +18,10 @@ config.resolver.alias = {
 
 // Block server-side files from being bundled
 config.resolver.blockList = [
-  /supabase\/functions\/.*/,
+  /supabase\/functions\/.*$/,
   /.*\+api\.ts$/,
+  /.*\.server\.ts$/,
+  /.*\.server\.js$/,
 ];
 
 // Add support for web platform
