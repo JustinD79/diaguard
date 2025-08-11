@@ -45,6 +45,5 @@ config.transformer = {
 };
 
 // Web-specific resolver configuration
-config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
 
 module.exports = config;
