@@ -1,10 +1,3 @@
-require('react-native-url-polyfill/auto');
-
-global.window = global;
-global.window.location = { protocol: 'http:' };
-global.location = global.window.location;
-global.self = global;
-
 const { getDefaultConfig } = require('expo/metro-config');
 
 /** @type {import('expo/metro-config').MetroConfig} */
@@ -34,14 +27,15 @@ config.resolver.assetExts.push('db', 'mp3', 'ttf', 'obj', 'png', 'jpg');
 config.resolver.sourceExts.push('jsx', 'js', 'ts', 'tsx', 'json', 'wasm', 'svg');
 
 // Configure transformer for web compatibility
-config.transformer = Object.assign({}, config.transformer, {
+config.transformer = {
+  ...config.transformer,
   babelTransformerPath: require.resolve('metro-react-native-babel-transformer'),
   minifierConfig: {
     mangle: {
       keep_fnames: true,
     },
   },
-});
+};
 
 // Web-specific resolver configuration
 config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
