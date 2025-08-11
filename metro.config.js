@@ -1,3 +1,5 @@
+require('react-native-url-polyfill/auto');
+
 global.window = global;
 global.window.location = { protocol: 'http:' };
 global.location = global.window.location;
