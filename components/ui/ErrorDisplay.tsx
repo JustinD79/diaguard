@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { TriangleAlert as AlertTriangle, RefreshCw, X, Wifi, WifiOff } from 'lucide-react-native';
+import { TriangleAlert as AlertTriangle, RefreshCw, X, WifiOff } from 'lucide-react-native';
 
 interface ErrorDisplayProps {
   error: string | null;

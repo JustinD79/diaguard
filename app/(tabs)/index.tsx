@@ -31,6 +31,7 @@ import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useAuth } from '@/contexts/AuthContext';
 import ScanLimitBanner from '@/components/notifications/ScanLimitBanner';
 import SubscriptionNotification from '@/components/notifications/SubscriptionNotification';
+import { router } from 'expo-router';
 
 interface FoodItem {
   id: string;
@@ -478,7 +479,7 @@ export default function FoodScanScreen() {
       if (isOffline) {
         await handleNetworkError(error, 'barcode_scanning_offline');
       } else {
-        await handleNetworkError(error, 'barcode_scanning');
+        await handleMedicalError(error, 'barcode_scanning');
       }
     } finally {
       setIsProcessing(false);
@@ -790,7 +791,7 @@ export default function FoodScanScreen() {
           <Text style={styles.subtitle}>Powered by advanced AI for diabetes management</Text>
           {isOffline && (
             <View style={styles.offlineIndicator}>
-              <WifiOff size={16} color="#D97706" />
+              <Text>📶</Text>
               <Text style={styles.offlineText}>Offline Mode</Text>
             </View>
           )}

@@ -206,6 +206,7 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
+      <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <X size={24} color="#6B7280" />
@@ -406,11 +407,16 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
           </View>
         </ScrollView>
       </SafeAreaView>
+      </SafeAreaView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
   container: {
     flex: 1,
     backgroundColor: '#F9FAFB',
