@@ -13,15 +13,16 @@ config.resolver.alias = {
 // Block server-side files from being bundled - use absolute paths for better exclusion
 const projectRoot = __dirname;
 config.resolver.blockList = [
-  // Block all Supabase functions
-  new RegExp(path.resolve(projectRoot, 'supabase', 'functions') + '/.*'),
-  // Block all API routes
-  /.*\+api\.(ts|js)$/,
+  // Block all Supabase functions with proper escaping
+  new RegExp(path.resolve(projectRoot, 'supabase', 'functions').replace(/[\\]/g, '\\\\') + '[\\\\/].*'),
+  // Block all API routes - more specific pattern
+  /.*[/\\]\+api\.(ts|js)$/,
   // Block server-only files
   /.*\.server\.(ts|js)$/,
-  // Block specific problematic files that use window/browser APIs
-  new RegExp(path.resolve(projectRoot, 'app') + '/.*\\+api\\.(ts|js)$'),
-  new RegExp(path.resolve(projectRoot, 'supabase') + '/.*'),
+  // Block any file with +api in the name anywhere in the project
+  new RegExp('.*\\+api\\.(ts|js)$'),
+  // Block entire supabase directory
+  new RegExp(path.resolve(projectRoot, 'supabase').replace(/[\\]/g, '\\\\') + '[\\\\/].*'),
 ];
 
 // Add support for web platform
