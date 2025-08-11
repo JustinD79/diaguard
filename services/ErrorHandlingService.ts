@@ -401,30 +401,10 @@ export class ErrorHandlingService {
   }
 
   private static getDeviceInfo(): DeviceInfo {
-    if (Platform.OS !== 'web') {
+    if (Platform.OS !== 'web' || typeof window === 'undefined' || typeof navigator === 'undefined') {
       return {
-        platform: Platform.OS,
-        userAgent: 'unknown',
-        language: 'unknown',
-        cookieEnabled: false,
-        onLine: true
-      };
-    }
-
-    if (Platform.OS === 'web' && typeof navigator === 'undefined') {
-      return {
-        platform: 'web',
-        userAgent: 'unknown',
-        language: 'unknown',
-        cookieEnabled: false,
-        onLine: true
-      };
-    }
-
-    if (Platform.OS !== 'web') {
-      return {
-        platform: Platform.OS,
-        userAgent: 'react-native',
+        platform: Platform.OS === 'web' ? 'web' : Platform.OS,
+        userAgent: Platform.OS === 'web' ? 'unknown' : 'react-native',
         language: 'unknown',
         cookieEnabled: false,
         onLine: true
