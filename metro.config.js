@@ -11,9 +11,10 @@ const { getDefaultConfig } = require('expo/metro-config');
 const config = getDefaultConfig(__dirname);
 
 // Add resolver alias to prevent stripe from being bundled on web
-config.resolver.alias = Object.assign({}, config.resolver.alias, {
+config.resolver.alias = {
+  ...config.resolver.alias,
   'stripe': require.resolve('./metro-shims/stripe-shim.js'),
-});
+};
 
 // Block server-side files from being bundled
 config.resolver.blockList = [
