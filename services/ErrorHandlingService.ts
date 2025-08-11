@@ -341,6 +341,8 @@ export class ErrorHandlingService {
    * Network connectivity check
    */
   private static async checkNetworkConnectivity(): Promise<boolean> {
+    if (Platform.OS !== 'web') return true; // Assume connected on native platforms
+    
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return false;
     
     try {
@@ -388,7 +390,7 @@ export class ErrorHandlingService {
   }
 
   private static getSessionId(): string {
-    if (typeof window !== 'undefined' && typeof sessionStorage !== 'undefined') {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof sessionStorage !== 'undefined') {
       try {
         return sessionStorage.getItem('sessionId') || 'unknown';
       } catch {
@@ -399,7 +401,7 @@ export class ErrorHandlingService {
   }
 
   private static getDeviceInfo(): DeviceInfo {
-    if (typeof window === 'undefined') {
+    if (Platform.OS !== 'web') {
       return {
         platform: Platform.OS,
         userAgent: 'unknown',
@@ -409,10 +411,20 @@ export class ErrorHandlingService {
       };
     }
 
-    if (typeof navigator === 'undefined') {
+    if (Platform.OS === 'web' && typeof navigator === 'undefined') {
       return {
         platform: 'web',
         userAgent: 'unknown',
+        language: 'unknown',
+        cookieEnabled: false,
+        onLine: true
+      };
+    }
+
+    if (Platform.OS !== 'web') {
+      return {
+        platform: Platform.OS,
+        userAgent: 'react-native',
         language: 'unknown',
         cookieEnabled: false,
         onLine: true
@@ -440,7 +452,7 @@ export class ErrorHandlingService {
 
   private static async enableOfflineMode(): Promise<void> {
     // Enable offline functionality
-    if (typeof window !== 'undefined') {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
       try {
         localStorage.setItem('offlineMode', 'true');
       } catch {
@@ -450,6 +462,11 @@ export class ErrorHandlingService {
   }
 
   private static async requestCameraPermission(): Promise<boolean> {
+    if (Platform.OS !== 'web') {
+      // On native platforms, assume permission is handled by expo-camera
+      return true;
+    }
+    
     if (typeof window === 'undefined' || typeof navigator === 'undefined') {
       return false;
     }
@@ -478,7 +495,7 @@ export class ErrorHandlingService {
 
   private static async sendToRemoteLogging(logEntry: ErrorLogEntry): Promise<void> {
     // Send to your logging service (Sentry, LogRocket, etc.)
-    if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && typeof fetch !== 'undefined') {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof navigator !== 'undefined' && typeof fetch !== 'undefined') {
       try {
         if (navigator.onLine) {
           await fetch('/api/errors', {
@@ -494,7 +511,7 @@ export class ErrorHandlingService {
   }
 
   private static async storeErrorLocally(logEntry: ErrorLogEntry): Promise<void> {
-    if (typeof window !== 'undefined') {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
       try {
         const errors = JSON.parse(localStorage.getItem('errorLog') || '[]');
         errors.unshift(logEntry);
@@ -514,7 +531,7 @@ export class ErrorHandlingService {
 
   static clearErrorLog(): void {
     this.errorLog = [];
-    if (typeof window !== 'undefined') {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
       try {
         localStorage.removeItem('errorLog');
       } catch {
