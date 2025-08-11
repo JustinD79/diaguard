@@ -206,15 +206,10 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-              <Text style={styles.featureText}>Secure payment processing</Text>
         <View style={styles.header}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <X size={24} color="#6B7280" />
-              <Text style={styles.featureText}>Multiple subscription tiers</Text>
-            </View>
-            <View style={styles.featureItem}>
-              <Check size={16} color="#059669" />
-              <Text style={styles.featureText}>Seamless monthly billing</Text>
+          </TouchableOpacity>
           <Text style={styles.headerTitle}>Complete Purchase</Text>
           <View style={{ width: 24 }} />
         </View>
