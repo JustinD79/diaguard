@@ -2,9 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { CreditCard, Smartphone, Wallet, Check } from 'lucide-react-native';
 
-// Add dynamic export to disable SSR for this component
-export const dynamic = 'force-dynamic';
-
 interface PaymentMethodSelectorProps {
   selectedMethod: 'card' | 'apple_pay' | 'google_pay';
   onMethodSelect: (method: 'card' | 'apple_pay' | 'google_pay') => void;
