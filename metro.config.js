@@ -1,4 +1,5 @@
 global.window = global;
+global.window.location = { protocol: 'http:' };
 global.self = global;
 
 const { getDefaultConfig } = require('expo/metro-config');
