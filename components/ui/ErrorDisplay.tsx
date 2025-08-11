@@ -62,13 +62,16 @@ export default function ErrorDisplay({
         
         <View style={styles.actions}>
           {showRetry && onRetry && (
-            <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
-              <RefreshCw size={16} color="#2563EB" />
-              <Text style={styles.retryText}>Retry</Text>
+            <TouchableOpacity 
+              style={styles.retryButton} 
+              onPress={onRetry}
               accessibilityRole="button"
               accessible={true}
               accessibilityLabel="Retry action"
               accessibilityHint="Tap to retry the failed operation"
+            >
+              <RefreshCw size={16} color="#2563EB" />
+              <Text style={styles.retryText}>Retry</Text>
             </TouchableOpacity>
           )}
           
