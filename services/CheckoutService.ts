@@ -1,5 +1,7 @@
+import Constants from 'expo-constants';
+
 export class CheckoutService {
-  private static readonly API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || '';
+  private static readonly API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || '';
 
   static async createCheckoutSession(
     priceId: string,

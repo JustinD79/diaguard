@@ -34,7 +34,8 @@
     },
     "extra": {
       "supabaseUrl": "https://kmlhyqusrxqkmaaefbhs.supabase.co",
-      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtemdkdmtncGR6a2Z6emNmdnZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2NTExNDMsImV4cCI6MjA2OTIyNzE0M30.a64PoQb3Uth-GxsdHEMfJdqD6Nv1j1kH35uHW_O_2kI"
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtemdkdmtncGR6a2Z6emNmdnZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2NTExNDMsImV4cCI6MjA2OTIyNzE0M30.a64PoQb3Uth-GxsdHEMfJdqD6Nv1j1kH35uHW_O_2kI",
+      "apiUrl": "http://localhost:8081"
     }
   }
 }

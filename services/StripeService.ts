@@ -1,7 +1,8 @@
+import Constants from 'expo-constants';
 import { products } from '@/src/stripe-config';
 
 export class StripeService {
-  private static readonly API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8081';
+  private static readonly API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:8081';
   private static readonly IS_DEVELOPMENT = !process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('your_stripe_secret_key');
 
   static readonly subscriptionPlans = products.map(product => ({
