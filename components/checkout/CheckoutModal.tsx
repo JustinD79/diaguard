@@ -40,7 +40,7 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'card' | 'apple_pay' | 'google_pay'>('card');
 
   const plan = products.find(p => p.priceId === selectedPlan) || products[0];
-  const basePrice = plan.price || 15.00;
+  const basePrice = plan.price!;
   
   const calculateDiscount = (promo: PromoCode | null) => {
     if (!promo) return 0;
@@ -209,11 +209,15 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <SafeAreaView style={styles.container}>
+              <Text style={styles.featureText}>Secure payment processing</Text>
         <View style={styles.header}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <X size={24} color="#6B7280" />
-          </TouchableOpacity>
+              <Text style={styles.featureText}>Multiple subscription tiers</Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Check size={16} color="#059669" />
+              <Text style={styles.featureText}>Seamless monthly billing</Text>
           <Text style={styles.headerTitle}>Complete Purchase</Text>
           <View style={{ width: 24 }} />
         </View>
@@ -395,8 +399,18 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
             
             <Text style={styles.termsText}>
               By continuing, you agree to our Terms of Service and Privacy Policy. 
-              {plan.description}
+              Your subscription will automatically renew monthly.
             </Text>
+            
+            <View style={styles.billingInfo}>
+              <Text style={styles.billingTitle}>💳 Billing Information</Text>
+              <Text style={styles.billingText}>
+                • Monthly billing cycle starts immediately{'\n'}
+                • Automatic renewal on the same date each month{'\n'}
+                • Cancel anytime from your account settings{'\n'}
+                • Secure payment processing via Stripe
+              </Text>
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -716,6 +730,26 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#9CA3AF',
     textAlign: 'center',
+    lineHeight: 16,
+  },
+  billingInfo: {
+    backgroundColor: '#F0F9FF',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#0EA5E9',
+  },
+  billingTitle: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#0369A1',
+    marginBottom: 6,
+  },
+  billingText: {
+    fontSize: 11,
+    fontFamily: 'Inter-Regular',
+    color: '#0369A1',
     lineHeight: 16,
   },
 });

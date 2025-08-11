@@ -67,7 +67,7 @@ export default function SubscriptionScreen() {
   };
 
   const renderCurrentSubscription = () => {
-    if (!subscription || subscription.subscription_status === 'not_started') {
+    if (!subscription || !isSubscriptionActive()) {
       return null;
     }
 
@@ -80,7 +80,7 @@ export default function SubscriptionScreen() {
         <View style={styles.subscriptionInfo}>
           <View style={styles.subscriptionHeader}>
             <Text style={styles.subscriptionName}>
-              {product?.name || 'Diagaurd Diamond Plan'}
+              {product?.name || products[0].name}
             </Text>
             <View style={[
               styles.statusBadge,
@@ -125,7 +125,7 @@ export default function SubscriptionScreen() {
             <Star size={24} color="#2563EB" />
           </View>
           <Text style={styles.planName}>{product.name}</Text>
-          <Text style={styles.planPrice}>${product.price?.toFixed(2) || '15.00'}<Text style={styles.planPeriod}>/month</Text></Text>
+          <Text style={styles.planPrice}>${product.price?.toFixed(2)}<Text style={styles.planPeriod}>/month</Text></Text>
         </View>
 
         <Text style={styles.planDescription}>{product.description}</Text>
@@ -149,19 +149,15 @@ export default function SubscriptionScreen() {
           </View>
           <View style={styles.featureItem}>
             <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Emergency medical information access</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Medication tracking & reminders</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Seamless monthly billing system</Text>
+            <Text style={styles.featureText}>Secure payment processing</Text>
           </View>
           <View style={styles.featureItem}>
             <Check size={16} color="#059669" />
             <Text style={styles.featureText}>Multiple subscription tier options</Text>
+          </View>
+          <View style={styles.featureItem}>
+            <Check size={16} color="#059669" />
+            <Text style={styles.featureText}>Seamless monthly billing system</Text>
           </View>
         </View>
 
@@ -169,7 +165,7 @@ export default function SubscriptionScreen() {
           title={hasActiveSubscription ? 'Already Subscribed' : 'Subscribe Now'}
           onPress={() => handleSubscribe(product.priceId)}
           disabled={hasActiveSubscription}
-          style={[styles.subscribeButton, hasActiveSubscription && styles.disabledButton]}
+          style={styles.subscribeButton}
         />
       </Card>
     );
@@ -177,7 +173,7 @@ export default function SubscriptionScreen() {
 
   const renderBenefits = () => (
     <Card style={styles.benefitsCard}>
-      <Text style={styles.sectionTitle}>Why Choose Diagaurd Diamond?</Text>
+      <Text style={styles.sectionTitle}>Why Choose {products[0].name}?</Text>
       
       <View style={styles.benefitsList}>
         <View style={styles.benefitItem}>
@@ -199,7 +195,7 @@ export default function SubscriptionScreen() {
           <View style={styles.benefitContent}>
             <Text style={styles.benefitTitle}>Medical-Grade Security</Text>
             <Text style={styles.benefitDescription}>
-              Your health data is protected with enterprise-level encryption and HIPAA compliance
+              Your payment and health data is protected with enterprise-level encryption and HIPAA compliance
             </Text>
           </View>
         </View>
@@ -211,7 +207,19 @@ export default function SubscriptionScreen() {
           <View style={styles.benefitContent}>
             <Text style={styles.benefitTitle}>Flexible Billing</Text>
             <Text style={styles.benefitDescription}>
-              Cancel anytime with no hidden fees. Your subscription, your control
+              Seamless monthly billing with secure payment processing. Cancel anytime with no hidden fees.
+            </Text>
+          </View>
+        </View>
+        
+        <View style={styles.benefitItem}>
+          <View style={styles.benefitIcon}>
+            <Star size={20} color="#2563EB" />
+          </View>
+          <View style={styles.benefitContent}>
+            <Text style={styles.benefitTitle}>Premium Experience</Text>
+            <Text style={styles.benefitDescription}>
+              Access to all subscription tiers and premium features designed for comprehensive diabetes management
             </Text>
           </View>
         </View>
@@ -246,6 +254,16 @@ export default function SubscriptionScreen() {
           onClose={() => setShowCheckout(false)}
           selectedPlan={selectedPlan}
         />
+        
+        <View style={styles.footerInfo}>
+          <Text style={styles.footerTitle}>🔒 Secure & Transparent Billing</Text>
+          <Text style={styles.footerText}>
+            • All payments processed securely through Stripe{'\n'}
+            • No hidden fees or surprise charges{'\n'}
+            • Easy subscription management{'\n'}
+            • Cancel anytime from your account
+          </Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -404,7 +422,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   disabledButton: {
-    opacity: 0.6,
+    backgroundColor: '#9CA3AF',
   },
   benefitsCard: {
     margin: 20,
@@ -439,5 +457,25 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
     lineHeight: 20,
+  },
+  footerInfo: {
+    backgroundColor: '#F0F9FF',
+    margin: 20,
+    borderRadius: 12,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#0EA5E9',
+  },
+  footerTitle: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#0369A1',
+    marginBottom: 8,
+  },
+  footerText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#0369A1',
+    lineHeight: 18,
   },
 });

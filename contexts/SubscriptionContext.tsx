@@ -45,7 +45,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         setSubscriptionPlanName(plan?.name || null);
       } else {
         setSubscriptionPlan(hasPromoCodeAccess ? 'promo_premium' : null);
-        setSubscriptionPlanName(hasPromoCodeAccess ? products[0].name : null);
+        setSubscriptionPlanName(hasPromoCodeAccess ? 'Diagaurd Diamond Plan' : null);
       }
     } catch (error) {
       console.error('Error refreshing subscription:', error);
@@ -91,7 +91,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         setIsLoading(false);
         setHasActiveSubscription(true);
         setHasPromoCodeAccess(true);
-        setSubscriptionPlanName(products[0].name);
+       setSubscriptionPlanName('Diagaurd Diamond Plan');
       } else if (isGuest) {
         // Guest users have limited access
         setIsLoading(false);

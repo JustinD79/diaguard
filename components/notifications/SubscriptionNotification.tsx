@@ -28,7 +28,7 @@ export default function SubscriptionNotification({
   const { hasActiveSubscription } = useSubscription();
   const { scansRemaining } = useScanLimit();
   const [slideAnim] = useState(new Animated.Value(300));
-  const product = products[0]; // Diagaurd Diamond Plan
+  const productName = 'Diagaurd Diamond Plan';
 
   useEffect(() => {
     if (visible) {
@@ -56,24 +56,24 @@ export default function SubscriptionNotification({
     switch (trigger) {
       case 'login':
         return {
-          title: `🎉 Welcome to ${product.name}!`,
+          title: `🎉 Welcome to Diagaurd!`,
           subtitle: 'You have 30 free AI scans this month',
-          description: `Upgrade to ${product.name} for unlimited scans and advanced features`,
+          description: `Upgrade to ${productName} for unlimited scans and advanced features`,
           buttonText: 'Explore Premium',
           urgency: 'low',
         };
       case 'scan_limit':
         return {
           title: '📸 Scan Limit Reached',
-          subtitle: `You've used all ${30 - scansRemaining}/30 free scans`,
-          description: `Upgrade to ${product.name} for unlimited AI food scanning`,
+          subtitle: `You've used all your free scans this month`,
+          description: `Upgrade to ${productName} for unlimited AI food scanning`,
           buttonText: 'Upgrade Now',
           urgency: 'high',
         };
       case 'feature_gate':
         return {
           title: '✨ Premium Feature',
-          subtitle: `This feature requires a ${product.name} subscription`,
+          subtitle: `This feature requires the ${productName}`,
           description: 'Unlock advanced AI analysis and personalized insights',
           buttonText: 'Get Premium',
           urgency: 'medium',

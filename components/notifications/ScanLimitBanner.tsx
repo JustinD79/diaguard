@@ -10,7 +10,7 @@ export default function ScanLimitBanner() {
   const router = useRouter();
   const { scansRemaining, totalScans } = useScanLimit();
   const { hasActiveSubscription } = useSubscription();
-  const product = products[0]; // Diagaurd Diamond Plan
+  const productName = 'Diagaurd Diamond Plan';
 
   if (hasActiveSubscription || scansRemaining > 10) return null;
 
@@ -38,14 +38,14 @@ export default function ScanLimitBanner() {
         <View style={styles.textContainer}>
           <Text style={styles.title}>
             {isExhausted 
-              ? 'No scans remaining' 
+              ? 'Scan limit reached' 
               : `${scansRemaining} scans left`
             }
           </Text>
           <Text style={styles.subtitle}>
             {isExhausted 
-              ? `Upgrade to ${product.name} for unlimited scanning` 
-              : `Upgrade to ${product.name} for unlimited`
+              ? `Get ${productName} for unlimited scanning` 
+              : `Get ${productName} for unlimited scans`
             }
           </Text>
         </View>

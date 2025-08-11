@@ -41,7 +41,7 @@ export default function SubscriptionSuccessScreen() {
 
           <Text style={styles.title}>Welcome to Diamond!</Text>
           <Text style={styles.subtitle}>
-            Your {product.name} subscription has been activated successfully. You now have access to all premium features for just ${product.price?.toFixed(2) || '15.00'}/month.
+            Your {product.name} subscription has been activated successfully. You now have access to all premium features for just ${product.price?.toFixed(2)}/month.
           </Text>
 
           <View style={styles.featuresList}>
@@ -59,7 +59,15 @@ export default function SubscriptionSuccessScreen() {
             </View>
             <View style={styles.featureItem}>
               <Check size={16} color="#059669" />
-              <Text style={styles.featureText}>Emergency medical information access</Text>
+              <Text style={styles.featureText}>Seamless monthly billing system</Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Check size={16} color="#059669" />
+              <Text style={styles.featureText}>Multiple subscription tier options</Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Check size={16} color="#059669" />
+              <Text style={styles.featureText}>Secure payment processing</Text>
             </View>
           </View>
 
