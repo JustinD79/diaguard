@@ -1,308 +1,52 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  Switch,
-  Alert,
-} from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Bell, Shield, Heart, CircleHelp as HelpCircle, Settings as SettingsIcon, ChevronRight, CreditCard as Edit, Phone, Mail } from 'lucide-react-native';
 
 export default function SettingsScreen() {
-  const [notifications, setNotifications] = useState({
-    glucoseAlerts: true,
-    medicationReminders: true,
-    mealReminders: false,
-    exerciseReminders: true,
-  });
-
-  const [userProfile, setUserProfile] = useState({
-    name: 'John Doe',
-    email: 'john.doe@email.com',
-    phone: '+1 (555) 123-4567',
-    diabetesType: 'Type 2',
-    diagnosisDate: '2019',
-  });
-
-  const [insulinSettings, setInsulinSettings] = useState({
-    carbRatio: '15',
-    correctionFactor: '50',
-    targetBG: '100',
-    maxInsulin: '10',
-  });
-
-  const renderSection = (title: string, children: React.ReactNode) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {children}
-    </View>
-  );
-
-  const renderSettingItem = (
-    icon: React.ReactNode,
-    title: string,
-    subtitle?: string,
-    onPress?: () => void,
-    rightComponent?: React.ReactNode
-  ) => (
-    <TouchableOpacity 
-      style={styles.settingItem}
-      onPress={onPress}
-      disabled={!onPress}
-    >
-      <View style={styles.settingIcon}>
-        {icon}
-      </View>
-      <View style={styles.settingContent}>
-        <Text style={styles.settingTitle}>{title}</Text>
-        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
-      </View>
-      {rightComponent || (onPress && <ChevronRight size={20} color="#9CA3AF" />)}
-    </TouchableOpacity>
-  );
-
-  const showEmergencyContacts = () => {
-    Alert.alert(
-      'Emergency Contacts',
-      'Dr. Sarah Johnson: (555) 123-4567\nEmergency Services: 911\nPoison Control: (800) 222-1222',
-      [{ text: 'OK' }]
-    );
-  };
-
   return (
     <SafeAreaView style={styles.container}>
-      <View accessibilityRole="banner" accessible={true} accessibilityLabel="Settings page header">
+      <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Settings</Text>
-          <Text style={styles.subtitle}>Manage your app preferences and health settings</Text>
-        </View>
-      </View>
-
-      <View accessibilityRole="main" accessible={true} accessibilityLabel="Settings and preferences">
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View accessibilityRole="region" accessible={true} accessibilityLabel="Profile settings section">
-          {renderSection('Profile', (
-          <View>
-            {renderSettingItem(
-              <User size={20} color="#2563EB" />,
-              userProfile.name,
-              `${userProfile.diabetesType} • Diagnosed ${userProfile.diagnosisDate}`,
-              () => Alert.alert('Edit Profile', 'Profile editing would open here'),
-              <Edit size={16} color="#9CA3AF" />
-            )}
-            {renderSettingItem(
-              <Mail size={20} color="#2563EB" />,
-              'Email',
-              userProfile.email
-            )}
-            {renderSettingItem(
-              <Phone size={20} color="#2563EB" />,
-              'Phone',
-              userProfile.phone
-            )}
-          </View>
-          ))}
+          <Text style={styles.subtitle}>Manage your preferences</Text>
         </View>
 
-        <View accessibilityRole="region" accessible={true} accessibilityLabel="Insulin calculator settings section">
-          {renderSection('Insulin Calculator Settings', (
-          <View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Carb Ratio (1 unit per X grams)</Text>
-              <TextInput
-                style={styles.input}
-                value={insulinSettings.carbRatio}
-                onChangeText={(text) => setInsulinSettings({ ...insulinSettings, carbRatio: text })}
-                keyboardType="numeric"
-                placeholder="15"
-                accessibilityLabel="Carbohydrate ratio setting"
-                accessibilityHint="Enter how many grams of carbs one unit of insulin covers"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Correction Factor (1 unit per X mg/dL)</Text>
-              <TextInput
-                style={styles.input}
-                value={insulinSettings.correctionFactor}
-                onChangeText={(text) => setInsulinSettings({ ...insulinSettings, correctionFactor: text })}
-                keyboardType="numeric"
-                placeholder="50"
-                accessibilityLabel="Correction factor setting"
-                accessibilityHint="Enter how many milligrams per deciliter one unit of insulin lowers blood glucose"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Target Blood Glucose (mg/dL)</Text>
-              <TextInput
-                style={styles.input}
-                value={insulinSettings.targetBG}
-                onChangeText={(text) => setInsulinSettings({ ...insulinSettings, targetBG: text })}
-                keyboardType="numeric"
-                placeholder="100"
-                accessibilityLabel="Target blood glucose setting"
-                accessibilityHint="Enter your target blood glucose level in milligrams per deciliter"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Maximum Single Dose (units)</Text>
-              <TextInput
-                style={styles.input}
-                value={insulinSettings.maxInsulin}
-                onChangeText={(text) => setInsulinSettings({ ...insulinSettings, maxInsulin: text })}
-                keyboardType="numeric"
-                placeholder="10"
-                accessibilityLabel="Maximum insulin dose setting"
-                accessibilityHint="Enter the maximum insulin units for a single dose"
-              />
-            </View>
-          </View>
-          ))}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Profile</Text>
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingText}>Personal Information</Text>
+            <Text style={styles.settingArrow}>›</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingText}>Medical Profile</Text>
+            <Text style={styles.settingArrow}>›</Text>
+          </TouchableOpacity>
         </View>
 
-        <View accessibilityRole="region" accessible={true} accessibilityLabel="Notification preferences section">
-          {renderSection('Notifications', (
-          <View>
-            {renderSettingItem(
-              <Bell size={20} color="#2563EB" />,
-              'Glucose Alerts',
-              'High/low blood sugar warnings',
-              undefined,
-              <Switch
-                value={notifications.glucoseAlerts}
-                onValueChange={(value) => 
-                  setNotifications({ ...notifications, glucoseAlerts: value })
-                }
-                trackColor={{ false: '#E5E7EB', true: '#93C5FD' }}
-                thumbColor={notifications.glucoseAlerts ? '#2563EB' : '#9CA3AF'}
-                accessibilityLabel="Glucose alerts toggle"
-                accessibilityHint="Enable or disable high and low blood sugar warnings"
-              />
-            )}
-
-            {renderSettingItem(
-              <Bell size={20} color="#2563EB" />,
-              'Medication Reminders',
-              'Insulin and other medication alerts',
-              undefined,
-              <Switch
-                value={notifications.medicationReminders}
-                onValueChange={(value) => 
-                  setNotifications({ ...notifications, medicationReminders: value })
-                }
-                trackColor={{ false: '#E5E7EB', true: '#93C5FD' }}
-                thumbColor={notifications.medicationReminders ? '#2563EB' : '#9CA3AF'}
-                accessibilityLabel="Medication reminders toggle"
-                accessibilityHint="Enable or disable medication reminder notifications"
-              />
-            )}
-
-            {renderSettingItem(
-              <Bell size={20} color="#2563EB" />,
-              'Meal Reminders',
-              'Remind to log meals and test glucose',
-              undefined,
-              <Switch
-                value={notifications.mealReminders}
-                onValueChange={(value) => 
-                  setNotifications({ ...notifications, mealReminders: value })
-                }
-                trackColor={{ false: '#E5E7EB', true: '#93C5FD' }}
-                thumbColor={notifications.mealReminders ? '#2563EB' : '#9CA3AF'}
-                accessibilityLabel="Meal reminders toggle"
-                accessibilityHint="Enable or disable meal logging reminder notifications"
-              />
-            )}
-
-            {renderSettingItem(
-              <Bell size={20} color="#2563EB" />,
-              'Exercise Reminders',
-              'Daily activity and movement prompts',
-              undefined,
-              <Switch
-                value={notifications.exerciseReminders}
-                onValueChange={(value) => 
-                  setNotifications({ ...notifications, exerciseReminders: value })
-                }
-                trackColor={{ false: '#E5E7EB', true: '#93C5FD' }}
-                thumbColor={notifications.exerciseReminders ? '#2563EB' : '#9CA3AF'}
-                accessibilityLabel="Exercise reminders toggle"
-                accessibilityHint="Enable or disable exercise reminder notifications"
-              />
-            )}
-          </View>
-          ))}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Insulin Settings</Text>
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingText}>Carb Ratio</Text>
+            <Text style={styles.settingValue}>1:15</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingText}>Correction Factor</Text>
+            <Text style={styles.settingValue}>1:50</Text>
+          </TouchableOpacity>
         </View>
 
-        <View accessibilityRole="region" accessible={true} accessibilityLabel="Health and safety settings section">
-          {renderSection('Health & Safety', (
-          <View>
-            {renderSettingItem(
-              <Shield size={20} color="#DC2626" />,
-              'Emergency Contacts',
-              'Quick access to healthcare providers',
-              showEmergencyContacts
-            )}
-            {renderSettingItem(
-              <Heart size={20} color="#DC2626" />,
-              'Medical ID',
-              'Emergency medical information',
-              () => Alert.alert('Medical ID', 'Medical ID setup would open here')
-            )}
-            {renderSettingItem(
-              <SettingsIcon size={20} color="#DC2626" />,
-              'Healthcare Provider',
-              'Dr. Sarah Johnson - Endocrinologist',
-              () => Alert.alert('Healthcare Provider', 'Provider contact options would appear here')
-            )}
-          </View>
-          ))}
-        </View>
-
-        <View accessibilityRole="region" accessible={true} accessibilityLabel="Support and help section">
-          {renderSection('Support', (
-          <View>
-            {renderSettingItem(
-              <HelpCircle size={20} color="#6B7280" />,
-              'Help & FAQs',
-              'Get answers to common questions',
-              () => Alert.alert('Help', 'Help center would open here')
-            )}
-            {renderSettingItem(
-              <Mail size={20} color="#6B7280" />,
-              'Contact Support',
-              'Get help from our support team',
-              () => Alert.alert('Contact Support', 'Support contact options would appear here')
-            )}
-            {renderSettingItem(
-              <Shield size={20} color="#6B7280" />,
-              'Privacy Policy',
-              'How we protect your health data',
-              () => Alert.alert('Privacy Policy', 'Privacy policy would be displayed here')
-            )}
-          </View>
-          ))}
-        </View>
-
-        <View style={styles.disclaimer} accessibilityRole="contentinfo" accessible={true} accessibilityLabel="Medical disclaimer">
-          <Text style={styles.disclaimerTitle}>Medical Disclaimer</Text>
-          <Text style={styles.disclaimerText}>
-            This app is for educational and tracking purposes only. It is not intended to replace professional medical advice, diagnosis, or treatment. Always consult with your healthcare provider before making any decisions about your diabetes management.
-          </Text>
-        </View>
-
-        <View style={styles.version} accessibilityRole="contentinfo" accessible={true} accessibilityLabel="App version information">
-          <Text style={styles.versionText}>DiabetesCare v1.0.0</Text>
-          <Text style={styles.versionSubtext}>Last updated: December 2024</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>App</Text>
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingText}>Notifications</Text>
+            <Text style={styles.settingArrow}>›</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingText}>Privacy</Text>
+            <Text style={styles.settingArrow}>›</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
-      </View>
     </SafeAreaView>
   );
 }
@@ -312,126 +56,60 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9FAFB',
   },
-  header: {
+  content: {
     padding: 20,
-    paddingBottom: 10,
+  },
+  header: {
+    marginBottom: 32,
   },
   title: {
-    fontSize: 28,
-    fontFamily: 'Inter-Bold',
+    fontSize: 32,
+    fontWeight: 'bold',
     color: '#111827',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
-    fontFamily: 'Inter-Regular',
+    fontSize: 18,
     color: '#6B7280',
   },
   section: {
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 20,
-    marginBottom: 20,
     borderRadius: 16,
-    paddingVertical: 4,
+    marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    overflow: 'hidden',
   },
   sectionTitle: {
     fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
+    fontWeight: '600',
     color: '#111827',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 8,
+    padding: 20,
+    paddingBottom: 12,
+    backgroundColor: '#F9FAFB',
   },
   settingItem: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
   },
-  settingIcon: {
-    width: 36,
-    height: 36,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  settingContent: {
-    flex: 1,
-  },
-  settingTitle: {
+  settingText: {
     fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
     color: '#111827',
-    marginBottom: 2,
   },
-  settingSubtitle: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#6B7280',
-  },
-  inputGroup: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#374151',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    padding: 12,
+  settingValue: {
     fontSize: 16,
-    fontFamily: 'Inter-Regular',
-    backgroundColor: '#F9FAFB',
+    color: '#2563EB',
+    fontWeight: '600',
   },
-  disclaimer: {
-    backgroundColor: '#FEF2F2',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 12,
-    padding: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#DC2626',
-  },
-  disclaimerTitle: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#DC2626',
-    marginBottom: 8,
-  },
-  disclaimerText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#DC2626',
-    lineHeight: 20,
-  },
-  version: {
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-  },
-  versionText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#6B7280',
-    marginBottom: 4,
-  },
-  versionSubtext: {
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
+  settingArrow: {
+    fontSize: 20,
     color: '#9CA3AF',
   },
 });

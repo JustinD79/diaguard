@@ -14,7 +14,16 @@ export default function TabLayout() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E5E7EB',
+          paddingBottom: 8,
+          paddingTop: 8,
+          height: 60,
         },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
+        tabBarActiveTintColor: '#2563EB',
+        tabBarInactiveTintColor: '#6B7280',
       }}>
       <Tabs.Screen
         name="index"
@@ -28,6 +37,20 @@ export default function TabLayout() {
         options={{
           title: 'Health',
           tabBarIcon: () => <TabBarIcon name="❤️" />,
+        }}
+      />
+      <Tabs.Screen
+        name="insulin"
+        options={{
+          title: 'Insulin',
+          tabBarIcon: () => <TabBarIcon name="💉" />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: () => <TabBarIcon name="⚙️" />,
         }}
       />
     </Tabs>
