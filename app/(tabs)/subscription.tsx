@@ -130,12 +130,12 @@ export default function SubscriptionScreen() {
 
         {product.description && (
           <Text style={styles.planDescription}>
-        <Text style={styles.planDescription}>
-          {typeof product.description === 'string' && product.description.trim() 
-            ? product.description 
-            : 'Premium diabetes management with AI-powered insights and comprehensive health tracking tools.'
-          }
-        </Text>
+            {typeof product.description === 'string' && product.description.trim() 
+              ? product.description 
+              : 'Premium diabetes management with AI-powered insights and comprehensive health tracking tools.'
+            }
+          </Text>
+        )}
 
         <View style={styles.featuresList}>
           <View style={styles.featureItem}>
