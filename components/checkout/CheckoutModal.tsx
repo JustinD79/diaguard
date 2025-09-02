@@ -444,10 +444,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9FAFB',
   },
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
