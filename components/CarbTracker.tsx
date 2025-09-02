@@ -7,16 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { 
-  Target, 
-  TrendingUp, 
-  Calendar, 
-  Droplet, 
-  Calculator,
-  Clock,
-  Activity,
-  BarChart3
-} from 'lucide-react-native';
+import { Target, TrendingUp, Calendar, Droplet, Calculator, Clock, Activity, ChartBar as BarChart3 } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Card from '@/components/ui/Card';
 import { CarbCalculatorService, BloodSugarImpact } from '@/services/CarbCalculatorService';

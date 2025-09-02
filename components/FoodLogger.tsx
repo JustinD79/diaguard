@@ -9,18 +9,7 @@ import {
   Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  Plus, 
-  Camera, 
-  Search, 
-  Clock, 
-  Utensils, 
-  Calculator,
-  TrendingUp,
-  Target,
-  X,
-  Edit3
-} from 'lucide-react-native';
+import { Plus, Camera, Search, Clock, Utensils, Calculator, TrendingUp, Target, X, CreditCard as Edit3 } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
