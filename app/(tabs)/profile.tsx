@@ -14,6 +14,7 @@ import { User, CreditCard as Edit, Camera, Calendar, Target, Activity, TrendingU
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import ProfilePictureSelector from '@/components/ui/ProfilePictureSelector';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Crown } from 'lucide-react-native';
 
@@ -97,6 +98,10 @@ export default function ProfileScreen() {
     Alert.alert('Success', 'Profile updated successfully');
   };
 
+  const handleImageSelected = (imageUri: string) => {
+    setProfile({ ...profile, profileImage: imageUri });
+  };
+
   const calculateAge = (dateOfBirth: string) => {
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
@@ -125,12 +130,11 @@ export default function ProfileScreen() {
   const renderProfileHeader = () => (
     <Card style={styles.profileCard}>
       <View style={styles.profileHeader}>
-        <View style={styles.profileImageContainer}>
-          <Image source={{ uri: profile.profileImage }} style={styles.profileImage} />
-          <TouchableOpacity style={styles.cameraButton}>
-            <Camera size={16} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
+        <ProfilePictureSelector
+          currentImage={profile.profileImage}
+          onImageSelected={handleImageSelected}
+          size={80}
+        />
         
         <View style={styles.profileInfo}>
           <Text style={styles.profileName}>{profile.name}</Text>
@@ -377,28 +381,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  profileImageContainer: {
-    position: 'relative',
-    marginRight: 16,
-  },
-  profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  cameraButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#2563EB',
-    borderRadius: 12,
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   profileInfo: {
     flex: 1,
+    marginLeft: 16,
   },
   profileName: {
     fontSize: 20,
