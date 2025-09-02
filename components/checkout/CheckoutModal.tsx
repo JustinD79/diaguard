@@ -407,7 +407,6 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
           </View>
         </ScrollView>
       </SafeAreaView>
-      </SafeAreaView>
     </Modal>
   );
 }
