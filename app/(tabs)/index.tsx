@@ -1,22 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  Camera, 
-  Calculator, 
-  Droplet, 
-  Plus, 
-  TrendingUp, 
-  Clock, 
-  AlertTriangle, 
-  Heart,
-  Utensils,
-  Pill,
-  Target,
-  Activity,
-  Scan,
-  Zap
-} from 'lucide-react-native';
+import { Camera, Calculator, Droplet, Plus, TrendingUp, Clock, TriangleAlert as AlertTriangle, Heart, Utensils, Pill, Target, Activity, Scan, Zap } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
