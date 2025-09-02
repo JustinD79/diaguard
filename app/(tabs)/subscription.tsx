@@ -230,7 +230,6 @@ export default function SubscriptionScreen() {
             </Text>
           </View>
         </View>
-        </Text>
       </View>
     </Card>
   );
