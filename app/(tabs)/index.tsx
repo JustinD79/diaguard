@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Camera, Calculator, Droplet, Plus, TrendingUp, Clock, TriangleAlert as AlertTriangle, Heart, Utensils, Pill, Target, Activity, Scan, Zap, BookOpen } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -10,6 +10,7 @@ import { useScanLimit } from '@/contexts/ScanLimitContext';
 import ScanLimitBanner from '@/components/notifications/ScanLimitBanner';
 import FoodCameraScanner from '@/components/FoodCameraScanner';
 import FoodLogger from '@/components/FoodLogger';
+import CarbTracker from '@/components/CarbTracker';
 import { Product, DiabetesInsights } from '@/services/FoodAPIService';
 
 interface QuickStat {
@@ -37,6 +38,7 @@ export default function HomeScreen() {
   const { canScan, scansRemaining } = useScanLimit();
   const [showFoodScanner, setShowFoodScanner] = useState(false);
   const [showFoodLogger, setShowFoodLogger] = useState(false);
+  const [showCarbTracker, setShowCarbTracker] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -159,6 +161,9 @@ export default function HomeScreen() {
       case 'emergency':
         router.push('/(tabs)/emergency');
         break;
+      case 'carb_tracker':
+        setShowCarbTracker(true);
+        break;
       default:
         break;
     }
@@ -267,6 +272,14 @@ export default function HomeScreen() {
         >
           <AlertTriangle size={20} color="#DC2626" />
           <Text style={styles.quickActionText}>Emergency</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.quickAction}
+          onPress={() => handleQuickAction('carb_tracker')}
+        >
+          <Target size={20} color="#8B5CF6" />
+          <Text style={styles.quickActionText}>Carb Tracker</Text>
         </TouchableOpacity>
       </View>
     </Card>
@@ -413,6 +426,21 @@ export default function HomeScreen() {
           Alert.alert('Success', 'Meal logged successfully!');
         }}
       />
+
+      {showCarbTracker && (
+        <Modal visible={showCarbTracker} animationType="slide" presentationStyle="pageSheet">
+          <SafeAreaView style={{ flex: 1 }}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setShowCarbTracker(false)}>
+                <Text style={styles.modalCancel}>Close</Text>
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>Carb & Insulin Tracker</Text>
+              <View style={{ width: 50 }} />
+            </View>
+            <CarbTracker />
+          </SafeAreaView>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -739,5 +767,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-Medium',
     color: '#2563EB',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
+  },
+  modalCancel: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
   },
 });
