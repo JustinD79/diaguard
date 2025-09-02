@@ -47,6 +47,48 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="recipes"
+        options={{
+          title: 'Recipes',
+          tabBarIcon: () => <TabBarIcon name="🍽️" />,
+        }}
+      />
+      <Tabs.Screen
+        name="reports"
+        options={{
+          title: 'Reports',
+          tabBarIcon: () => <TabBarIcon name="📊" />,
+        }}
+      />
+      <Tabs.Screen
+        name="medications"
+        options={{
+          title: 'Medications',
+          tabBarIcon: () => <TabBarIcon name="💊" />,
+        }}
+      />
+      <Tabs.Screen
+        name="emergency"
+        options={{
+          title: 'Emergency',
+          tabBarIcon: () => <TabBarIcon name="🚨" />,
+        }}
+      />
+      <Tabs.Screen
+        name="subscription"
+        options={{
+          title: 'Premium',
+          tabBarIcon: () => <TabBarIcon name="👑" />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: () => <TabBarIcon name="👤" />,
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',

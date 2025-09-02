@@ -1,38 +1,398 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { 
+  Camera, 
+  Calculator, 
+  Droplet, 
+  Plus, 
+  TrendingUp, 
+  Clock, 
+  AlertTriangle, 
+  Heart,
+  Utensils,
+  Pill,
+  Target,
+  Activity,
+  Scan,
+  Zap
+} from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useScanLimit } from '@/contexts/ScanLimitContext';
+import ScanLimitBanner from '@/components/notifications/ScanLimitBanner';
+import FoodScanner from '@/components/FoodScanner';
+
+interface QuickStat {
+  id: string;
+  label: string;
+  value: string;
+  unit: string;
+  trend: 'up' | 'down' | 'stable';
+  color: string;
+  icon: any;
+}
+
+interface RecentActivity {
+  id: string;
+  type: 'meal' | 'insulin' | 'glucose' | 'medication';
+  description: string;
+  time: string;
+  value?: string;
+  icon: any;
+}
 
 export default function HomeScreen() {
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Diabetes Care</Text>
-          <Text style={styles.subtitle}>Your health companion</Text>
-        </View>
+  const router = useRouter();
+  const { hasActiveSubscription, isPremiumFeature } = useSubscription();
+  const { canScan, scansRemaining } = useScanLimit();
+  const [showFoodScanner, setShowFoodScanner] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Welcome Back!</Text>
-          <Text style={styles.cardText}>
-            Track your blood glucose, calculate insulin doses, and manage your diabetes with confidence.
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const quickStats: QuickStat[] = [
+    {
+      id: 'glucose',
+      label: 'Current BG',
+      value: '142',
+      unit: 'mg/dL',
+      trend: 'stable',
+      color: '#D97706',
+      icon: Droplet
+    },
+    {
+      id: 'insulin',
+      label: 'Daily Insulin',
+      value: '24',
+      unit: 'units',
+      trend: 'down',
+      color: '#2563EB',
+      icon: Calculator
+    },
+    {
+      id: 'carbs',
+      label: 'Carbs Today',
+      value: '85',
+      unit: 'grams',
+      trend: 'up',
+      color: '#059669',
+      icon: Utensils
+    },
+    {
+      id: 'time_in_range',
+      label: 'Time in Range',
+      value: '78',
+      unit: '%',
+      trend: 'up',
+      color: '#8B5CF6',
+      icon: Target
+    }
+  ];
+
+  const recentActivities: RecentActivity[] = [
+    {
+      id: '1',
+      type: 'meal',
+      description: 'Lunch: Grilled chicken salad',
+      time: '12:30 PM',
+      value: '25g carbs',
+      icon: Utensils
+    },
+    {
+      id: '2',
+      type: 'insulin',
+      description: 'Rapid-acting insulin',
+      time: '12:15 PM',
+      value: '4 units',
+      icon: Calculator
+    },
+    {
+      id: '3',
+      type: 'glucose',
+      description: 'Blood glucose reading',
+      time: '11:45 AM',
+      value: '128 mg/dL',
+      icon: Droplet
+    },
+    {
+      id: '4',
+      type: 'medication',
+      description: 'Metformin taken',
+      time: '8:00 AM',
+      icon: Pill
+    }
+  ];
+
+  const handleAIFoodScan = () => {
+    if (!canScan) {
+      Alert.alert(
+        'Scan Limit Reached',
+        'You\'ve used all your free scans this month. Upgrade to premium for unlimited scanning.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Upgrade', onPress: () => router.push('/(tabs)/subscription') }
+        ]
+      );
+      return;
+    }
+
+    if (isPremiumFeature('ai_food_recognition')) {
+      Alert.alert(
+        'Premium Feature',
+        'AI food recognition requires a premium subscription.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Upgrade', onPress: () => router.push('/(tabs)/subscription') }
+        ]
+      );
+      return;
+    }
+
+    setShowFoodScanner(true);
+  };
+
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'insulin_calc':
+        router.push('/(tabs)/insulin');
+        break;
+      case 'glucose_log':
+        Alert.alert('Quick Glucose Entry', 'Glucose logging feature would open here');
+        break;
+      case 'food_log':
+        Alert.alert('Quick Food Entry', 'Manual food logging feature would open here');
+        break;
+      case 'emergency':
+        router.push('/(tabs)/emergency');
+        break;
+      default:
+        break;
+    }
+  };
+
+  const renderWelcomeHeader = () => {
+    const hour = currentTime.getHours();
+    const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+    
+    return (
+      <View style={styles.welcomeHeader}>
+        <Text style={styles.greeting}>{greeting}</Text>
+        <Text style={styles.welcomeText}>Ready to manage your diabetes today?</Text>
+      </View>
+    );
+  };
+
+  const renderAIFoodScanner = () => (
+    <Card style={styles.scannerCard}>
+      <View style={styles.scannerHeader}>
+        <View style={styles.scannerIcon}>
+          <Camera size={24} color="#2563EB" />
+        </View>
+        <View style={styles.scannerInfo}>
+          <Text style={styles.scannerTitle}>AI Food Recognition</Text>
+          <Text style={styles.scannerSubtitle}>
+            {canScan 
+              ? `${scansRemaining} scans remaining this month`
+              : 'Upgrade for unlimited scanning'
+            }
           </Text>
         </View>
-
-        <View style={styles.quickStats}>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>142</Text>
-            <Text style={styles.statLabel}>Avg Glucose</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>7.2%</Text>
-            <Text style={styles.statLabel}>A1C Goal</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>28</Text>
-            <Text style={styles.statLabel}>Days Tracked</Text>
-          </View>
+      </View>
+      
+      <Text style={styles.scannerDescription}>
+        Point your camera at food to instantly get carb counts, nutrition info, and insulin recommendations
+      </Text>
+      
+      <Button
+        title={canScan ? "Start AI Food Scan" : "Upgrade for Unlimited Scans"}
+        onPress={handleAIFoodScan}
+        style={[styles.scannerButton, !canScan && styles.disabledButton]}
+      />
+      
+      {hasActiveSubscription && (
+        <View style={styles.premiumBadge}>
+          <Zap size={12} color="#059669" />
+          <Text style={styles.premiumText}>Premium Active</Text>
         </View>
+      )}
+    </Card>
+  );
+
+  const renderQuickActions = () => (
+    <Card style={styles.quickActionsCard}>
+      <Text style={styles.sectionTitle}>Quick Actions</Text>
+      
+      <View style={styles.quickActionsGrid}>
+        <TouchableOpacity
+          style={styles.quickAction}
+          onPress={() => handleQuickAction('insulin_calc')}
+        >
+          <Calculator size={20} color="#2563EB" />
+          <Text style={styles.quickActionText}>Insulin Calculator</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.quickAction}
+          onPress={() => handleQuickAction('glucose_log')}
+        >
+          <Droplet size={20} color="#DC2626" />
+          <Text style={styles.quickActionText}>Log Glucose</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.quickAction}
+          onPress={() => handleQuickAction('food_log')}
+        >
+          <Plus size={20} color="#059669" />
+          <Text style={styles.quickActionText}>Add Meal</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.quickAction}
+          onPress={() => handleQuickAction('emergency')}
+        >
+          <AlertTriangle size={20} color="#DC2626" />
+          <Text style={styles.quickActionText}>Emergency</Text>
+        </TouchableOpacity>
+      </View>
+    </Card>
+  );
+
+  const renderTodaysSummary = () => (
+    <Card style={styles.summaryCard}>
+      <Text style={styles.sectionTitle}>Today's Summary</Text>
+      
+      <View style={styles.statsGrid}>
+        {quickStats.map((stat) => {
+          const IconComponent = stat.icon;
+          return (
+            <View key={stat.id} style={styles.statItem}>
+              <View style={[styles.statIcon, { backgroundColor: `${stat.color}15` }]}>
+                <IconComponent size={16} color={stat.color} />
+              </View>
+              <Text style={styles.statValue}>{stat.value}</Text>
+              <Text style={styles.statLabel}>{stat.label}</Text>
+              <Text style={styles.statUnit}>{stat.unit}</Text>
+            </View>
+          );
+        })}
+      </View>
+    </Card>
+  );
+
+  const renderRecentActivity = () => (
+    <Card style={styles.activityCard}>
+      <View style={styles.activityHeader}>
+        <Text style={styles.sectionTitle}>Recent Activity</Text>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/health')}>
+          <Text style={styles.viewAllText}>View All</Text>
+        </TouchableOpacity>
+      </View>
+      
+      <View style={styles.activityList}>
+        {recentActivities.slice(0, 4).map((activity) => {
+          const IconComponent = activity.icon;
+          return (
+            <View key={activity.id} style={styles.activityItem}>
+              <View style={styles.activityIcon}>
+                <IconComponent size={16} color="#6B7280" />
+              </View>
+              <View style={styles.activityInfo}>
+                <Text style={styles.activityDescription}>{activity.description}</Text>
+                <Text style={styles.activityTime}>{activity.time}</Text>
+              </View>
+              {activity.value && (
+                <Text style={styles.activityValue}>{activity.value}</Text>
+              )}
+            </View>
+          );
+        })}
+      </View>
+    </Card>
+  );
+
+  const renderMedicationReminders = () => (
+    <Card style={styles.medicationCard}>
+      <View style={styles.medicationHeader}>
+        <Pill size={20} color="#8B5CF6" />
+        <Text style={styles.sectionTitle}>Medication Reminders</Text>
+      </View>
+      
+      <View style={styles.medicationItem}>
+        <View style={styles.medicationInfo}>
+          <Text style={styles.medicationName}>Metformin 500mg</Text>
+          <Text style={styles.medicationTime}>Due in 2 hours (8:00 PM)</Text>
+        </View>
+        <TouchableOpacity style={styles.medicationButton}>
+          <Clock size={16} color="#8B5CF6" />
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity 
+        style={styles.viewMedicationsButton}
+        onPress={() => router.push('/(tabs)/medications')}
+      >
+        <Text style={styles.viewMedicationsText}>View All Medications</Text>
+      </TouchableOpacity>
+    </Card>
+  );
+
+  const renderInsights = () => (
+    <Card style={styles.insightsCard}>
+      <View style={styles.insightsHeader}>
+        <TrendingUp size={20} color="#059669" />
+        <Text style={styles.sectionTitle}>Today's Insights</Text>
+      </View>
+      
+      <Text style={styles.insightText}>
+        🎯 Your glucose levels are 12% more stable today compared to yesterday. Great job with meal timing!
+      </Text>
+      
+      <TouchableOpacity 
+        style={styles.viewReportsButton}
+        onPress={() => router.push('/(tabs)/reports')}
+      >
+        <Text style={styles.viewReportsText}>View Detailed Reports</Text>
+      </TouchableOpacity>
+    </Card>
+  );
+
+  const handleFoodScanned = (product: any, insights: any) => {
+    setShowFoodScanner(false);
+    Alert.alert(
+      'Food Scanned Successfully!',
+      `${product.name}\nCarbs: ${product.nutrition.carbs}g\nEstimated insulin: ${insights.estimatedInsulinUnits} units`,
+      [
+        { text: 'Log Meal', onPress: () => console.log('Logging meal...') },
+        { text: 'Calculate Insulin', onPress: () => router.push('/(tabs)/insulin') }
+      ]
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {renderWelcomeHeader()}
+        
+        <ScanLimitBanner />
+        
+        {renderAIFoodScanner()}
+        {renderQuickActions()}
+        {renderTodaysSummary()}
+        {renderRecentActivity()}
+        {renderMedicationReminders()}
+        {renderInsights()}
       </ScrollView>
+
+      {showFoodScanner && (
+        <FoodScanner onFoodScanned={handleFoodScanned} />
+      )}
     </SafeAreaView>
   );
 }
@@ -43,68 +403,282 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
   },
   content: {
+    paddingBottom: 20,
+  },
+  welcomeHeader: {
     padding: 20,
+    paddingBottom: 10,
   },
-  header: {
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+  greeting: {
+    fontSize: 28,
+    fontFamily: 'Inter-Bold',
     color: '#111827',
-    marginBottom: 8,
+    marginBottom: 4,
   },
-  subtitle: {
-    fontSize: 18,
-    color: '#6B7280',
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  cardText: {
+  welcomeText: {
     fontSize: 16,
+    fontFamily: 'Inter-Regular',
     color: '#6B7280',
-    lineHeight: 24,
   },
-  quickStats: {
+  sectionTitle: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+  },
+  scannerCard: {
+    margin: 20,
+    marginBottom: 10,
+    position: 'relative',
+  },
+  scannerHeader: {
     flexDirection: 'row',
-    gap: 12,
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  statCard: {
+  scannerIcon: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#EBF4FF',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  scannerInfo: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+  },
+  scannerTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  scannerSubtitle: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  scannerDescription: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  scannerButton: {
+    marginBottom: 0,
+  },
+  disabledButton: {
+    backgroundColor: '#9CA3AF',
+  },
+  premiumBadge: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ECFDF5',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    gap: 4,
+  },
+  premiumText: {
+    fontSize: 10,
+    fontFamily: 'Inter-SemiBold',
+    color: '#059669',
+  },
+  quickActionsCard: {
+    margin: 20,
+    marginBottom: 10,
+  },
+  quickActionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 12,
+  },
+  quickAction: {
+    flex: 1,
+    minWidth: '45%',
+    backgroundColor: '#F9FAFB',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  quickActionText: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#374151',
+    textAlign: 'center',
+  },
+  summaryCard: {
+    margin: 20,
+    marginBottom: 10,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 12,
+  },
+  statItem: {
+    flex: 1,
+    minWidth: '45%',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 16,
+  },
+  statIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   statValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2563EB',
-    marginBottom: 4,
+    fontSize: 20,
+    fontFamily: 'Inter-Bold',
+    color: '#111827',
+    marginBottom: 2,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 11,
+    fontFamily: 'Inter-Medium',
     color: '#6B7280',
-    textAlign: 'center',
+    marginBottom: 1,
+  },
+  statUnit: {
+    fontSize: 10,
+    fontFamily: 'Inter-Regular',
+    color: '#9CA3AF',
+  },
+  activityCard: {
+    margin: 20,
+    marginBottom: 10,
+  },
+  activityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  viewAllText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#2563EB',
+  },
+  activityList: {
+    gap: 12,
+  },
+  activityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    gap: 12,
+  },
+  activityIcon: {
+    width: 32,
+    height: 32,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  activityInfo: {
+    flex: 1,
+  },
+  activityDescription: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  activityTime: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  activityValue: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#2563EB',
+  },
+  medicationCard: {
+    margin: 20,
+    marginBottom: 10,
+  },
+  medicationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  medicationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+  },
+  medicationInfo: {
+    flex: 1,
+  },
+  medicationName: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  medicationTime: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  medicationButton: {
+    backgroundColor: '#EBF4FF',
+    borderRadius: 8,
+    padding: 8,
+  },
+  viewMedicationsButton: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  viewMedicationsText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#2563EB',
+  },
+  insightsCard: {
+    margin: 20,
+    marginBottom: 10,
+  },
+  insightsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  insightText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#374151',
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  viewReportsButton: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  viewReportsText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#2563EB',
   },
 });
