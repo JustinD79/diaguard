@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Camera, Calculator, Droplet, Plus, TrendingUp, Clock, TriangleAlert as AlertTriangle, Heart, Utensils, Pill, Target, Activity, Scan, Zap } from 'lucide-react-native';
+import { Camera, Calculator, Droplet, Plus, TrendingUp, Clock, TriangleAlert as AlertTriangle, Heart, Utensils, Pill, Target, Activity, Scan, Zap, BookOpen } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useScanLimit } from '@/contexts/ScanLimitContext';
 import ScanLimitBanner from '@/components/notifications/ScanLimitBanner';
-import FoodScanner from '@/components/FoodScanner';
+import FoodCameraScanner from '@/components/FoodCameraScanner';
+import FoodLogger from '@/components/FoodLogger';
+import { Product, DiabetesInsights } from '@/services/FoodAPIService';
 
 interface QuickStat {
   id: string;
@@ -34,6 +36,7 @@ export default function HomeScreen() {
   const { hasActiveSubscription, isPremiumFeature } = useSubscription();
   const { canScan, scansRemaining } = useScanLimit();
   const [showFoodScanner, setShowFoodScanner] = useState(false);
+  const [showFoodLogger, setShowFoodLogger] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -151,7 +154,7 @@ export default function HomeScreen() {
         Alert.alert('Quick Glucose Entry', 'Glucose logging feature would open here');
         break;
       case 'food_log':
-        Alert.alert('Quick Food Entry', 'Manual food logging feature would open here');
+        setShowFoodLogger(true);
         break;
       case 'emergency':
         router.push('/(tabs)/emergency');
@@ -191,7 +194,7 @@ export default function HomeScreen() {
       </View>
       
       <Text style={styles.scannerDescription}>
-        Point your camera at food to instantly get carb counts, nutrition info, and insulin recommendations
+        Advanced AI-powered food recognition that analyzes your meals to provide accurate carb counts, sugar content, and personalized insulin dosage recommendations
       </Text>
       
       <Button
@@ -206,6 +209,26 @@ export default function HomeScreen() {
           <Text style={styles.premiumText}>Premium Active</Text>
         </View>
       )}
+    </Card>
+  );
+
+  const renderQuickFoodLogger = () => (
+    <Card style={styles.foodLoggerCard}>
+      <View style={styles.foodLoggerHeader}>
+        <View style={styles.foodLoggerIcon}>
+          <BookOpen size={24} color="#059669" />
+        </View>
+        <View style={styles.foodLoggerInfo}>
+          <Text style={styles.foodLoggerTitle}>Food Logger</Text>
+          <Text style={styles.foodLoggerSubtitle}>Track meals, carbs, and insulin</Text>
+        </View>
+      </View>
+      
+      <Text style={styles.foodLoggerDescription}>
+        Comprehensive meal tracking with camera scanning, manual entry, and automatic insulin calculations
+      </Text>
+      
+      <Button title="Open Food Logger" onPress={() => setShowFoodLogger(true)} />
     </Card>
   );
 
@@ -232,10 +255,10 @@ export default function HomeScreen() {
 
         <TouchableOpacity
           style={styles.quickAction}
-          onPress={() => handleQuickAction('food_log')}
+          onPress={() => setShowFoodLogger(true)}
         >
           <Plus size={20} color="#059669" />
-          <Text style={styles.quickActionText}>Add Meal</Text>
+          <Text style={styles.quickActionText}>Log Food</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -349,15 +372,15 @@ export default function HomeScreen() {
   );
 
   const handleFoodScanned = (product: any, insights: any) => {
-    setShowFoodScanner(false);
     Alert.alert(
       'Food Scanned Successfully!',
       `${product.name}\nCarbs: ${product.nutrition.carbs}g\nEstimated insulin: ${insights.estimatedInsulinUnits} units`,
       [
-        { text: 'Log Meal', onPress: () => console.log('Logging meal...') },
+        { text: 'Open Food Logger', onPress: () => setShowFoodLogger(true) },
         { text: 'Calculate Insulin', onPress: () => router.push('/(tabs)/insulin') }
       ]
     );
+    setShowFoodScanner(false);
   };
 
   return (
@@ -368,6 +391,7 @@ export default function HomeScreen() {
         <ScanLimitBanner />
         
         {renderAIFoodScanner()}
+        {renderQuickFoodLogger()}
         {renderQuickActions()}
         {renderTodaysSummary()}
         {renderRecentActivity()}
@@ -375,9 +399,20 @@ export default function HomeScreen() {
         {renderInsights()}
       </ScrollView>
 
-      {showFoodScanner && (
-        <FoodScanner onFoodScanned={handleFoodScanned} />
-      )}
+      <FoodCameraScanner
+        visible={showFoodScanner}
+        onClose={() => setShowFoodScanner(false)}
+        onFoodAnalyzed={handleFoodScanned}
+      />
+
+      <FoodLogger
+        visible={showFoodLogger}
+        onClose={() => setShowFoodLogger(false)}
+        onMealLogged={(meal) => {
+          console.log('Meal logged:', meal);
+          Alert.alert('Success', 'Meal logged successfully!');
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -472,6 +507,45 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Inter-SemiBold',
     color: '#059669',
+  },
+  foodLoggerCard: {
+    margin: 20,
+    marginBottom: 10,
+  },
+  foodLoggerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  foodLoggerIcon: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#ECFDF5',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  foodLoggerInfo: {
+    flex: 1,
+  },
+  foodLoggerTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  foodLoggerSubtitle: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  foodLoggerDescription: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+    lineHeight: 20,
+    marginBottom: 16,
   },
   quickActionsCard: {
     margin: 20,
