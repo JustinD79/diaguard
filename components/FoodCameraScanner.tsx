@@ -13,17 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import { 
-  Camera, 
-  X, 
-  FlipHorizontal, 
-  Flash, 
-  Image as ImageIcon, 
-  Zap,
-  Target,
-  CheckCircle,
-  RefreshCw
-} from 'lucide-react-native';
+import { Camera, X, FlipHorizontal, Slash as Flash, Image as ImageIcon, Zap, Target, CircleCheck as CheckCircle, RefreshCw } from 'lucide-react-native';
 import { FoodAPIService, Product, DiabetesInsights } from '@/services/FoodAPIService';
 import { useScanLimit } from '@/contexts/ScanLimitContext';
 import Button from '@/components/ui/Button';
