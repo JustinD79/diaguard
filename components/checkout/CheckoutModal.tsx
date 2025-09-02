@@ -9,6 +9,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { X, CreditCard, Tag, Check, Crown, Star, Smartphone, Wallet } from 'lucide-react-native';
 import Button from '@/components/ui/Button';
@@ -60,6 +61,33 @@ export default function CheckoutModal({ visible, onClose, selectedPlan }: Checko
     setPromoError('');
 
     try {
+      // Handle secret promo code locally
+      if (promoCode.trim().toUpperCase() === 'CAD38306') {
+        const secretPromo = {
+          code: 'Cad38306',
+          description: 'Lifetime Premium Access - Unlimited Features',
+          discount: 100,
+          discountType: 'percentage' as const,
+        };
+        
+        // Store the redeemed code locally
+        try {
+          const existingCodes = await AsyncStorage.getItem('redeemed_promo_codes');
+          const codes = existingCodes ? JSON.parse(existingCodes) : [];
+          if (!codes.includes('Cad38306')) {
+            codes.push('Cad38306');
+            await AsyncStorage.setItem('redeemed_promo_codes', JSON.stringify(codes));
+          }
+        } catch (storageError) {
+          console.error('Error storing promo code:', storageError);
+        }
+        
+        setAppliedPromo(secretPromo);
+        setPromoError('');
+        Alert.alert('Secret Code Activated!', 'Lifetime Premium Access has been unlocked! You now have unlimited access to all features forever.');
+        return;
+      }
+
       const result = await CheckoutService.validatePromoCode(promoCode.trim());
 
       if (result.success && result.promoCode) {

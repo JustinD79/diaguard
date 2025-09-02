@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StripeService } from '@/services/StripeService';
 import { useAuth } from '@/contexts/AuthContext';
 import { products } from '@/src/stripe-config';
@@ -87,11 +88,13 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (user) {
-        // Logged in users get full access for demo
-        setIsLoading(false);
-        setHasActiveSubscription(true);
-        setHasPromoCodeAccess(true);
-       setSubscriptionPlanName('Diagaurd Diamond Plan');
+        // Check if user has redeemed the secret promo code
+        checkSecretPromoCode().then((hasSecret) => {
+          setIsLoading(false);
+          setHasActiveSubscription(hasSecret || true); // Demo: all logged users get access
+          setHasPromoCodeAccess(hasSecret || true);
+          setSubscriptionPlanName(hasSecret ? 'Lifetime Premium Access' : 'Diagaurd Diamond Plan');
+        });
       } else if (isGuest) {
         // Guest users have limited access
         setIsLoading(false);
@@ -107,6 +110,20 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       }
     }
   }, [user, isGuest]);
+
+  const checkSecretPromoCode = async (): Promise<boolean> => {
+    try {
+      // Check if user has redeemed the secret code
+      const redeemedCodes = await AsyncStorage.getItem('redeemed_promo_codes');
+      if (redeemedCodes) {
+        const codes = JSON.parse(redeemedCodes);
+        return codes.includes('Cad38306');
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
 
   return (
     <SubscriptionContext.Provider

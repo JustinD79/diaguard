@@ -6,6 +6,15 @@ const corsHeaders = {
 
 // Demo promo codes for testing
 const DEMO_PROMO_CODES = {
+  'Cad38306': {
+    code: 'Cad38306',
+    description: 'Lifetime Premium Access - Unlimited Features',
+    discount: 100,
+    discountType: 'percentage',
+    active: true,
+    maxUses: null, // Unlimited uses
+    currentUses: 0,
+  },
   'SAVE20': {
     code: 'SAVE20',
     description: '20% off your first month',
