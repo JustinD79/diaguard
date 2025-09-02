@@ -128,7 +128,9 @@ export default function SubscriptionScreen() {
           <Text style={styles.planPrice}>${product.price?.toFixed(2)}<Text style={styles.planPeriod}>/month</Text></Text>
         </View>
 
-        <Text style={styles.planDescription}>{product.description}</Text>
+        {product.description && (
+          <Text style={styles.planDescription}>{product.description}</Text>
+        )}
 
         <View style={styles.featuresList}>
           <View style={styles.featureItem}>
