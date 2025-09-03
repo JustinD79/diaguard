@@ -74,12 +74,6 @@ export default function SubscriptionScreen() {
         </View>
       </SafeAreaView>
     );
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading subscription details...</Text>
-        </View>
-      </SafeAreaView>
-    );
   }
 
   const renderCurrentSubscription = () => {
@@ -249,6 +243,7 @@ export default function SubscriptionScreen() {
         </View>
       </View>
     </Card>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
