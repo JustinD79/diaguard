@@ -66,6 +66,16 @@ export default function SubscriptionScreen() {
     return new Date(timestamp * 1000).toLocaleDateString();
   };
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading subscription details...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const renderCurrentSubscription = () => {
     if (!subscription || !isSubscriptionActive()) {
       return null;
@@ -126,15 +136,15 @@ export default function SubscriptionScreen() {
           </View>
           <Text style={styles.planName}>{product.name}</Text>
           <Text style={styles.planPrice}>
-            ${plan.price?.toFixed(2)}
+            $15.00
             <Text style={styles.planPeriod}>/month</Text>
           </Text>
         </View>
 
         <Text style={styles.planDescription}>
-          {typeof product.description === 'string' && product.description.trim() 
-            ? product.description 
-            : 'Premium diabetes management with unlimited AI-powered features'
+          {typeof product.description === 'string' && product.description.trim()
+            ? product.description
+            : 'Complete diabetes management with unlimited AI-powered features and full access to all tools'
           }
         </Text>
 
@@ -234,15 +244,10 @@ export default function SubscriptionScreen() {
       </View>
     </Card>
   );
-        {typeof product.description === 'string' && product.description.trim() 
-          ? product.description 
+
+  if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading subscription details...</Text>
-        </View>
-      </SafeAreaView>
-    );
+  }
   }
 
   return (
