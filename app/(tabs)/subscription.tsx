@@ -134,7 +134,7 @@ export default function SubscriptionScreen() {
         <Text style={styles.planDescription}>
           {typeof plan.description === 'string' && plan.description.trim() 
             ? plan.description 
-            : 'Premium diabetes management with AI-powered insights and comprehensive health tracking tools.'
+          $15.00
           }
         </Text>
 
@@ -234,8 +234,8 @@ export default function SubscriptionScreen() {
       </View>
     </Card>
   );
-
-  if (loading) {
+        {typeof product.description === 'string' && product.description.trim() 
+          ? product.description 
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
