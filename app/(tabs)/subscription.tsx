@@ -132,9 +132,9 @@ export default function SubscriptionScreen() {
         </View>
 
         <Text style={styles.planDescription}>
-          {typeof plan.description === 'string' && plan.description.trim() 
-            ? plan.description 
-          $15.00
+          {typeof product.description === 'string' && product.description.trim() 
+            ? product.description 
+            : 'Premium diabetes management with unlimited AI-powered features'
           }
         </Text>
 
