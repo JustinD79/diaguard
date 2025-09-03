@@ -123,22 +123,10 @@ export default function HomeScreen() {
     if (!canScan) {
       Alert.alert(
         'Scan Limit Reached',
-        'You\'ve used all your free scans this month. Upgrade to premium for unlimited scanning.',
+        'You\'ve used all 30 free scans this month. Subscribe to Diagaurd Diamond Plan for unlimited scanning.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Upgrade', onPress: () => router.push('/(tabs)/subscription') }
-        ]
-      );
-      return;
-    }
-
-    if (isPremiumFeature('ai_food_recognition')) {
-      Alert.alert(
-        'Premium Feature',
-        'AI food recognition requires a premium subscription.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Upgrade', onPress: () => router.push('/(tabs)/subscription') }
+          { text: 'Subscribe', onPress: () => router.push('/(tabs)/subscription') }
         ]
       );
       return;

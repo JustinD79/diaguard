@@ -70,19 +70,9 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       return !guestFeatures.includes(feature);
     }
 
-    const premiumFeatures = [
-      'ai_food_recognition',
-      'barcode_scanning',
-      'portion_estimation',
-      'advanced_analytics',
-      'personalized_coaching',
-      'recipe_recommendations',
-      'export_data',
-      'healthcare_integration',
-      'priority_support'
-    ];
-
-    return premiumFeatures.includes(feature) && !hasActiveSubscription && !hasPromoCodeAccess;
+    // With the $15 plan, all features are included - no premium gates for logged-in users
+    // Only guests are restricted
+    return false;
   };
 
   useEffect(() => {

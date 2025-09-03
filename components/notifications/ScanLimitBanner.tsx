@@ -39,13 +39,13 @@ export default function ScanLimitBanner() {
           <Text style={styles.title}>
             {isExhausted 
               ? 'Scan limit reached' 
-              : `${scansRemaining} scans left`
+              : `${scansRemaining} of 30 free scans left`
             }
           </Text>
           <Text style={styles.subtitle}>
             {isExhausted 
               ? `Get ${productName} for unlimited scanning` 
-              : `Get ${productName} for unlimited scans`
+              : `Subscribe for unlimited scans at $15/month`
             }
           </Text>
         </View>
