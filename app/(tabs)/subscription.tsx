@@ -125,17 +125,18 @@ export default function SubscriptionScreen() {
             <Star size={24} color="#2563EB" />
           </View>
           <Text style={styles.planName}>{product.name}</Text>
-          <Text style={styles.planPrice}>${product.price?.toFixed(2)}<Text style={styles.planPeriod}>/month</Text></Text>
+          <Text style={styles.planPrice}>
+            ${plan.price?.toFixed(2)}
+            <Text style={styles.planPeriod}>/month</Text>
+          </Text>
         </View>
 
-        {product.description && (
-          <Text style={styles.planDescription}>
-            {typeof product.description === 'string' && product.description.trim() 
-              ? product.description 
-              : 'Premium diabetes management with AI-powered insights and comprehensive health tracking tools.'
-            }
-          </Text>
-        )}
+        <Text style={styles.planDescription}>
+          {typeof plan.description === 'string' && plan.description.trim() 
+            ? plan.description 
+            : 'Premium diabetes management with AI-powered insights and comprehensive health tracking tools.'
+          }
+        </Text>
 
         <View style={styles.featuresList}>
           <View style={styles.featureItem}>
