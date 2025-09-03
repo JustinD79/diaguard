@@ -67,13 +67,12 @@ export default function SubscriptionScreen() {
   };
 
   if (loading) {
+    return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Loading subscription details...</Text>
         </View>
       </SafeAreaView>
-    );
-  }
     );
   }
 
