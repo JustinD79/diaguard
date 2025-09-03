@@ -245,11 +245,6 @@ export default function SubscriptionScreen() {
     </Card>
   );
 
-  if (loading) {
-    return (
-  }
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
