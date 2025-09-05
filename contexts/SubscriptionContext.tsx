@@ -2,12 +2,13 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StripeService } from '@/services/StripeService';
 import { useAuth } from '@/contexts/AuthContext';
-import { products } from '@/src/stripe-config';
+import { products, getProductByTier, getFeaturesByTier } from '@/src/stripe-config';
 
 interface SubscriptionContextType {
   hasActiveSubscription: boolean;
   subscriptionPlan: string | null;
   subscriptionPlanName: string | null;
+  subscriptionTier: 'standard' | 'gold' | 'diamond';
   isLoading: boolean;
   refreshSubscription: () => Promise<void>;
   isPremiumFeature: (feature: string) => boolean;
@@ -25,6 +26,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
   const [subscriptionPlanName, setSubscriptionPlanName] = useState<string | null>(null);
+  const [subscriptionTier, setSubscriptionTier] = useState<'standard' | 'gold' | 'diamond'>('standard');
   const [hasPromoCodeAccess, setHasPromoCodeAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -60,19 +62,14 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   };
 
   const isPremiumFeature = (feature: string): boolean => {
-    // Guests have very limited access
+    // Guests have no access to any features
     if (isGuest || !user) {
-      const guestFeatures = [
-        'view_recipes',
-        'basic_calculator',
-        'view_emergency_info'
-      ];
-      return !guestFeatures.includes(feature);
+      return true; // All features require login
     }
 
-    // With the $15 plan, all features are included - no premium gates for logged-in users
-    // Only guests are restricted
-    return false;
+    // Check if feature is available in user's current tier
+    const userFeatures = getFeaturesByTier(subscriptionTier);
+    return !userFeatures.includes(feature);
   };
 
   useEffect(() => {
@@ -81,20 +78,30 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         // Check if user has redeemed the secret promo code
         checkSecretPromoCode().then((hasSecret) => {
           setIsLoading(false);
-          setHasActiveSubscription(hasSecret || true); // Demo: all logged users get access
+          if (hasSecret) {
+            setHasActiveSubscription(true);
+            setSubscriptionTier('diamond');
+            setSubscriptionPlanName('Lifetime Premium Access');
+          } else {
+            // Default to standard (free) tier for logged-in users
+            setHasActiveSubscription(false);
+            setSubscriptionTier('standard');
+            setSubscriptionPlanName('Standard Plan');
+          }
           setHasPromoCodeAccess(hasSecret || true);
-          setSubscriptionPlanName(hasSecret ? 'Lifetime Premium Access' : 'Diagaurd Diamond Plan');
         });
       } else if (isGuest) {
         // Guest users have limited access
         setIsLoading(false);
         setHasActiveSubscription(false);
+        setSubscriptionTier('standard');
         setHasPromoCodeAccess(false);
         setSubscriptionPlanName(null);
       } else {
         // Not logged in, redirect to auth
         setIsLoading(false);
         setHasActiveSubscription(false);
+        setSubscriptionTier('standard');
         setHasPromoCodeAccess(false);
         setSubscriptionPlanName(null);
       }
@@ -121,6 +128,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         hasActiveSubscription,
         subscriptionPlan,
         subscriptionPlanName,
+        subscriptionTier,
         isLoading,
         refreshSubscription,
         isPremiumFeature,

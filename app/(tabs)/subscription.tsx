@@ -12,6 +12,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { products } from '@/src/stripe-config';
 import CheckoutModal from '@/components/checkout/CheckoutModal';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 // Add dynamic export to disable SSR for this component
 export const dynamic = 'force-dynamic';
@@ -28,6 +29,7 @@ export default function SubscriptionScreen() {
   const [loading, setLoading] = useState(true);
   const [showCheckout, setShowCheckout] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string>('');
+  const { subscriptionTier, hasActiveSubscription } = useSubscription();
 
   useEffect(() => {
     // Simulate loading
@@ -125,73 +127,117 @@ export default function SubscriptionScreen() {
   };
 
   const renderPricingCard = () => {
-    const product = products[0]; // Diagaurd Diamond Plan
-    const hasActiveSubscription = isSubscriptionActive();
-
     return (
-      <Card style={styles.pricingCard}>
-        <View style={styles.pricingHeader}>
-          <View style={styles.planIcon}>
-            <Star size={24} color="#2563EB" />
-          </View>
-          <Text style={styles.planName}>{product.name}</Text>
-          <Text style={styles.planPrice}>
-            $15.00
-            <Text style={styles.planPeriod}>/month</Text>
-          </Text>
-        </View>
+      <View style={styles.pricingContainer}>
+        {products.map((product) => {
+          const isCurrentPlan = subscriptionTier === product.tier;
+          const isUpgrade = product.tier === 'gold' || product.tier === 'diamond';
+          
+          return (
+            <Card key={product.priceId} style={[
+              styles.pricingCard,
+              isCurrentPlan && styles.currentPlanCard,
+              product.tier === 'diamond' && styles.diamondCard
+            ]}>
+              <View style={styles.pricingHeader}>
+                <View style={[
+                  styles.planIcon,
+                  product.tier === 'standard' && styles.standardIcon,
+                  product.tier === 'gold' && styles.goldIcon,
+                  product.tier === 'diamond' && styles.diamondIcon
+                ]}>
+                  <Star size={24} color={
+                    product.tier === 'standard' ? '#6B7280' :
+                    product.tier === 'gold' ? '#F59E0B' : '#2563EB'
+                  } />
+                </View>
+                <Text style={styles.planName}>{product.name}</Text>
+                <Text style={styles.planPrice}>
+                  ${product.price?.toFixed(2) || '0.00'}
+                  <Text style={styles.planPeriod}>
+                    {product.price === 0 ? '' : '/month'}
+                  </Text>
+                </Text>
+                {product.tier === 'diamond' && (
+                  <View style={styles.popularBadge}>
+                    <Text style={styles.popularText}>Most Popular</Text>
+                  </View>
+                )}
+              </View>
 
-        <Text style={styles.planDescription}>
-          {typeof product.description === 'string' && product.description.trim()
-            ? product.description
-            : 'Complete diabetes management with unlimited AI-powered features and full access to all tools'
-          }
-        </Text>
+              <Text style={styles.planDescription}>
+                {product.description}
+              </Text>
 
-        <View style={styles.featuresList}>
-          <View style={styles.featureItem}>
-            <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Unlimited AI-powered food recognition</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Advanced insulin calculator</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Comprehensive health analytics</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Personalized diabetes-friendly recipes</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Secure payment processing</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Multiple subscription tier options</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Check size={16} color="#059669" />
-            <Text style={styles.featureText}>Seamless monthly billing system</Text>
-          </View>
-        </View>
+              <View style={styles.scanLimitInfo}>
+                <Text style={styles.scanLimitText}>
+                  {product.scanLimit ? `${product.scanLimit} AI scans/month` : 'Unlimited AI scans'}
+                </Text>
+              </View>
 
-        <Button
-          title={hasActiveSubscription ? 'Already Subscribed' : 'Subscribe Now'}
-          onPress={() => handleSubscribe(product.priceId)}
-          disabled={hasActiveSubscription}
-          style={styles.subscribeButton}
-        />
-      </Card>
+              <View style={styles.featuresList}>
+                {product.features.slice(0, 6).map((feature, index) => (
+                  <View key={index} style={styles.featureItem}>
+                    <Check size={16} color="#059669" />
+                    <Text style={styles.featureText}>
+                      {this.getFeatureDisplayName(feature)}
+                    </Text>
+                  </View>
+                ))}
+                {product.features.length > 6 && (
+                  <Text style={styles.moreFeatures}>
+                    +{product.features.length - 6} more features
+                  </Text>
+                )}
+              </View>
+
+              <Button
+                title={
+                  isCurrentPlan ? 'Current Plan' :
+                  product.price === 0 ? 'Free Plan' :
+                  'Subscribe Now'
+                }
+                onPress={() => handleSubscribe(product.priceId)}
+                disabled={isCurrentPlan || (product.price === 0 && subscriptionTier !== 'standard')}
+                style={[
+                  styles.subscribeButton,
+                  isCurrentPlan && styles.currentPlanButton,
+                  product.tier === 'diamond' && styles.diamondButton
+                ]}
+              />
+            </Card>
+          );
+        })}
+      </View>
     );
+  };
+
+  const getFeatureDisplayName = (feature: string): string => {
+    const featureNames: { [key: string]: string } = {
+      'insulin_calculator': 'Insulin Calculator',
+      'health_monitor': 'Health Monitor',
+      'emergency_info': 'Emergency Information',
+      'basic_reports': 'Basic Health Reports',
+      'medication_viewing': 'Medication Viewing',
+      'manual_food_entry': 'Manual Food Entry',
+      'basic_profile': 'Basic Profile',
+      'advanced_reports': 'Advanced Analytics',
+      'medication_reminders': 'Medication Reminders',
+      'profile_management': 'Full Profile Management',
+      'detailed_carb_tracking': 'Detailed Carb Tracking',
+      'advanced_recipe_search': 'Advanced Recipe Search',
+      'camera_food_logging': 'Camera Food Logging',
+      'ai_insights': 'AI-Powered Insights',
+      'priority_support': 'Priority Support',
+      'advanced_medical_analysis': 'Advanced Medical Analysis',
+      'unlimited_scans': 'Unlimited AI Scans'
+    };
+    return featureNames[feature] || feature;
   };
 
   const renderBenefits = () => (
     <Card style={styles.benefitsCard}>
-      <Text style={styles.sectionTitle}>Why Choose {products[0].name}?</Text>
+      <Text style={styles.sectionTitle}>Why Choose Premium?</Text>
       
       <View style={styles.benefitsList}>
         <View style={styles.benefitItem}>
@@ -254,7 +300,13 @@ export default function SubscriptionScreen() {
         </View>
 
         {renderCurrentSubscription()}
-        {renderPricingCard()}
+        <View style={styles.pricingSection}>
+          <Text style={styles.pricingSectionTitle}>Choose Your Plan</Text>
+          <Text style={styles.pricingSectionSubtitle}>
+            Select the plan that best fits your diabetes management needs
+          </Text>
+          {renderPricingCard()}
+        </View>
         {renderBenefits()}
         
         <CheckoutModal
@@ -397,6 +449,84 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontFamily: 'Inter-Bold',
     color: '#6B4EFF',
+  },
+  pricingContainer: {
+    gap: 16,
+  },
+  pricingSection: {
+    margin: 20,
+    marginBottom: 10,
+  },
+  pricingSectionTitle: {
+    fontSize: 24,
+    fontFamily: 'Inter-Bold',
+    color: '#111827',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  pricingSectionSubtitle: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  currentPlanCard: {
+    borderWidth: 2,
+    borderColor: '#059669',
+  },
+  diamondCard: {
+    borderWidth: 2,
+    borderColor: '#2563EB',
+  },
+  standardIcon: {
+    backgroundColor: '#F3F4F6',
+  },
+  goldIcon: {
+    backgroundColor: '#FEF3C7',
+  },
+  diamondIcon: {
+    backgroundColor: '#EBF4FF',
+  },
+  popularBadge: {
+    position: 'absolute',
+    top: -8,
+    right: 16,
+    backgroundColor: '#2563EB',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  popularText: {
+    fontSize: 10,
+    fontFamily: 'Inter-SemiBold',
+    color: '#FFFFFF',
+  },
+  scanLimitInfo: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  scanLimitText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#374151',
+  },
+  moreFeatures: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  currentPlanButton: {
+    backgroundColor: '#059669',
+  },
+  diamondButton: {
+    backgroundColor: '#2563EB',
   },
   planPeriod: {
     fontSize: 16,

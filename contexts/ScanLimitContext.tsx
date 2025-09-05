@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSubscription } from './SubscriptionContext';
 import { useAuth } from './AuthContext';
+import { getProductByTier } from '@/src/stripe-config';
 
 interface ScanLimitContextType {
   scansRemaining: number;
@@ -22,9 +23,15 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
   const { user, isGuest } = useAuth();
   const [scansRemaining, setScansRemaining] = useState(0);
   const [totalScans, setTotalScans] = useState(0);
-  const { hasActiveSubscription, hasPromoCodeAccess } = useSubscription();
+  const { hasActiveSubscription, hasPromoCodeAccess, subscriptionTier } = useSubscription();
 
-  const FREE_SCAN_LIMIT = 30;
+  const getScanLimit = (): number => {
+    if (hasActiveSubscription || hasPromoCodeAccess) {
+      const product = getProductByTier(subscriptionTier);
+      return product?.scanLimit || 999999; // unlimited if undefined
+    }
+    return 30; // Standard free tier
+  };
 
   useEffect(() => {
     if ((user || isGuest) && typeof window !== 'undefined') {
@@ -44,13 +51,14 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
       const scanKey = getScanKey();
       const storedScans = await AsyncStorage.getItem(scanKey);
       const usedScans = storedScans ? parseInt(storedScans) : 0;
+      const scanLimit = getScanLimit();
       
       setTotalScans(usedScans);
       
-      if (hasActiveSubscription || hasPromoCodeAccess) {
-        setScansRemaining(999); // Unlimited for premium users
+      if (scanLimit === 999999) {
+        setScansRemaining(999999); // Unlimited
       } else {
-        setScansRemaining(Math.max(0, FREE_SCAN_LIMIT - usedScans));
+        setScansRemaining(Math.max(0, scanLimit - usedScans));
       }
     } catch (error) {
       console.error('Error loading scan data:', error);
@@ -63,8 +71,9 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
       return false;
     }
 
-    if (hasActiveSubscription || hasPromoCodeAccess) {
-      return true; // Unlimited scans for premium users
+    const scanLimit = getScanLimit();
+    if (scanLimit === 999999) {
+      return true; // Unlimited scans
     }
 
     if (scansRemaining <= 0) {
@@ -77,7 +86,7 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
       
       await AsyncStorage.setItem(scanKey, newTotal.toString());
       setTotalScans(newTotal);
-      setScansRemaining(Math.max(0, FREE_SCAN_LIMIT - newTotal));
+      setScansRemaining(Math.max(0, scanLimit - newTotal));
       
       return true;
     } catch (error) {
@@ -91,7 +100,7 @@ export function ScanLimitProvider({ children }: ScanLimitProviderProps) {
       const scanKey = getScanKey();
       await AsyncStorage.removeItem(scanKey);
       setTotalScans(0);
-      setScansRemaining(FREE_SCAN_LIMIT);
+      setScansRemaining(getScanLimit());
     } catch (error) {
       console.error('Error resetting scans:', error);
     }
