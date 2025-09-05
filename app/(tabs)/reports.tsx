@@ -8,11 +8,14 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChartBar as BarChart3, TrendingUp, Calendar, Download, Target, Activity, Droplet } from 'lucide-react-native';
+import { ChartBar as BarChart3, TrendingUp, Calendar, Download, Target, Activity, Droplet, Settings } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import DoctorEmailSection from '@/components/DoctorEmailSection';
 
 const { width } = Dimensions.get('window');
 
 export default function ReportsScreen() {
+  const router = useRouter();
   const [selectedPeriod, setSelectedPeriod] = useState('week');
 
   const periods = [
@@ -223,11 +226,27 @@ export default function ReportsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
           <Text style={styles.title}>Health Reports</Text>
           <Text style={styles.subtitle}>Analyze your diabetes management progress</Text>
         </View>
+        <TouchableOpacity
+          style={styles.settingsButton}
+          onPress={() => router.push('/(tabs)/settings')}
+          accessibilityRole="button"
+          accessible={true}
+          accessibilityLabel="Open settings"
+        >
+          <Settings size={24} color="#6B7280" />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <DoctorEmailSection 
+          style={styles.doctorEmailSection}
+          onEmailSaved={(email) => console.log('Doctor email saved:', email)}
+        />
 
         {renderPeriodSelector()}
         {renderSummaryCards()}
@@ -256,8 +275,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     padding: 20,
-    paddingBottom: 10,
+    paddingBottom: 0,
+  },
+  headerContent: {
+    flex: 1,
+  },
+  settingsButton: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    padding: 8,
+    marginTop: 4,
   },
   title: {
     fontSize: 28,
@@ -269,6 +300,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
+  },
+  doctorEmailSection: {
+    margin: 20,
+    marginBottom: 10,
   },
   periodSelector: {
     flexDirection: 'row',
