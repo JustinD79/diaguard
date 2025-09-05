@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Mail, Lock, Bell, Shield, ChevronRight, Edit, Check, X } from 'lucide-react-native';
+import { User, Mail, Lock, Bell, Shield, ChevronRight, CreditCard as Edit, Check, X } from 'lucide-react-native';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import ValidationInput, { ValidationRules } from '@/components/ui/ValidationInput';
