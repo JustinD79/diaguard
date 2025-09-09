@@ -6,17 +6,26 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChartBar as BarChart3, TrendingUp, Calendar, Download, Target, Activity, Droplet, Settings } from 'lucide-react-native';
+import { ChartBar as BarChart3, TrendingUp, Calendar, Download, Target, Activity, Droplet, Settings, FileText, Users, Share } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import DoctorEmailSection from '@/components/DoctorEmailSection';
+import RealTimeDashboard from '@/components/analytics/RealTimeDashboard';
+import ProviderReportGenerator from '@/components/analytics/ProviderReportGenerator';
+import FamilyDashboard from '@/components/analytics/FamilyDashboard';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 
 const { width } = Dimensions.get('window');
 
 export default function ReportsScreen() {
   const router = useRouter();
   const [selectedPeriod, setSelectedPeriod] = useState('week');
+  const [activeView, setActiveView] = useState<'analytics' | 'reports' | 'family'>('analytics');
+  const [showProviderReport, setShowProviderReport] = useState(false);
+  const [showFamilyDashboard, setShowFamilyDashboard] = useState(false);
 
   const periods = [
     { key: 'week', label: '7 Days' },
@@ -24,6 +33,162 @@ export default function ReportsScreen() {
     { key: 'quarter', label: '3 Months' },
     { key: 'year', label: '1 Year' },
   ];
+
+  const renderViewSelector = () => (
+    <View style={styles.viewSelector}>
+      <TouchableOpacity
+        style={[
+          styles.viewButton,
+          activeView === 'analytics' && styles.viewButtonSelected
+        ]}
+        onPress={() => setActiveView('analytics')}
+      >
+        <Activity size={16} color={activeView === 'analytics' ? '#FFFFFF' : '#6B7280'} />
+        <Text style={[
+          styles.viewButtonText,
+          activeView === 'analytics' && styles.viewButtonTextSelected
+        ]}>
+          Real-time Analytics
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[
+          styles.viewButton,
+          activeView === 'reports' && styles.viewButtonSelected
+        ]}
+        onPress={() => setActiveView('reports')}
+      >
+        <FileText size={16} color={activeView === 'reports' ? '#FFFFFF' : '#6B7280'} />
+        <Text style={[
+          styles.viewButtonText,
+          activeView === 'reports' && styles.viewButtonTextSelected
+        ]}>
+          Provider Reports
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[
+          styles.viewButton,
+          activeView === 'family' && styles.viewButtonSelected
+        ]}
+        onPress={() => setActiveView('family')}
+      >
+        <Users size={16} color={activeView === 'family' ? '#FFFFFF' : '#6B7280'} />
+        <Text style={[
+          styles.viewButtonText,
+          activeView === 'family' && styles.viewButtonTextSelected
+        ]}>
+          Family Access
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderProviderReportsView = () => (
+    <View style={styles.reportsView}>
+      <Card style={styles.reportActionsCard}>
+        <Text style={styles.sectionTitle}>Healthcare Provider Reports</Text>
+        <Text style={styles.cardDescription}>
+          Generate comprehensive reports to share with your healthcare team during appointments.
+        </Text>
+        
+        <View style={styles.reportActions}>
+          <Button
+            title="Generate Report for Doctor"
+            onPress={() => setShowProviderReport(true)}
+            style={styles.reportButton}
+          />
+          
+          <View style={styles.reportFeatures}>
+            <View style={styles.reportFeature}>
+              <Target size={16} color="#2563EB" />
+              <Text style={styles.reportFeatureText}>Glucose trends and time-in-range analysis</Text>
+            </View>
+            <View style={styles.reportFeature}>
+              <Activity size={16} color="#2563EB" />
+              <Text style={styles.reportFeatureText}>Medication adherence tracking</Text>
+            </View>
+            <View style={styles.reportFeature}>
+              <TrendingUp size={16} color="#2563EB" />
+              <Text style={styles.reportFeatureText}>AI-powered insights and recommendations</Text>
+            </View>
+          </View>
+        </View>
+      </Card>
+
+      <DoctorEmailSection 
+        style={styles.doctorEmailSection}
+        onEmailSaved={(email) => console.log('Doctor email saved:', email)}
+      />
+    </View>
+  );
+
+  const renderFamilyAccessView = () => (
+    <View style={styles.familyView}>
+      <Card style={styles.familyAccessCard}>
+        <Text style={styles.sectionTitle}>Family & Caregiver Access</Text>
+        <Text style={styles.cardDescription}>
+          Share your diabetes management data with family members and caregivers for better support.
+        </Text>
+        
+        <View style={styles.familyActions}>
+          <Button
+            title="View Family Dashboard"
+            onPress={() => setShowFamilyDashboard(true)}
+            style={styles.familyButton}
+          />
+          
+          <View style={styles.familyFeatures}>
+            <View style={styles.familyFeature}>
+              <Users size={16} color="#059669" />
+              <Text style={styles.familyFeatureText}>Real-time health status sharing</Text>
+            </View>
+            <View style={styles.familyFeature}>
+              <Share size={16} color="#059669" />
+              <Text style={styles.familyFeatureText}>Automatic alerts for critical events</Text>
+            </View>
+            <View style={styles.familyFeature}>
+              <Calendar size={16} color="#059669" />
+              <Text style={styles.familyFeatureText}>Medication reminder coordination</Text>
+            </View>
+          </View>
+        </View>
+      </Card>
+
+      <Card style={styles.caregiverListCard}>
+        <Text style={styles.sectionTitle}>Authorized Caregivers</Text>
+        
+        <View style={styles.caregiverItem}>
+          <View style={styles.caregiverInfo}>
+            <Text style={styles.caregiverName}>Sarah Johnson</Text>
+            <Text style={styles.caregiverRole}>Spouse • Full Access</Text>
+          </View>
+          <View style={styles.caregiverStatus}>
+            <Text style={styles.caregiverStatusText}>Active</Text>
+          </View>
+        </View>
+
+        <TouchableOpacity style={styles.addCaregiverButton}>
+          <Text style={styles.addCaregiverText}>+ Add Family Member</Text>
+        </TouchableOpacity>
+      </Card>
+    </View>
+  );
+
+  const renderContent = () => {
+    switch (activeView) {
+      case 'analytics':
+        return <RealTimeDashboard />;
+      case 'reports':
+        return renderProviderReportsView();
+      case 'family':
+        return renderFamilyAccessView();
+      default:
+        return <RealTimeDashboard />;
+    }
+  };
 
   const renderPeriodSelector = () => (
     <View style={styles.periodSelector}>
@@ -237,34 +402,43 @@ export default function ReportsScreen() {
           accessibilityRole="button"
           accessible={true}
           accessibilityLabel="Open settings"
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <Text style={styles.title}>Health Analytics</Text>
+          <Text style={styles.subtitle}>Comprehensive diabetes management insights</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.settingsButton}
+          onPress={() => router.push('/(tabs)/settings')}
         >
           <Settings size={24} color="#6B7280" />
         </TouchableOpacity>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <DoctorEmailSection 
-          style={styles.doctorEmailSection}
-          onEmailSaved={(email) => console.log('Doctor email saved:', email)}
-        />
+      {renderViewSelector()}
+      {renderContent()}
 
-        {renderPeriodSelector()}
-        {renderSummaryCards()}
-        {renderGlucoseChart()}
-        {renderMealImpact()}
-        {renderInsights()}
+      <ProviderReportGenerator
+        visible={showProviderReport}
+        onClose={() => setShowProviderReport(false)}
+      />
 
-        <View style={styles.exportSection}>
-          <TouchableOpacity style={styles.exportButton}>
-            <Download size={20} color="#2563EB" />
-            <Text style={styles.exportButtonText}>Export Report</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.shareButton}>
-            <Calendar size={20} color="#FFFFFF" />
-            <Text style={styles.shareButtonText}>Share with Doctor</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+      {showFamilyDashboard && (
+        <Modal visible={showFamilyDashboard} animationType="slide" presentationStyle="pageSheet">
+          <FamilyDashboard
+            patientUserId="demo_patient_id"
+            patientName="John Doe"
+            relationship="spouse"
+          />
+          <SafeAreaView style={styles.familyModalFooter}>
+            <Button
+              title="Close"
+              onPress={() => setShowFamilyDashboard(false)}
+              variant="outline"
+            />
+          </SafeAreaView>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -283,6 +457,18 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     flex: 1,
+    alignItems: 'flex-start',
+    padding: 20,
+    paddingBottom: 0,
+  },
+  headerContent: {
+    flex: 1,
+  },
+  settingsButton: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    padding: 8,
+    marginTop: 4,
   },
   settingsButton: {
     backgroundColor: '#F3F4F6',
@@ -301,9 +487,157 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
   },
-  doctorEmailSection: {
+  viewSelector: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    gap: 8,
+  },
+  viewButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    gap: 6,
+  },
+  viewButtonSelected: {
+    backgroundColor: '#2563EB',
+    borderColor: '#2563EB',
+  },
+  viewButtonText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+  },
+  viewButtonTextSelected: {
+    color: '#FFFFFF',
+  },
+  reportsView: {
+    flex: 1,
+  },
+  reportActionsCard: {
     margin: 20,
     marginBottom: 10,
+    padding: 20,
+  },
+  cardDescription: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  reportActions: {
+    gap: 16,
+  },
+  reportButton: {
+    backgroundColor: '#2563EB',
+  },
+  reportFeatures: {
+    gap: 8,
+  },
+  reportFeature: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  reportFeatureText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#374151',
+  },
+  doctorEmailSection: {
+    margin: 20,
+    marginBottom: 20,
+  },
+  familyView: {
+    flex: 1,
+  },
+  familyAccessCard: {
+    margin: 20,
+    marginBottom: 10,
+    padding: 20,
+  },
+  familyActions: {
+    gap: 16,
+  },
+  familyButton: {
+    backgroundColor: '#059669',
+  },
+  familyFeatures: {
+    gap: 8,
+  },
+  familyFeature: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  familyFeatureText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#374151',
+  },
+  caregiverListCard: {
+    margin: 20,
+    marginBottom: 20,
+    padding: 20,
+  },
+  caregiverItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+  },
+  caregiverInfo: {
+    flex: 1,
+  },
+  caregiverName: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  caregiverRole: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  caregiverStatus: {
+    backgroundColor: '#ECFDF5',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  caregiverStatusText: {
+    fontSize: 10,
+    fontFamily: 'Inter-SemiBold',
+    color: '#059669',
+  },
+  addCaregiverButton: {
+    backgroundColor: '#EBF4FF',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+  },
+  addCaregiverText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#2563EB',
+  },
+  familyModalFooter: {
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
   },
   periodSelector: {
     flexDirection: 'row',
