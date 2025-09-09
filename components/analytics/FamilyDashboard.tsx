@@ -9,20 +9,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  Heart, 
-  AlertTriangle, 
-  Clock, 
-  Battery, 
-  Phone, 
-  MessageCircle,
-  Activity,
-  Pill,
-  Utensils,
-  TrendingUp,
-  Shield,
-  Bell
-} from 'lucide-react-native';
+import { Heart, TriangleAlert as AlertTriangle, Clock, Battery, Phone, MessageCircle, Activity, Pill, Utensils, TrendingUp, Shield, Bell } from 'lucide-react-native';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { RealTimeAnalyticsService, FamilyDashboard as FamilyDashboardData, Alert as HealthAlert } from '@/services/RealTimeAnalyticsService';

@@ -8,19 +8,7 @@ import {
   RefreshControl,
   Alert,
 } from 'react-native';
-import { 
-  Activity, 
-  TrendingUp, 
-  TrendingDown, 
-  Minus, 
-  AlertTriangle, 
-  Heart, 
-  Target,
-  Clock,
-  Droplet,
-  Calculator,
-  Utensils
-} from 'lucide-react-native';
+import { Activity, TrendingUp, TrendingDown, Minus, TriangleAlert as AlertTriangle, Heart, Target, Clock, Droplet, Calculator, Utensils } from 'lucide-react-native';
 import Card from '@/components/ui/Card';
 import { RealTimeAnalyticsService, RealTimeMetrics, AnalyticsInsight } from '@/services/RealTimeAnalyticsService';
 import { useAuth } from '@/contexts/AuthContext';
