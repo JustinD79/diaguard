@@ -11,6 +11,7 @@ import ScanLimitBanner from '@/components/notifications/ScanLimitBanner';
 import FoodCameraScanner from '@/components/FoodCameraScanner';
 import FoodLogger from '@/components/FoodLogger';
 import CarbTracker from '@/components/CarbTracker';
+import RealTimeDashboard from '@/components/analytics/RealTimeDashboard';
 import { Product, DiabetesInsights } from '@/services/FoodAPIService';
 
 interface QuickStat {
@@ -40,6 +41,7 @@ export default function HomeScreen() {
   const [showFoodLogger, setShowFoodLogger] = useState(false);
   const [showCarbTracker, setShowCarbTracker] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -395,6 +397,30 @@ export default function HomeScreen() {
         {renderQuickFoodLogger()}
         {renderQuickActions()}
         {renderTodaysSummary()}
+        
+        <Card style={styles.analyticsCard}>
+          <View style={styles.analyticsHeader}>
+            <View style={styles.analyticsIcon}>
+              <TrendingUp size={24} color="#2563EB" />
+            </View>
+            <View style={styles.analyticsInfo}>
+              <Text style={styles.analyticsTitle}>Real-time Analytics</Text>
+              <Text style={styles.analyticsSubtitle}>AI-powered insights and trends</Text>
+            </View>
+          </View>
+          
+          <Text style={styles.analyticsDescription}>
+            Get comprehensive analysis of your diabetes management with real-time insights, 
+            pattern recognition, and personalized recommendations.
+          </Text>
+          
+          <Button
+            title="View Analytics Dashboard"
+            onPress={() => setShowAnalytics(true)}
+            style={styles.analyticsButton}
+          />
+        </Card>
+        
         {renderRecentActivity()}
         {renderMedicationReminders()}
         {renderInsights()}
@@ -426,6 +452,21 @@ export default function HomeScreen() {
               <View style={{ width: 50 }} />
             </View>
             <CarbTracker />
+          </SafeAreaView>
+        </Modal>
+      )}
+
+      {showAnalytics && (
+        <Modal visible={showAnalytics} animationType="slide" presentationStyle="pageSheet">
+          <SafeAreaView style={{ flex: 1 }}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setShowAnalytics(false)}>
+                <Text style={styles.modalCancel}>Close</Text>
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>Real-time Analytics</Text>
+              <View style={{ width: 50 }} />
+            </View>
+            <RealTimeDashboard />
           </SafeAreaView>
         </Modal>
       )}
@@ -755,6 +796,48 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-Medium',
     color: '#2563EB',
+  },
+  analyticsCard: {
+    margin: 20,
+    marginBottom: 10,
+  },
+  analyticsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  analyticsIcon: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#EBF4FF',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  analyticsInfo: {
+    flex: 1,
+  },
+  analyticsTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  analyticsSubtitle: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  analyticsDescription: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  analyticsButton: {
+    backgroundColor: '#2563EB',
   },
   modalHeader: {
     flexDirection: 'row',
