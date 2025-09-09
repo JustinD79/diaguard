@@ -180,7 +180,7 @@ export default function SubscriptionScreen() {
                   <View key={index} style={styles.featureItem}>
                     <Check size={16} color="#059669" />
                     <Text style={styles.featureText}>
-                      {this.getFeatureDisplayName(feature)}
+                      {getFeatureDisplayName(feature)}
                     </Text>
                   </View>
                 ))}
