@@ -402,14 +402,6 @@ export default function ReportsScreen() {
           accessibilityRole="button"
           accessible={true}
           accessibilityLabel="Open settings"
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.title}>Health Analytics</Text>
-          <Text style={styles.subtitle}>Comprehensive diabetes management insights</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.settingsButton}
-          onPress={() => router.push('/(tabs)/settings')}
         >
           <Settings size={24} color="#6B7280" />
         </TouchableOpacity>
@@ -457,18 +449,6 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     flex: 1,
-    alignItems: 'flex-start',
-    padding: 20,
-    paddingBottom: 0,
-  },
-  headerContent: {
-    flex: 1,
-  },
-  settingsButton: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
-    padding: 8,
-    marginTop: 4,
   },
   settingsButton: {
     backgroundColor: '#F3F4F6',
