@@ -10,18 +10,7 @@ import {
   Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  FileText, 
-  Download, 
-  Mail, 
-  Calendar, 
-  TrendingUp, 
-  Activity,
-  Target,
-  AlertTriangle,
-  X,
-  Check
-} from 'lucide-react-native';
+import { FileText, Download, Mail, Calendar, TrendingUp, Activity, Target, TriangleAlert as AlertTriangle, X, Check } from 'lucide-react-native';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { RealTimeAnalyticsService, ProviderReport } from '@/services/RealTimeAnalyticsService';
