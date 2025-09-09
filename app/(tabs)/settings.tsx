@@ -320,7 +320,7 @@ export default function SettingsScreen() {
                 label="Height"
                 value={editData.height || ''}
                 onChangeText={(text) => setEditData({ ...editData, height: text })}
-                placeholder="e.g., 5'10\" or 178 cm"
+                placeholder="e.g., 5'10&quot; or 178 cm"
               />
               <ValidationInput
                 label="Weight"
