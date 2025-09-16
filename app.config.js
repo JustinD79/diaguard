@@ -7,6 +7,7 @@ export default {
     icon: "./assets/images/icon.png",
     userInterfaceStyle: "light",
     scheme: "diabetes-care-app",
+    sdkVersion: "53.0.0",
     platforms: ["ios", "android", "web"],
     splash: {
       image: "./assets/images/splash.png",
