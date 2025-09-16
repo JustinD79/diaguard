@@ -28,7 +28,7 @@ export default {
     web: {
       favicon: "./assets/images/favicon.png",
       bundler: "metro",
-      output: "static"
+      output: "single"
     },
     plugins: [
       "expo-router",
