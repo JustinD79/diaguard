@@ -1,17 +1,13 @@
 const { getDefaultConfig } = require('expo/metro-config');
+const { withNativeWind } = require('nativewind/metro');
 
-const config = getDefaultConfig(__dirname);
+let config = getDefaultConfig(__dirname);
 
 // Enable web support
 config.resolver.platforms = ['ios', 'android', 'native', 'web'];
 
 // Add support for additional file extensions
 config.resolver.sourceExts.push('sql', 'db');
-
-// Add resolver alias for SSR compatibility
-config.resolver.alias = {
-  '@react-native-async-storage/async-storage': require.resolve('./metro-shims/async-storage-mock.js'),
-};
 
 // Configure resolver for Node.js environment
 config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
@@ -24,4 +20,5 @@ config.transformer.minifierConfig = {
   },
 };
 
-module.exports = config;
+// Apply NativeWind configuration
+config = withNativeWind(config, { input: './global.css' });
