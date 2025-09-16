@@ -41,5 +41,6 @@
     "@types/react": "^19.1.13",
     "@types/react-native": "^0.73.0",
     "metro": "^0.80.0",
+  },
   "private": true
 }
