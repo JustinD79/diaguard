@@ -21,7 +21,7 @@ if (config.serializer) {
 // Ensure transformer compatibility
 config.transformer = {
   ...config.transformer,
-  unstable_allowRequireContext: false,
+  unstable_allowRequireContext: true,
 };
 
 module.exports = config;
