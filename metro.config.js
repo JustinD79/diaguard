@@ -12,6 +12,8 @@ if (config.serializer && config.serializer.customSerializer) {
 config.resolver = {
   ...config.resolver,
   platforms: ['ios', 'android', 'native', 'web'],
+  unstable_enableSymlinks: false,
+  unstable_enablePackageExports: true,
 };
 
 module.exports = config;
