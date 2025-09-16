@@ -1,5 +1,6 @@
 const { getDefaultConfig } = require('expo/metro-config');
 const { withNativeWind } = require('nativewind/metro');
+const path = require('path');
 
 let config = getDefaultConfig(__dirname);
 
@@ -11,6 +12,23 @@ config.resolver.sourceExts.push('sql', 'db');
 
 // Configure resolver for Node.js environment
 config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
+
+// Add alias for window object in Node.js environment
+config.resolver.alias = {
+  ...config.resolver.alias,
+  '@react-native-async-storage/async-storage': path.resolve(__dirname, 'metro-shims/async-storage-mock.js'),
+};
+
+// Add platform-specific resolver for web builds
+config.resolver.platforms = ['ios', 'android', 'native', 'web'];
+
+// Configure for web compatibility
+if (process.env.EXPO_PLATFORM === 'web') {
+  config.resolver.alias = {
+    ...config.resolver.alias,
+    'window': path.resolve(__dirname, 'metro-shims/window-shim.js'),
+  };
+}
 
 // Configure transformer for better web compatibility
 config.transformer.minifierConfig = {
