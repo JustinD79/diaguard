@@ -38,6 +38,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "nativewind": "^4.2.1",
+    "tailwindcss": "^4.1.13",
     "typescript": "~5.3.3"
   },
   "private": true
