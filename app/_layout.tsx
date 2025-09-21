@@ -4,6 +4,7 @@ import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 import { ScanLimitProvider } from '@/contexts/ScanLimitContext';
+import { UsageTrackingProvider } from '@/contexts/UsageTrackingContext';
 
 export default function RootLayout() {
   useFrameworkReady();
@@ -11,10 +12,14 @@ export default function RootLayout() {
     <AuthProvider>
       <SubscriptionProvider>
         <ScanLimitProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="+not-found" />
-          </Stack>
+          <UsageTrackingProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+          </UsageTrackingProvider>
           <StatusBar style="auto" />
         </ScanLimitProvider>
       </SubscriptionProvider>

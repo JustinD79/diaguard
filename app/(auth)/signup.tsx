@@ -65,7 +65,7 @@ export default function SignupScreen() {
         Alert.alert(
           'Account Created!',
           'Your account has been successfully created. You can now access all premium features.',
-          [{ text: 'Continue', onPress: () => router.replace('/(tabs)') }]
+          [{ text: 'Continue', onPress: () => router.replace('/') }]
         );
       }
     } catch (err) {

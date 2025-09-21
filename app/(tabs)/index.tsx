@@ -166,7 +166,7 @@ export default function HomeScreen() {
     return (
       <View style={styles.welcomeHeader}>
         <Text style={styles.greeting}>{greeting}</Text>
-        <Text style={styles.welcomeText}>Ready to manage your diabetes today?</Text>
+        <Text style={styles.welcomeText}>Welcome to your diabetes dashboard</Text>
       </View>
     );
   };
@@ -178,32 +178,22 @@ export default function HomeScreen() {
           <Camera size={24} color="#2563EB" />
         </View>
         <View style={styles.scannerInfo}>
-          <Text style={styles.scannerTitle}>AI Food Recognition</Text>
+          <Text style={styles.scannerTitle}>Quick Scan Access</Text>
           <Text style={styles.scannerSubtitle}>
-            {canScan 
-              ? `${scansRemaining} scans remaining this month`
-              : 'Upgrade for unlimited scanning'
-            }
+            Return to camera scanner for food analysis
           </Text>
         </View>
       </View>
       
       <Text style={styles.scannerDescription}>
-        Advanced AI-powered food recognition that analyzes your meals to provide accurate carb counts, sugar content, and personalized insulin dosage recommendations
+        Access the main camera interface for AI-powered food recognition and instant nutrition analysis
       </Text>
       
       <Button
-        title={canScan ? "Start AI Food Scan" : "Upgrade for Unlimited Scans"}
-        onPress={handleAIFoodScan}
-        style={[styles.scannerButton, !canScan && styles.disabledButton]}
+        title="Open Camera Scanner"
+        onPress={() => router.push('/')}
+        style={styles.scannerButton}
       />
-      
-      {hasActiveSubscription && (
-        <View style={styles.premiumBadge}>
-          <Zap size={12} color="#059669" />
-          <Text style={styles.premiumText}>Premium Active</Text>
-        </View>
-      )}
     </Card>
   );
 

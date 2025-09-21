@@ -40,7 +40,7 @@ export default function LoginScreen() {
       if (error) {
         setError(error.message);
       } else {
-        router.replace('/(tabs)');
+        router.replace('/');
       }
     } catch (err) {
       setError('An unexpected error occurred');
@@ -50,7 +50,7 @@ export default function LoginScreen() {
   };
 
   const handleGuestAccess = () => {
-    router.replace('/(tabs)');
+    router.replace('/');
   };
 
   return (
