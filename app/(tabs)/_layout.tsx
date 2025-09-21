@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
-import { Camera, Home, Heart, Calculator, ChefHat, FileText, Pill, AlertTriangle, Crown, User, Settings } from 'lucide-react-native';
+import { Camera, Hop as Home, Heart, Calculator, ChefHat, FileText, Pill, TriangleAlert as AlertTriangle, Crown, User, Settings } from 'lucide-react-native';
 
 function TabBarIcon({ IconComponent, color }: { IconComponent: any; color: string }) {
   return <IconComponent size={20} color={color} />;
