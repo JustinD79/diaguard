@@ -4,7 +4,7 @@ import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 import { ScanLimitProvider } from '@/contexts/ScanLimitContext';
-import { UsageTrackingProvider } from '@/contexts/UsageTrackingContext';
+import { UsageTrackingProvider } from '../contexts/UsageTrackingContext';
 
 export default function RootLayout() {
   useFrameworkReady();
