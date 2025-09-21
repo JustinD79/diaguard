@@ -12,7 +12,7 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@supabase/supabase-js": "^2.57.0",
-    "expo": "~52.0.30",
+    "expo": "~53.0.0",
     "expo-application": "~5.9.1",
     "expo-battery": "~6.0.1",
     "expo-camera": "~15.0.16",
