@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
     "scheme": "diabetes-care-app",
-    "sdkVersion": "52.0.30",
+    "sdkVersion": "53.0.0",
     "platforms": ["ios", "android", "web"],
     "splash": {
       "image": "./assets/images/splash.png",
@@ -31,7 +31,10 @@
     "web": {
       "favicon": "./assets/images/favicon.png",
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "devClient": {
+        "enabled": true
+      }
     },
     "plugins": [
       "expo-router",
@@ -39,6 +42,12 @@
         "expo-camera",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to scan food items for diabetes management."
+        }
+      ],
+      [
+        "expo-dev-client",
+        {
+          "addGeneratedScheme": false
         }
       ]
     ]
