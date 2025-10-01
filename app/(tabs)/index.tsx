@@ -12,6 +12,7 @@ import FoodCameraScanner from '@/components/FoodCameraScanner';
 import FoodLogger from '@/components/FoodLogger';
 import CarbTracker from '@/components/CarbTracker';
 import RealTimeDashboard from '@/components/analytics/RealTimeDashboard';
+import ShareableURL from '@/components/ShareableURL';
 import { Product, DiabetesInsights } from '@/services/FoodAPIService';
 
 interface QuickStat {
