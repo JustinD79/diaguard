@@ -31,7 +31,7 @@
     "web": {
       "favicon": "./assets/images/favicon.png",
       "bundler": "metro",
-      "output": "static"
+      "output": "single"
     },
     "plugins": [
       "expo-router",
@@ -41,12 +41,7 @@
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to scan food items for diabetes management."
         }
       ],
-      [
-        "expo-dev-client",
-        {
-          "addGeneratedScheme": false
-        }
-      ]
+      "expo-font"
     ]
   }
 }

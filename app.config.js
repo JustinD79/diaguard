@@ -29,7 +29,7 @@ export default {
     web: {
       favicon: "./assets/images/favicon.png",
       bundler: "metro",
-      output: "static"
+      output: "single"
     },
     plugins: [
       "expo-router",
@@ -38,7 +38,8 @@ export default {
         {
           cameraPermission: "Allow $(PRODUCT_NAME) to access your camera to scan food items for diabetes management."
         }
-      ]
+      ],
+      "expo-font"
     ],
     extra: {
       router: {
