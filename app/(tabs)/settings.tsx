@@ -395,6 +395,25 @@ export default function SettingsScreen() {
           <>
             {renderPersonalInfo()}
             {renderAccountSettings()}
+            
+            <Card style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Smartphone size={20} color="#2563EB" />
+                <Text style={styles.sectionTitle}>Developer Tools</Text>
+              </View>
+              
+              <TouchableOpacity 
+                style={styles.settingItem}
+                onPress={() => setShowMobilePreview(true)}
+              >
+                <View style={styles.settingInfo}>
+                  <Text style={styles.settingLabel}>Mobile Preview Helper</Text>
+                  <Text style={styles.settingValue}>Test app on mobile devices</Text>
+                </View>
+                <ChevronRight size={16} color="#9CA3AF" />
+              </TouchableOpacity>
+            </Card>
+            
             {renderMedicalSettings()}
             {renderAppSettings()}
             
@@ -411,6 +430,11 @@ export default function SettingsScreen() {
       </ScrollView>
 
       {renderEditModal()}
+      
+      <MobilePreviewHelper
+        visible={showMobilePreview}
+        onClose={() => setShowMobilePreview(false)}
+      />
     </SafeAreaView>
   );
 }

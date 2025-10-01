@@ -389,6 +389,13 @@ export default function HomeScreen() {
         {renderTodaysSummary()}
         
         <Card style={styles.analyticsCard}>
+          <ShareableURL 
+            developmentURL="http://localhost:8081"
+            onQRCodePress={() => Alert.alert('QR Code', 'Check your terminal for the QR code to scan with Expo Go app')}
+          />
+        </Card>
+        
+        <Card style={styles.analyticsCard}>
           <View style={styles.analyticsHeader}>
             <View style={styles.analyticsIcon}>
               <TrendingUp size={24} color="#2563EB" />
