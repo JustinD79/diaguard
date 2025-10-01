@@ -30,6 +30,7 @@
     "expo-media-library": "~16.0.5",
     "expo-network": "~6.0.1",
     "expo-router": "~4.0.17",
+    "expo-splash-screen": "^31.0.10",
     "expo-status-bar": "~1.12.1",
     "lucide-react-native": "^0.542.0",
     "react": "18.2.0",
