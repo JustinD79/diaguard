@@ -855,4 +855,45 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#111827',
   },
+  testingSection: {
+    padding: 20,
+  },
+  testingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  testingIcon: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#EBF4FF',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  testingInfo: {
+    flex: 1,
+  },
+  testingTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  testingSubtitle: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  testingDescription: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  testingButton: {
+    backgroundColor: '#2563EB',
+  },
 });
