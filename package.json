@@ -3,7 +3,7 @@
   "main": "index.js",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "NODE_OPTIONS=--max-old-space-size=8192 expo start",
     "dev": "expo start",
     "web": "expo start --web",
     "tunnel": "expo start --tunnel",
