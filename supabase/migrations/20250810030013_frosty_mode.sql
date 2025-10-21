@@ -63,6 +63,7 @@ ALTER TABLE promo_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_promo_codes ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for promo_codes
+DROP POLICY IF EXISTS "Anyone can read active promo codes" ON promo_codes;
 CREATE POLICY "Anyone can read active promo codes"
   ON promo_codes
   FOR SELECT
@@ -70,12 +71,14 @@ CREATE POLICY "Anyone can read active promo codes"
   USING (active = true);
 
 -- Create policies for user_promo_codes
+DROP POLICY IF EXISTS "Users can view their own promo code redemptions" ON user_promo_codes;
 CREATE POLICY "Users can view their own promo code redemptions"
   ON user_promo_codes
   FOR SELECT
   TO authenticated
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can redeem promo codes" ON user_promo_codes;
 CREATE POLICY "Users can redeem promo codes"
   ON user_promo_codes
   FOR INSERT
