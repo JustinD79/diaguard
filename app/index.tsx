@@ -161,6 +161,9 @@ export default function CameraLandingPage() {
           ]}
           onPress={handleScanPress}
           activeOpacity={0.8}
+          accessible={true}
+          accessibilityLabel="Scan food with camera"
+          accessibilityRole="button"
         >
           <View style={styles.scanButtonInner}>
             <Camera size={32} color="#FFFFFF" />
@@ -301,6 +304,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
+    zIndex: 1,
   },
   scanFrame: {
     width: width * 0.8,
@@ -309,6 +313,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 40,
+    pointerEvents: 'none',
   },
   scanCorners: {
     position: 'absolute',
@@ -394,6 +399,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 16,
     elevation: 8,
+    zIndex: 1000,
+    pointerEvents: 'auto',
   },
   scanButtonDisabled: {
     backgroundColor: '#6B7280',
