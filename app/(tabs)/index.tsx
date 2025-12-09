@@ -12,6 +12,7 @@ import FoodCameraScanner from '@/components/FoodCameraScanner';
 import FoodLogger from '@/components/FoodLogger';
 import CarbTracker from '@/components/CarbTracker';
 import RealTimeDashboard from '@/components/analytics/RealTimeDashboard';
+import GlucoseTrendCard from '@/components/glucose/GlucoseTrendCard';
 import { Product, DiabetesInsights } from '@/services/FoodAPIService';
 
 interface QuickStat {
@@ -380,9 +381,11 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {renderWelcomeHeader()}
-        
+
         <ScanLimitBanner />
-        
+
+        <GlucoseTrendCard />
+
         {renderAIFoodScanner()}
         {renderQuickFoodLogger()}
         {renderQuickActions()}
