@@ -38,28 +38,15 @@ export default function DexcomConnectionCard() {
     }
   };
 
-  const handleConnect = () => {
-    Alert.alert(
-      'Connect Dexcom',
-      'To connect your Dexcom account, you\'ll need:\n\n' +
-      '1. An active Dexcom account\n' +
-      '2. Dexcom API credentials (Client ID and Secret)\n\n' +
-      'Visit developer.dexcom.com to register your application.\n\n' +
-      'Note: This feature requires additional setup. Contact support for assistance.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Get Started',
-          onPress: () => {
-            Alert.alert(
-              'Coming Soon',
-              'Dexcom OAuth integration will be completed in the production version. ' +
-              'For now, you can manually enter glucose readings in the app.',
-            );
-          }
-        },
-      ]
-    );
+  const handleConnect = async () => {
+    try {
+      await DexcomService.openAuthorizationUrl();
+    } catch (error: any) {
+      Alert.alert(
+        'Connection Error',
+        error.message || 'Failed to open Dexcom authorization. Please try again.',
+      );
+    }
   };
 
   const handleDisconnect = () => {
