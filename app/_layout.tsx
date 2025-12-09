@@ -8,6 +8,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 import { ScanLimitProvider } from '@/contexts/ScanLimitContext';
 import { UsageTrackingProvider } from '@/contexts/UsageTrackingContext';
+import { LegalConsentProvider } from '@/contexts/LegalConsentContext';
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -34,19 +35,21 @@ export default function RootLayout() {
   
   return (
     <AuthProvider>
-      <SubscriptionProvider>
-        <ScanLimitProvider>
-          <UsageTrackingProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="(auth)" />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-            <StatusBar style="auto" />
-          </UsageTrackingProvider>
-        </ScanLimitProvider>
-      </SubscriptionProvider>
+      <LegalConsentProvider>
+        <SubscriptionProvider>
+          <ScanLimitProvider>
+            <UsageTrackingProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+              <StatusBar style="auto" />
+            </UsageTrackingProvider>
+          </ScanLimitProvider>
+        </SubscriptionProvider>
+      </LegalConsentProvider>
     </AuthProvider>
   );
 }
