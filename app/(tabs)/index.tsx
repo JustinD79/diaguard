@@ -12,7 +12,6 @@ import FoodCameraScanner from '@/components/FoodCameraScanner';
 import FoodLogger from '@/components/FoodLogger';
 import CarbTracker from '@/components/CarbTracker';
 import RealTimeDashboard from '@/components/analytics/RealTimeDashboard';
-import ShareableURL from '@/components/ShareableURL';
 import { Product, DiabetesInsights } from '@/services/FoodAPIService';
 
 interface QuickStat {
@@ -388,14 +387,7 @@ export default function HomeScreen() {
         {renderQuickFoodLogger()}
         {renderQuickActions()}
         {renderTodaysSummary()}
-        
-        <Card style={styles.analyticsCard}>
-          <ShareableURL 
-            developmentURL="http://localhost:8081"
-            onQRCodePress={() => Alert.alert('QR Code', 'Check your terminal for the QR code to scan with Expo Go app')}
-          />
-        </Card>
-        
+
         <Card style={styles.analyticsCard}>
           <View style={styles.analyticsHeader}>
             <View style={styles.analyticsIcon}>
