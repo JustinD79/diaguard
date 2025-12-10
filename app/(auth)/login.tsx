@@ -65,7 +65,7 @@ export default function LoginScreen() {
               <Heart size={40} color="#2563EB" />
             </View>
             <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>Sign in to your DiabetesCare account</Text>
+            <Text style={styles.subtitle}>Sign in to your DiaGaurd account</Text>
           </View>
 
           <View style={styles.form}>

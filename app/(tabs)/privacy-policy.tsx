@@ -19,7 +19,7 @@ export default function PrivacyPolicyScreen() {
         <Text style={styles.lastUpdated}>Last Updated: December 2025</Text>
 
         <Text style={styles.intro}>
-          DiabetesCare ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application and related services.
+          DiaGaurd ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application and related services.
         </Text>
 
         <View style={styles.section}>
@@ -147,7 +147,7 @@ export default function PrivacyPolicyScreen() {
         <View style={styles.disclaimer}>
           <Text style={styles.disclaimerTitle}>HIPAA Compliance</Text>
           <Text style={styles.disclaimerText}>
-            While we implement security measures consistent with HIPAA standards, DiabetesCare is not a covered entity under HIPAA. The health information you provide is subject to this Privacy Policy, not HIPAA regulations.
+            While we implement security measures consistent with HIPAA standards, DiaGaurd is not a covered entity under HIPAA. The health information you provide is subject to this Privacy Policy, not HIPAA regulations.
           </Text>
         </View>
       </ScrollView>

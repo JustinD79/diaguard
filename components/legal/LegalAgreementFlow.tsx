@@ -75,7 +75,7 @@ export default function LegalAgreementFlow({
   const handleDecline = () => {
     Alert.alert(
       'Agreement Required',
-      'You must accept all terms and disclaimers to use DiabetesCare. The app cannot function without your acknowledgment of these important safety warnings.',
+      'You must accept all terms and disclaimers to use DiaGaurd. The app cannot function without your acknowledgment of these important safety warnings.',
       [
         { text: 'Review Again', style: 'cancel' },
         { text: 'Exit App', style: 'destructive', onPress: onDecline },
@@ -102,7 +102,7 @@ export default function LegalAgreementFlow({
         <View style={styles.warningItem}>
           <AlertTriangle size={20} color="#DC2626" />
           <Text style={styles.warningItemText}>
-            <Text style={styles.bold}>NOT A MEDICAL DEVICE:</Text> DiabetesCare is a health management tool, NOT a substitute for professional medical advice, diagnosis, or treatment.
+            <Text style={styles.bold}>NOT A MEDICAL DEVICE:</Text> DiaGaurd is a health management tool, NOT a substitute for professional medical advice, diagnosis, or treatment.
           </Text>
         </View>
 
@@ -167,7 +167,7 @@ export default function LegalAgreementFlow({
       <Card style={styles.termsCard}>
         <Text style={styles.termsTitle}>1. Limited Liability</Text>
         <Text style={styles.termsText}>
-          DiabetesCare and its developers SHALL NOT BE LIABLE for any health complications, medical decisions, adverse events, or damages arising from use of this app. Use at your own risk.
+          DiaGaurd and its developers SHALL NOT BE LIABLE for any health complications, medical decisions, adverse events, or damages arising from use of this app. Use at your own risk.
         </Text>
       </Card>
 
@@ -217,7 +217,7 @@ export default function LegalAgreementFlow({
             <Square size={24} color="#6B7280" />
           )}
           <Text style={styles.checkboxText}>
-            I acknowledge DiabetesCare is not liable for medical outcomes
+            I acknowledge DiaGaurd is not liable for medical outcomes
           </Text>
         </TouchableOpacity>
 
@@ -328,7 +328,7 @@ export default function LegalAgreementFlow({
       <Card style={styles.infoCard}>
         <Text style={styles.infoTitle}>DO NOT rely on this app in emergencies</Text>
         <Text style={styles.infoText}>
-          DiabetesCare is a tracking and estimation tool. In medical emergencies, always call emergency services or go to the nearest emergency room.
+          DiaGaurd is a tracking and estimation tool. In medical emergencies, always call emergency services or go to the nearest emergency room.
         </Text>
       </Card>
 
@@ -446,7 +446,7 @@ export default function LegalAgreementFlow({
           </View>
 
           <Text style={styles.footerNote}>
-            All agreements must be accepted to use DiabetesCare
+            All agreements must be accepted to use DiaGaurd
           </Text>
         </View>
       </SafeAreaView>

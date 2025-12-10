@@ -82,7 +82,7 @@ export default function ShareableURL({
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.actionButton}
-              onPress={() => shareURL(localIP, 'DiabetesCare Mobile Test')}
+              onPress={() => shareURL(localIP, 'DiaGaurd Mobile Test')}
             >
               <ExternalLink size={16} color="#2563EB" />
             </TouchableOpacity>
@@ -137,7 +137,7 @@ export default function ShareableURL({
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.actionButton}
-                onPress={() => shareURL(ngrokURL, 'DiabetesCare App Test')}
+                onPress={() => shareURL(ngrokURL, 'DiaGaurd App Test')}
               >
                 <ExternalLink size={16} color="#2563EB" />
               </TouchableOpacity>

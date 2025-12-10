@@ -130,7 +130,7 @@ export default function InsulinScreen() {
             • This tool is for educational purposes only{'\n'}
             • You will consult your healthcare provider for all insulin decisions{'\n'}
             • You understand incorrect dosing can be life-threatening{'\n'}
-            • DiabetesCare is not liable for medical outcomes
+            • DiaGaurd is not liable for medical outcomes
           </Text>
         </View>
       </ScrollView>

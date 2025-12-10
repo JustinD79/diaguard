@@ -114,7 +114,7 @@ export default function CameraLandingPage() {
         </TouchableOpacity>
         
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>DiabetesCare</Text>
+          <Text style={styles.headerTitle}>DiaGaurd</Text>
           <Text style={styles.headerSubtitle}>AI Food Scanner</Text>
         </View>
         

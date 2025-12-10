@@ -19,7 +19,7 @@ export default function TermsOfServiceScreen() {
         <Text style={styles.lastUpdated}>Last Updated: December 2025</Text>
 
         <Text style={styles.intro}>
-          Please read these Terms of Service ("Terms") carefully before using the DiabetesCare mobile application and services ("Service") operated by DiabetesCare ("us", "we", or "our").
+          Please read these Terms of Service ("Terms") carefully before using the DiaGaurd mobile application and services ("Service") operated by DiaGaurd ("us", "we", or "our").
         </Text>
 
         <View style={styles.section}>
@@ -32,7 +32,7 @@ export default function TermsOfServiceScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>2. Medical Disclaimer</Text>
           <Text style={styles.paragraph}>
-            IMPORTANT: DiabetesCare is a health management tool and is NOT a substitute for professional medical advice, diagnosis, or treatment.
+            IMPORTANT: DiaGaurd is a health management tool and is NOT a substitute for professional medical advice, diagnosis, or treatment.
           </Text>
           <Text style={styles.bullet}>• Always seek the advice of your physician or qualified health provider</Text>
           <Text style={styles.bullet}>• Never disregard professional medical advice because of information from our app</Text>
@@ -116,7 +116,7 @@ export default function TermsOfServiceScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>7. Intellectual Property</Text>
           <Text style={styles.paragraph}>
-            The Service and its original content, features, and functionality are owned by DiabetesCare and are protected by:
+            The Service and its original content, features, and functionality are owned by DiaGaurd and are protected by:
           </Text>
           <Text style={styles.bullet}>• Copyright laws</Text>
           <Text style={styles.bullet}>• Trademark laws</Text>

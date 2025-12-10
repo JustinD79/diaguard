@@ -59,7 +59,7 @@ export default function OnboardingFlow({ visible, onComplete }: OnboardingFlowPr
 
   const steps = [
     {
-      title: 'Welcome to DiabetesCare',
+      title: 'Welcome to DiaGaurd',
       subtitle: 'Let\'s set up your profile for personalized diabetes management',
       component: 'welcome'
     },
@@ -134,7 +134,7 @@ export default function OnboardingFlow({ visible, onComplete }: OnboardingFlowPr
       <View style={styles.welcomeIcon}>
         <Heart size={48} color="#2563EB" />
       </View>
-      <Text style={styles.welcomeTitle}>Welcome to DiabetesCare</Text>
+      <Text style={styles.welcomeTitle}>Welcome to DiaGaurd</Text>
       <Text style={styles.welcomeDescription}>
         We'll help you manage your diabetes with AI-powered food recognition, 
         insulin calculations, and personalized insights. Let's get started by 
@@ -323,7 +323,7 @@ export default function OnboardingFlow({ visible, onComplete }: OnboardingFlowPr
       </View>
       <Text style={styles.completeTitle}>Setup Complete!</Text>
       <Text style={styles.completeDescription}>
-        Your profile has been configured. You can now start using DiabetesCare 
+        Your profile has been configured. You can now start using DiaGaurd 
         to manage your diabetes with personalized insights and recommendations.
       </Text>
       <View style={styles.nextSteps}>

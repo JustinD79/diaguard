@@ -69,7 +69,7 @@ export default function MobilePreviewHelper({ visible, onClose }: MobilePreviewH
 
   const sendTestURL = () => {
     const mobileURL = generateMobileURL();
-    const message = `Test the DiabetesCare app on your mobile device:\n\n${mobileURL}\n\nMake sure you're connected to the same WiFi network!`;
+    const message = `Test the DiaGaurd app on your mobile device:\n\n${mobileURL}\n\nMake sure you're connected to the same WiFi network!`;
     
     Alert.alert(
       'Share Test URL',
@@ -247,7 +247,7 @@ export default function MobilePreviewHelper({ visible, onClose }: MobilePreviewH
               {ngrokURL && (
                 <Button
                   title="Share Public URL"
-                  onPress={() => shareViaSystem(`Test DiabetesCare: ${ngrokURL}`)}
+                  onPress={() => shareViaSystem(`Test DiaGaurd: ${ngrokURL}`)}
                   style={styles.shareButton}
                 />
               )}
