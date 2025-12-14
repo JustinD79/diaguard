@@ -1,18 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StripeService } from '@/services/StripeService';
 import { useAuth } from '@/contexts/AuthContext';
-import { products, getProductByTier, getFeaturesByTier } from '@/src/stripe-config';
+import { SubscriptionService } from '@/services/SubscriptionService';
+import { PlanName, canUserAccessFeature } from '@/services/StripeConfig';
 
 interface SubscriptionContextType {
   hasActiveSubscription: boolean;
   subscriptionPlan: string | null;
   subscriptionPlanName: string | null;
-  subscriptionTier: 'standard' | 'gold' | 'diamond';
+  subscriptionTier: PlanName;
   isLoading: boolean;
   refreshSubscription: () => Promise<void>;
   isPremiumFeature: (feature: string) => boolean;
   hasPromoCodeAccess: boolean;
+  isFamilyMember: boolean;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -26,35 +27,58 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
   const [subscriptionPlanName, setSubscriptionPlanName] = useState<string | null>(null);
-  const [subscriptionTier, setSubscriptionTier] = useState<'standard' | 'gold' | 'diamond'>('standard');
+  const [subscriptionTier, setSubscriptionTier] = useState<PlanName>('free');
   const [hasPromoCodeAccess, setHasPromoCodeAccess] = useState(false);
+  const [isFamilyMember, setIsFamilyMember] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshSubscription = async () => {
+    if (!user || isGuest) {
+      setHasActiveSubscription(false);
+      setSubscriptionTier('free');
+      setSubscriptionPlanName('Free Plan');
+      setIsFamilyMember(false);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // For development, simulate subscription status
-      const status = {
-        hasActiveSubscription: hasPromoCodeAccess,
-        subscription: null
-      };
-      
-      setHasActiveSubscription(status.hasActiveSubscription || hasPromoCodeAccess);
-      if (status.subscription) {
-        const plan = StripeService.subscriptionPlans.find(
-          p => p.stripePriceId === status.subscription?.priceId
-        );
-        setSubscriptionPlan(plan?.id || null);
-        setSubscriptionPlanName(plan?.name || null);
+      const hasPromo = await checkSecretPromoCode();
+
+      if (hasPromo) {
+        setHasActiveSubscription(true);
+        setSubscriptionTier('diamond');
+        setSubscriptionPlanName('Lifetime Premium Access');
+        setSubscriptionPlan('promo_premium');
+        setHasPromoCodeAccess(true);
+        setIsFamilyMember(false);
       } else {
-        setSubscriptionPlan(hasPromoCodeAccess ? 'promo_premium' : null);
-        setSubscriptionPlanName(hasPromoCodeAccess ? 'Diagaurd Diamond Plan' : null);
+        const subscription = await SubscriptionService.getSubscription();
+
+        if (subscription && ['active', 'trialing'].includes(subscription.status)) {
+          setHasActiveSubscription(true);
+          setSubscriptionTier(subscription.plan_name);
+          setSubscriptionPlanName(SubscriptionService.formatPlanName(subscription.plan_name));
+          setSubscriptionPlan(subscription.stripe_subscription_id || null);
+          setIsFamilyMember(subscription.isFamilyMember || false);
+          setHasPromoCodeAccess(false);
+        } else {
+          setHasActiveSubscription(false);
+          setSubscriptionTier('free');
+          setSubscriptionPlanName('Free Plan');
+          setSubscriptionPlan(null);
+          setIsFamilyMember(false);
+          setHasPromoCodeAccess(false);
+        }
       }
     } catch (error) {
       console.error('Error refreshing subscription:', error);
       setHasActiveSubscription(false);
+      setSubscriptionTier('free');
+      setSubscriptionPlanName('Free Plan');
       setSubscriptionPlan(null);
-      setSubscriptionPlanName(null);
+      setIsFamilyMember(false);
       setHasPromoCodeAccess(false);
     } finally {
       setIsLoading(false);
@@ -62,55 +86,39 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   };
 
   const isPremiumFeature = (feature: string): boolean => {
-    // Guests have no access to any features
     if (isGuest || !user) {
-      return true; // All features require login
+      return true;
     }
 
-    // Check if feature is available in user's current tier
-    const userFeatures = getFeaturesByTier(subscriptionTier);
-    return !userFeatures.includes(feature);
+    if (hasPromoCodeAccess) {
+      return false;
+    }
+
+    return !canUserAccessFeature(subscriptionTier, feature);
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (user) {
-        // Check if user has redeemed the secret promo code
-        checkSecretPromoCode().then((hasSecret) => {
-          setIsLoading(false);
-          if (hasSecret) {
-            setHasActiveSubscription(true);
-            setSubscriptionTier('diamond');
-            setSubscriptionPlanName('Lifetime Premium Access');
-          } else {
-            // Default to standard (free) tier for logged-in users
-            setHasActiveSubscription(false);
-            setSubscriptionTier('standard');
-            setSubscriptionPlanName('Standard Plan');
-          }
-          setHasPromoCodeAccess(hasSecret || true);
-        });
-      } else if (isGuest) {
-        // Guest users have limited access
-        setIsLoading(false);
-        setHasActiveSubscription(false);
-        setSubscriptionTier('standard');
-        setHasPromoCodeAccess(false);
-        setSubscriptionPlanName(null);
-      } else {
-        // Not logged in, redirect to auth
-        setIsLoading(false);
-        setHasActiveSubscription(false);
-        setSubscriptionTier('standard');
-        setHasPromoCodeAccess(false);
-        setSubscriptionPlanName(null);
-      }
+    if (user) {
+      refreshSubscription();
+    } else if (isGuest) {
+      setIsLoading(false);
+      setHasActiveSubscription(false);
+      setSubscriptionTier('free');
+      setSubscriptionPlanName('Free Plan');
+      setHasPromoCodeAccess(false);
+      setIsFamilyMember(false);
+    } else {
+      setIsLoading(false);
+      setHasActiveSubscription(false);
+      setSubscriptionTier('free');
+      setSubscriptionPlanName(null);
+      setHasPromoCodeAccess(false);
+      setIsFamilyMember(false);
     }
   }, [user, isGuest]);
 
   const checkSecretPromoCode = async (): Promise<boolean> => {
     try {
-      // Check if user has redeemed the secret code
       const redeemedCodes = await AsyncStorage.getItem('redeemed_promo_codes');
       if (redeemedCodes) {
         const codes = JSON.parse(redeemedCodes);
@@ -133,6 +141,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         refreshSubscription,
         isPremiumFeature,
         hasPromoCodeAccess,
+        isFamilyMember,
       }}
     >
       {children}
