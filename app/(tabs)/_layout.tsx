@@ -41,13 +41,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="insulin"
-        options={{
-          title: 'Insulin',
-          tabBarIcon: ({ color }) => <TabBarIcon IconComponent={Calculator} color={color} />,
-        }}
-      />
-      <Tabs.Screen
         name="recipes"
         options={{
           title: 'Recipes',
