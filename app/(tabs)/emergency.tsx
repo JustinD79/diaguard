@@ -23,7 +23,6 @@ interface EmergencyContact {
 
 interface MedicalInfo {
   diabetesType: string;
-  medications: string[];
   allergies: string[];
   emergencyInstructions: string;
   bloodType: string;
@@ -58,7 +57,6 @@ export default function EmergencyScreen() {
 
   const [medicalInfo] = useState<MedicalInfo>({
     diabetesType: 'Type 2',
-    medications: ['Metformin 500mg', 'Lantus 20 units'],
     allergies: ['Penicillin', 'Shellfish'],
     emergencyInstructions: 'Follow emergency plan provided by healthcare provider. Call 911 for medical emergencies.',
     bloodType: 'O+',
@@ -179,17 +177,17 @@ export default function EmergencyScreen() {
         </View>
 
         <View style={styles.medicalInfoItem}>
-          <Text style={styles.medicalInfoLabel}>Medications</Text>
-          {medicalInfo.medications.map((med, index) => (
-            <Text key={index} style={styles.medicalInfoValue}>• {med}</Text>
-          ))}
-        </View>
-
-        <View style={styles.medicalInfoItem}>
           <Text style={styles.medicalInfoLabel}>Allergies</Text>
           {medicalInfo.allergies.map((allergy, index) => (
             <Text key={index} style={[styles.medicalInfoValue, styles.allergyText]}>• {allergy}</Text>
           ))}
+        </View>
+
+        <View style={styles.medicalInfoItem}>
+          <Text style={styles.medicalInfoLabel}>Note</Text>
+          <Text style={styles.medicalInfoValue}>
+            Track medications with your healthcare provider. Always carry your prescription list during emergencies.
+          </Text>
         </View>
 
         <View style={styles.medicalInfoItem}>

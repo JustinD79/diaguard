@@ -12,7 +12,7 @@ import {
 import { Droplet, Plus, Target, TrendingUp } from 'lucide-react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { HydrationService, DailyHydrationSummary } from '../../services/HydrationService';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 export default function HydrationScreen() {
   const { user } = useAuth();

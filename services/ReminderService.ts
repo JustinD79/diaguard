@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 export interface Reminder {
   id: string;
   user_id: string;
-  reminder_type: 'meal' | 'medication' | 'testing' | 'exercise' | 'hydration';
+  reminder_type: 'meal' | 'testing' | 'exercise' | 'hydration';
   title: string;
   message: string;
   time: string;

@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
-import { Camera, Hop as Home, Heart, Calculator, ChefHat, FileText, Pill, TriangleAlert as AlertTriangle, Crown, User, Settings, Activity, Droplet, Trophy } from 'lucide-react-native';
+import { Camera, Hop as Home, Heart, Calculator, ChefHat, FileText, TriangleAlert as AlertTriangle, Crown, User, Settings, Activity, Droplet, Trophy } from 'lucide-react-native';
 
 function TabBarIcon({ IconComponent, color }: { IconComponent: any; color: string }) {
   return <IconComponent size={20} color={color} />;
@@ -52,13 +52,6 @@ export default function TabLayout() {
         options={{
           title: 'Reports',
           tabBarIcon: ({ color }) => <TabBarIcon IconComponent={FileText} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="medications"
-        options={{
-          title: 'Medications',
-          tabBarIcon: ({ color }) => <TabBarIcon IconComponent={Pill} color={color} />,
         }}
       />
       <Tabs.Screen

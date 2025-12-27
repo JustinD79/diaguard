@@ -9,10 +9,10 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { Activity, Plus, TrendingUp, Calendar, Zap } from 'lucide-react-native';
+import { Activity, Plus, TrendingUp, Zap } from 'lucide-react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { ExerciseTrackingService, ExerciseLog } from '../../services/ExerciseTrackingService';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 export default function ExerciseScreen() {
   const { user } = useAuth();

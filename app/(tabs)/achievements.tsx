@@ -9,7 +9,7 @@ import {
 import { Trophy, Award, Star, TrendingUp, Flame, Zap } from 'lucide-react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { AchievementService, Achievement, UserStats } from '../../services/AchievementService';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 const iconMap: Record<string, any> = {
   trophy: Trophy,
