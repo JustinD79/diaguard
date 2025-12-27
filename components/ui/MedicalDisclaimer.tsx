@@ -50,21 +50,20 @@ export default function MedicalDisclaimer({
     >
       <AlertCircle size={compact ? 20 : 24} color={iconColor} style={styles.icon} />
       <View style={styles.content}>
-        <Text style={[styles.title, { color: textColor }]}>Medical Disclaimer</Text>
+        <Text style={[styles.title, { color: textColor }]}>Educational Information</Text>
         {!compact && (
           <>
             <Text style={[styles.text, { color: textColor }]}>
-              This app is a health management tool and NOT a substitute for professional medical
-              advice, diagnosis, or treatment.
+              This app provides estimated nutritional information for educational purposes only and does not provide medical advice.
             </Text>
             <Text style={[styles.text, { color: textColor }]}>
-              • Always consult your healthcare provider before making medical decisions
+              • Always consult your healthcare provider for medical decisions
             </Text>
             <Text style={[styles.text, { color: textColor }]}>
-              • AI-generated nutritional data may contain errors
+              • Nutritional estimates may vary from actual values
             </Text>
             <Text style={[styles.text, { color: textColor }]}>
-              • Verify all insulin dosage calculations with your doctor
+              • User interpretation required at all times
             </Text>
             <Text style={[styles.text, { color: textColor }]}>
               • In case of emergency, call 911 immediately
@@ -73,7 +72,7 @@ export default function MedicalDisclaimer({
         )}
         {compact && (
           <Text style={[styles.text, { color: textColor }]}>
-            Not a substitute for professional medical advice. Always consult your healthcare provider.
+            Estimates only. Always consult a healthcare professional for medical decisions.
           </Text>
         )}
       </View>

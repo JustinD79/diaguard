@@ -34,8 +34,6 @@ export class EnhancedFoodRecognitionService {
                 rawImageData: null,
               },
               nutrition: food.nutrition,
-              insulinImpact: food.insulinImpact || this.calculateInsulinImpact(food.nutrition),
-              glycemicResponse: food.glycemicResponse || this.predictGlycemicResponse(food.nutrition),
               portionAccuracy: food.confidence || 0.85,
               warnings: food.warnings || [],
               alternatives: food.alternatives || [],
@@ -159,8 +157,6 @@ export class EnhancedFoodRecognitionService {
       analyses.push({
         item,
         nutrition,
-        insulinImpact: this.calculateInsulinImpact(nutrition),
-        glycemicResponse: this.predictGlycemicResponse(nutrition),
         portionAccuracy: item.portion.confidenceLevel,
         warnings: this.generateWarnings(nutrition, item),
       });
@@ -169,75 +165,15 @@ export class EnhancedFoodRecognitionService {
     return analyses;
   }
 
-  private static calculateInsulinImpact(nutrition: NutritionAnalysis): InsulinImpact {
-    const carbs = nutrition.macronutrients.carbohydrates;
-    const gi = nutrition.glycemicInfo.glycemicIndex;
-
-    const units1to15 = Math.round((carbs / 15) * 10) / 10;
-    const units1to10 = Math.round((carbs / 10) * 10) / 10;
-    const units1to12 = Math.round((carbs / 12) * 10) / 10;
-
-    return {
-      standardRatio: {
-        ratio: '1:15',
-        units: units1to15,
-      },
-      conservativeRatio: {
-        ratio: '1:10',
-        units: units1to10,
-      },
-      aggressiveRatio: {
-        ratio: '1:12',
-        units: units1to12,
-      },
-      recommended: units1to15,
-      confidence: nutrition.glycemicInfo.glycemicLoad < 20 ? 'high' : 'medium',
-      notes: [
-        'Always consult with your healthcare provider',
-        'Individual insulin sensitivity varies',
-        'Consider current blood glucose before dosing',
-      ],
-    };
-  }
-
-  private static predictGlycemicResponse(nutrition: NutritionAnalysis): GlycemicResponse {
-    const gl = nutrition.glycemicInfo.glycemicLoad;
-
-    let peakTime = 60;
-    let peakIncrease = gl * 3;
-
-    if (nutrition.macronutrients.fiber > 5) {
-      peakTime += 15;
-      peakIncrease *= 0.85;
-    }
-
-    if (nutrition.macronutrients.protein > 20) {
-      peakTime += 10;
-      peakIncrease *= 0.9;
-    }
-
-    return {
-      expectedPeakTime: `${peakTime} minutes`,
-      expectedPeakIncrease: `${Math.round(peakIncrease)} mg/dL`,
-      duration: `${Math.round(120 + (gl * 5))} minutes`,
-      curve: gl < 10 ? 'gradual' : gl < 20 ? 'moderate' : 'rapid',
-      factors: {
-        fiber: nutrition.macronutrients.fiber,
-        protein: nutrition.macronutrients.protein,
-        fat: nutrition.macronutrients.fat,
-      },
-    };
-  }
-
   private static generateWarnings(nutrition: NutritionAnalysis, item: IdentifiedFoodItem): string[] {
     const warnings: string[] = [];
 
     if (nutrition.macronutrients.carbohydrates > 50) {
-      warnings.push('⚠️ High carbohydrate content - monitor blood glucose closely');
+      warnings.push('⚠️ High carbohydrate content');
     }
 
     if (nutrition.macronutrients.sugars > 20) {
-      warnings.push('⚠️ High sugar content - may cause rapid blood glucose spike');
+      warnings.push('⚠️ High sugar content');
     }
 
     if (item.portion.confidenceLevel < 0.7) {
@@ -245,7 +181,7 @@ export class EnhancedFoodRecognitionService {
     }
 
     if (nutrition.glycemicInfo.glycemicLoad > 20) {
-      warnings.push('⚠️ High glycemic load - consider pairing with protein or fiber');
+      warnings.push('⚠️ High glycemic load');
     }
 
     if (nutrition.allergens.length > 0) {
@@ -274,7 +210,6 @@ export class EnhancedFoodRecognitionService {
         (sum, a) => sum + a.nutrition.glycemicInfo.glycemicLoad,
         0
       ),
-      estimatedTotalInsulin: Math.round((totals.carbs / 15) * 10) / 10,
     };
   }
 
@@ -290,7 +225,7 @@ export class EnhancedFoodRecognitionService {
     const totals = this.calculateTotalNutrition(analyses);
 
     if (totals.protein < 15) {
-      recommendations.push('💡 Consider adding more protein to balance blood sugar');
+      recommendations.push('💡 Consider adding more protein for balanced nutrition');
     }
 
     if (totals.fiber < 5) {
@@ -298,7 +233,7 @@ export class EnhancedFoodRecognitionService {
     }
 
     if (totals.carbs > 60) {
-      recommendations.push('💡 High carb meal - monitor blood glucose 2 hours post-meal');
+      recommendations.push('💡 High carbohydrate meal');
     }
 
     if (totals.totalGlycemicLoad > 30) {
@@ -356,31 +291,8 @@ export interface IdentifiedFoodItem {
 export interface DetailedFoodAnalysis {
   item: IdentifiedFoodItem;
   nutrition: NutritionAnalysis;
-  insulinImpact: InsulinImpact;
-  glycemicResponse: GlycemicResponse;
   portionAccuracy: number;
   warnings: string[];
-}
-
-export interface InsulinImpact {
-  standardRatio: { ratio: string; units: number };
-  conservativeRatio: { ratio: string; units: number };
-  aggressiveRatio: { ratio: string; units: number };
-  recommended: number;
-  confidence: 'high' | 'medium' | 'low';
-  notes: string[];
-}
-
-export interface GlycemicResponse {
-  expectedPeakTime: string;
-  expectedPeakIncrease: string;
-  duration: string;
-  curve: 'gradual' | 'moderate' | 'rapid';
-  factors: {
-    fiber: number;
-    protein: number;
-    fat: number;
-  };
 }
 
 export interface NutritionTotals {
@@ -391,7 +303,6 @@ export interface NutritionTotals {
   fiber: number;
   sugars: number;
   totalGlycemicLoad: number;
-  estimatedTotalInsulin: number;
 }
 
 export interface EnhancedFoodAnalysisResult {

@@ -8,7 +8,6 @@ import ValidationInput, { ValidationRules } from '@/components/ui/ValidationInpu
 import { UserProfileService } from '@/services/UserProfileService';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import DexcomConnectionCard from '@/components/settings/DexcomConnectionCard';
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
@@ -396,8 +395,6 @@ export default function SettingsScreen() {
           <>
             {renderPersonalInfo()}
             {renderAccountSettings()}
-
-            <DexcomConnectionCard />
 
             {renderMedicalSettings()}
             {renderAppSettings()}

@@ -7,28 +7,22 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { Target, TrendingUp, Calendar, Droplet, Calculator, Clock, Activity, ChartBar as BarChart3 } from 'lucide-react-native';
+import { Target, TrendingUp, Calendar, Activity, ChartBar as BarChart3 } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Card from '@/components/ui/Card';
-import { CarbCalculatorService, BloodSugarImpact } from '@/services/CarbCalculatorService';
 
 interface CarbEntry {
   id: string;
   timestamp: Date;
   foodName: string;
   carbs: number;
-  insulin: number;
-  bloodSugarBefore?: number;
-  bloodSugarAfter?: number;
   mealType: string;
 }
 
 interface DailyStats {
   totalCarbs: number;
-  totalInsulin: number;
-  avgBloodSugar: number;
   mealsLogged: number;
-  timeInRange: number;
+  avgCarbs: number;
 }
 
 export default function CarbTracker() {
@@ -83,19 +77,15 @@ export default function CarbTracker() {
         } else {
           weekData.push({
             totalCarbs: 0,
-            totalInsulin: 0,
-            avgBloodSugar: 0,
             mealsLogged: 0,
-            timeInRange: 0,
+            avgCarbs: 0,
           });
         }
       } catch (error) {
         weekData.push({
           totalCarbs: 0,
-          totalInsulin: 0,
-          avgBloodSugar: 0,
           mealsLogged: 0,
-          timeInRange: 0,
+          avgCarbs: 0,
         });
       }
     }
@@ -105,27 +95,12 @@ export default function CarbTracker() {
 
   const calculateDayStats = (entries: CarbEntry[]): DailyStats => {
     const totalCarbs = entries.reduce((sum, entry) => sum + entry.carbs, 0);
-    const totalInsulin = entries.reduce((sum, entry) => sum + entry.insulin, 0);
-    
-    const bgReadings = entries
-      .filter(entry => entry.bloodSugarAfter)
-      .map(entry => entry.bloodSugarAfter!);
-    
-    const avgBloodSugar = bgReadings.length > 0 
-      ? bgReadings.reduce((sum, bg) => sum + bg, 0) / bgReadings.length 
-      : 0;
-    
-    const inRangeReadings = bgReadings.filter(bg => bg >= 70 && bg <= 180).length;
-    const timeInRange = bgReadings.length > 0 
-      ? (inRangeReadings / bgReadings.length) * 100 
-      : 0;
+    const avgCarbs = entries.length > 0 ? totalCarbs / entries.length : 0;
 
     return {
       totalCarbs: Math.round(totalCarbs),
-      totalInsulin: Math.round(totalInsulin * 10) / 10,
-      avgBloodSugar: Math.round(avgBloodSugar),
       mealsLogged: entries.length,
-      timeInRange: Math.round(timeInRange),
+      avgCarbs: Math.round(avgCarbs),
     };
   };
 
@@ -135,26 +110,22 @@ export default function CarbTracker() {
 
   const getWeeklyAverages = (): DailyStats => {
     if (weeklyStats.length === 0) {
-      return { totalCarbs: 0, totalInsulin: 0, avgBloodSugar: 0, mealsLogged: 0, timeInRange: 0 };
+      return { totalCarbs: 0, mealsLogged: 0, avgCarbs: 0 };
     }
 
     const totals = weeklyStats.reduce(
       (acc, day) => ({
         totalCarbs: acc.totalCarbs + day.totalCarbs,
-        totalInsulin: acc.totalInsulin + day.totalInsulin,
-        avgBloodSugar: acc.avgBloodSugar + day.avgBloodSugar,
         mealsLogged: acc.mealsLogged + day.mealsLogged,
-        timeInRange: acc.timeInRange + day.timeInRange,
+        avgCarbs: acc.avgCarbs + day.avgCarbs,
       }),
-      { totalCarbs: 0, totalInsulin: 0, avgBloodSugar: 0, mealsLogged: 0, timeInRange: 0 }
+      { totalCarbs: 0, mealsLogged: 0, avgCarbs: 0 }
     );
 
     return {
       totalCarbs: Math.round(totals.totalCarbs / 7),
-      totalInsulin: Math.round((totals.totalInsulin / 7) * 10) / 10,
-      avgBloodSugar: Math.round(totals.avgBloodSugar / 7),
       mealsLogged: Math.round(totals.mealsLogged / 7),
-      timeInRange: Math.round(totals.timeInRange / 7),
+      avgCarbs: Math.round(totals.avgCarbs / 7),
     };
   };
 
@@ -202,28 +173,20 @@ export default function CarbTracker() {
 
         <Card style={styles.statCard}>
           <View style={styles.statIcon}>
-            <Calculator size={20} color="#059669" />
+            <Activity size={20} color="#059669" />
           </View>
-          <Text style={styles.statValue}>{stats.totalInsulin}</Text>
+          <Text style={styles.statValue}>{stats.mealsLogged}</Text>
           <Text style={styles.statLabel}>
-            {isWeekly ? 'Avg Daily Insulin' : 'Total Insulin'}
+            {isWeekly ? 'Avg Daily Meals' : 'Meals Logged'}
           </Text>
         </Card>
 
         <Card style={styles.statCard}>
           <View style={styles.statIcon}>
-            <Droplet size={20} color="#DC2626" />
+            <TrendingUp size={20} color="#8B5CF6" />
           </View>
-          <Text style={styles.statValue}>{stats.avgBloodSugar}</Text>
-          <Text style={styles.statLabel}>Avg Blood Sugar</Text>
-        </Card>
-
-        <Card style={styles.statCard}>
-          <View style={styles.statIcon}>
-            <Activity size={20} color="#8B5CF6" />
-          </View>
-          <Text style={styles.statValue}>{stats.timeInRange}%</Text>
-          <Text style={styles.statLabel}>Time in Range</Text>
+          <Text style={styles.statValue}>{stats.avgCarbs}g</Text>
+          <Text style={styles.statLabel}>Avg Carbs/Meal</Text>
         </Card>
       </View>
     );
@@ -237,7 +200,7 @@ export default function CarbTracker() {
         <View style={styles.noEntriesContainer}>
           <Calendar size={32} color="#9CA3AF" />
           <Text style={styles.noEntriesText}>No entries today</Text>
-          <Text style={styles.noEntriesSubtext}>Start logging your meals to track carbs and insulin</Text>
+          <Text style={styles.noEntriesSubtext}>Start logging your meals to track carbs</Text>
         </View>
       ) : (
         <View style={styles.entriesList}>
@@ -249,20 +212,13 @@ export default function CarbTracker() {
                 </Text>
                 <Text style={styles.entryMealType}>{entry.mealType}</Text>
               </View>
-              
+
               <View style={styles.entryInfo}>
                 <Text style={styles.entryFoodName}>{entry.foodName}</Text>
                 <Text style={styles.entryNutrition}>
-                  {entry.carbs}g carbs • {entry.insulin} units insulin
+                  {entry.carbs}g carbs
                 </Text>
               </View>
-              
-              {entry.bloodSugarAfter && (
-                <View style={styles.entryBG}>
-                  <Text style={styles.entryBGValue}>{entry.bloodSugarAfter}</Text>
-                  <Text style={styles.entryBGLabel}>mg/dL</Text>
-                </View>
-              )}
             </View>
           ))}
         </View>
@@ -273,11 +229,11 @@ export default function CarbTracker() {
   const renderInsights = () => {
     const todaysStats = getTodaysStats();
     const weeklyAvg = getWeeklyAverages();
-    
+
     return (
       <Card style={styles.insightsCard}>
         <Text style={styles.sectionTitle}>Insights & Trends</Text>
-        
+
         <View style={styles.insightsList}>
           <View style={styles.insightItem}>
             <TrendingUp size={16} color="#059669" />
@@ -285,18 +241,18 @@ export default function CarbTracker() {
               Your carb intake is {todaysStats.totalCarbs > weeklyAvg.totalCarbs ? 'higher' : 'lower'} than your weekly average
             </Text>
           </View>
-          
+
           <View style={styles.insightItem}>
             <Target size={16} color="#2563EB" />
             <Text style={styles.insightText}>
-              Time in range: {todaysStats.timeInRange}% (target: 70%+)
+              You've logged {todaysStats.mealsLogged} meal{todaysStats.mealsLogged !== 1 ? 's' : ''} today
             </Text>
           </View>
-          
+
           <View style={styles.insightItem}>
-            <Clock size={16} color="#8B5CF6" />
+            <Activity size={16} color="#8B5CF6" />
             <Text style={styles.insightText}>
-              You've logged {todaysStats.mealsLogged} meal{todaysStats.mealsLogged !== 1 ? 's' : ''} today
+              Your weekly average is {weeklyAvg.avgCarbs}g carbs per meal
             </Text>
           </View>
         </View>

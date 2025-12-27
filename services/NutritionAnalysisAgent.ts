@@ -59,7 +59,7 @@ export class NutritionAnalysisAgent {
           glycemicInfo: {
             glycemicIndex: nutritionData.glycemicIndex,
             glycemicLoad: Math.round(nutritionData.glycemicLoad * factor),
-            insulinImpact: this.calculateInsulinImpact(nutritionData, factor)
+            insulinImpact: 'See healthcare provider for personalized guidance'
           },
           healthScore: this.calculateHealthScore(nutritionData),
           allergens: this.getAllergens(foodKey),
@@ -146,16 +146,6 @@ export class NutritionAnalysisAgent {
     });
 
     return result;
-  }
-
-  private static calculateInsulinImpact(nutritionData: any, factor: number): string {
-    const carbs = nutritionData.per100g.carbs * factor;
-    const gi = nutritionData.glycemicIndex;
-    
-    if (carbs < 5) return 'minimal';
-    if (gi < 35) return 'low';
-    if (gi < 70) return 'moderate';
-    return 'high';
   }
 
   private static calculateHealthScore(nutritionData: any): number {

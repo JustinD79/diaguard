@@ -12,7 +12,6 @@ import FoodCameraScanner from '@/components/FoodCameraScanner';
 import FoodLogger from '@/components/FoodLogger';
 import CarbTracker from '@/components/CarbTracker';
 import RealTimeDashboard from '@/components/analytics/RealTimeDashboard';
-import GlucoseTrendCard from '@/components/glucose/GlucoseTrendCard';
 import { Product, DiabetesInsights } from '@/services/FoodAPIService';
 
 interface QuickStat {
@@ -27,7 +26,7 @@ interface QuickStat {
 
 interface RecentActivity {
   id: string;
-  type: 'meal' | 'insulin' | 'glucose' | 'medication';
+  type: 'meal' | 'medication';
   description: string;
   time: string;
   value?: string;
@@ -51,24 +50,6 @@ export default function HomeScreen() {
 
   const quickStats: QuickStat[] = [
     {
-      id: 'glucose',
-      label: 'Current BG',
-      value: '142',
-      unit: 'mg/dL',
-      trend: 'stable',
-      color: '#D97706',
-      icon: Droplet
-    },
-    {
-      id: 'insulin',
-      label: 'Daily Insulin',
-      value: '24',
-      unit: 'units',
-      trend: 'down',
-      color: '#2563EB',
-      icon: Calculator
-    },
-    {
       id: 'carbs',
       label: 'Carbs Today',
       value: '85',
@@ -78,10 +59,28 @@ export default function HomeScreen() {
       icon: Utensils
     },
     {
-      id: 'time_in_range',
-      label: 'Time in Range',
-      value: '78',
-      unit: '%',
+      id: 'meals',
+      label: 'Meals Logged',
+      value: '3',
+      unit: 'meals',
+      trend: 'stable',
+      color: '#2563EB',
+      icon: Activity
+    },
+    {
+      id: 'calories',
+      label: 'Calories',
+      value: '1,850',
+      unit: 'kcal',
+      trend: 'up',
+      color: '#D97706',
+      icon: Zap
+    },
+    {
+      id: 'nutrition_score',
+      label: 'Nutrition Score',
+      value: '8.2',
+      unit: '/10',
       trend: 'up',
       color: '#8B5CF6',
       icon: Target
@@ -99,19 +98,19 @@ export default function HomeScreen() {
     },
     {
       id: '2',
-      type: 'insulin',
-      description: 'Rapid-acting insulin',
-      time: '12:15 PM',
-      value: '4 units',
-      icon: Calculator
+      type: 'meal',
+      description: 'Breakfast: Oatmeal with berries',
+      time: '8:15 AM',
+      value: '42g carbs',
+      icon: Utensils
     },
     {
       id: '3',
-      type: 'glucose',
-      description: 'Blood glucose reading',
-      time: '11:45 AM',
-      value: '128 mg/dL',
-      icon: Droplet
+      type: 'meal',
+      description: 'Snack: Greek yogurt',
+      time: '10:30 AM',
+      value: '15g carbs',
+      icon: Utensils
     },
     {
       id: '4',
@@ -140,12 +139,6 @@ export default function HomeScreen() {
 
   const handleQuickAction = (action: string) => {
     switch (action) {
-      case 'insulin_calc':
-        router.push('/(tabs)/insulin');
-        break;
-      case 'glucose_log':
-        Alert.alert('Quick Glucose Entry', 'Glucose logging feature would open here');
-        break;
       case 'food_log':
         setShowFoodLogger(true);
         break;
@@ -206,12 +199,12 @@ export default function HomeScreen() {
         </View>
         <View style={styles.foodLoggerInfo}>
           <Text style={styles.foodLoggerTitle}>Food Logger</Text>
-          <Text style={styles.foodLoggerSubtitle}>Track meals, carbs, and insulin</Text>
+          <Text style={styles.foodLoggerSubtitle}>Track meals and carbs</Text>
         </View>
       </View>
-      
+
       <Text style={styles.foodLoggerDescription}>
-        Comprehensive meal tracking with camera scanning, manual entry, and automatic insulin calculations
+        Comprehensive meal tracking with camera scanning and manual entry
       </Text>
       
       <Button title="Open Food Logger" onPress={() => setShowFoodLogger(true)} />
@@ -221,30 +214,22 @@ export default function HomeScreen() {
   const renderQuickActions = () => (
     <Card style={styles.quickActionsCard}>
       <Text style={styles.sectionTitle}>Quick Actions</Text>
-      
+
       <View style={styles.quickActionsGrid}>
-        <TouchableOpacity
-          style={styles.quickAction}
-          onPress={() => handleQuickAction('insulin_calc')}
-        >
-          <Calculator size={20} color="#2563EB" />
-          <Text style={styles.quickActionText}>Insulin Calculator</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.quickAction}
-          onPress={() => handleQuickAction('glucose_log')}
-        >
-          <Droplet size={20} color="#DC2626" />
-          <Text style={styles.quickActionText}>Log Glucose</Text>
-        </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.quickAction}
           onPress={() => setShowFoodLogger(true)}
         >
           <Plus size={20} color="#059669" />
           <Text style={styles.quickActionText}>Log Food</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.quickAction}
+          onPress={() => handleQuickAction('carb_tracker')}
+        >
+          <Target size={20} color="#8B5CF6" />
+          <Text style={styles.quickActionText}>Carb Tracker</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -257,10 +242,10 @@ export default function HomeScreen() {
 
         <TouchableOpacity
           style={styles.quickAction}
-          onPress={() => handleQuickAction('carb_tracker')}
+          onPress={() => router.push('/(tabs)/reports')}
         >
-          <Target size={20} color="#8B5CF6" />
-          <Text style={styles.quickActionText}>Carb Tracker</Text>
+          <TrendingUp size={20} color="#2563EB" />
+          <Text style={styles.quickActionText}>View Reports</Text>
         </TouchableOpacity>
       </View>
     </Card>
@@ -368,10 +353,10 @@ export default function HomeScreen() {
   const handleFoodScanned = (product: any, insights: any) => {
     Alert.alert(
       'Food Scanned Successfully!',
-      `${product.name}\nCarbs: ${product.nutrition.carbs}g\nEstimated insulin: ${insights.estimatedInsulinUnits} units`,
+      `${product.name}\nCarbs: ${product.nutrition.carbs}g`,
       [
         { text: 'Open Food Logger', onPress: () => setShowFoodLogger(true) },
-        { text: 'Calculate Insulin', onPress: () => router.push('/(tabs)/insulin') }
+        { text: 'OK', style: 'cancel' }
       ]
     );
     setShowFoodScanner(false);
@@ -383,8 +368,6 @@ export default function HomeScreen() {
         {renderWelcomeHeader()}
 
         <ScanLimitBanner />
-
-        <GlucoseTrendCard />
 
         {renderAIFoodScanner()}
         {renderQuickFoodLogger()}

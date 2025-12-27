@@ -60,7 +60,7 @@ export default function EmergencyScreen() {
     diabetesType: 'Type 2',
     medications: ['Metformin 500mg', 'Lantus 20 units'],
     allergies: ['Penicillin', 'Shellfish'],
-    emergencyInstructions: 'If unconscious, check blood glucose. If low, administer glucose gel or call 911.',
+    emergencyInstructions: 'Follow emergency plan provided by healthcare provider. Call 911 for medical emergencies.',
     bloodType: 'O+',
     doctorName: 'Dr. Sarah Johnson',
     doctorPhone: '+1 (555) 123-4567',
@@ -233,32 +233,18 @@ export default function EmergencyScreen() {
 
   const renderEmergencyGuidelines = () => (
     <Card style={styles.guidelinesCard}>
-      <Text style={styles.sectionTitle}>Emergency Guidelines</Text>
-      
+      <Text style={styles.sectionTitle}>Emergency Information</Text>
+
       <View style={styles.guideline}>
         <View style={styles.guidelineIcon}>
           <AlertTriangle size={16} color="#DC2626" />
         </View>
         <View style={styles.guidelineContent}>
-          <Text style={styles.guidelineTitle}>Severe Hypoglycemia (Low Blood Sugar)</Text>
+          <Text style={styles.guidelineTitle}>In Case of Emergency</Text>
           <Text style={styles.guidelineText}>
-            • If conscious: Give 15g fast-acting carbs{'\n'}
-            • If unconscious: Call 911 immediately{'\n'}
-            • Do not give food/drink if unconscious
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.guideline}>
-        <View style={styles.guidelineIcon}>
-          <AlertTriangle size={16} color="#D97706" />
-        </View>
-        <View style={styles.guidelineContent}>
-          <Text style={styles.guidelineTitle}>Severe Hyperglycemia (High Blood Sugar)</Text>
-          <Text style={styles.guidelineText}>
-            • Check for ketones if possible{'\n'}
-            • Encourage water intake{'\n'}
-            • Seek medical attention if BG &gt; 400 mg/dL
+            • Call 911 immediately for medical emergencies{'\n'}
+            • Contact your healthcare provider for medical guidance{'\n'}
+            • Keep your medical ID information up to date
           </Text>
         </View>
       </View>
@@ -268,12 +254,11 @@ export default function EmergencyScreen() {
           <Clock size={16} color="#2563EB" />
         </View>
         <View style={styles.guidelineContent}>
-          <Text style={styles.guidelineTitle}>When to Call 911</Text>
+          <Text style={styles.guidelineTitle}>Important Reminders</Text>
           <Text style={styles.guidelineText}>
-            • Unconsciousness or confusion{'\n'}
-            • Severe dehydration{'\n'}
-            • Persistent vomiting{'\n'}
-            • Blood glucose &gt; 400 mg/dL with ketones
+            • Always follow your healthcare provider's emergency plan{'\n'}
+            • Keep emergency contact information accessible{'\n'}
+            • Inform family members of your condition and emergency contacts
           </Text>
         </View>
       </View>

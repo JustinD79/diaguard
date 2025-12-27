@@ -27,17 +27,17 @@ export default function PersistentDisclaimerBanner({
     <View style={styles.fullContainer}>
       <View style={styles.header}>
         <AlertTriangle size={24} color="#DC2626" />
-        <Text style={styles.title}>IMPORTANT MEDICAL DISCLAIMER</Text>
+        <Text style={styles.title}>IMPORTANT DISCLAIMER</Text>
       </View>
 
       <Text style={styles.mainText}>
-        ⚠️ This calculator is for educational purposes only. Always consult your healthcare provider.
+        ⚠️ This app provides estimated nutritional information for educational purposes only and does not provide medical advice.
       </Text>
 
       <View style={styles.warningList}>
-        <Text style={styles.warningItem}>• NOT a substitute for professional medical advice</Text>
-        <Text style={styles.warningItem}>• AI-generated data may contain errors</Text>
-        <Text style={styles.warningItem}>• Verify ALL insulin calculations with your doctor</Text>
+        <Text style={styles.warningItem}>• Nutritional estimates for informational purposes</Text>
+        <Text style={styles.warningItem}>• Not a substitute for professional medical advice</Text>
+        <Text style={styles.warningItem}>• Always consult your healthcare provider for medical decisions</Text>
       </View>
 
       <Pressable

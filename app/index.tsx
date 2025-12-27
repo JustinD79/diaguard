@@ -71,11 +71,11 @@ export default function CameraLandingPage() {
 
   const handleFoodScanned = (product: Product, insights: DiabetesInsights) => {
     setShowCameraScanner(false);
-    
+
     // Show scan result and navigate to home
     Alert.alert(
       'Food Scanned Successfully!',
-      `${product.name}\nCarbs: ${product.nutrition.carbs}g\nEstimated insulin: ${insights.estimatedInsulinUnits} units`,
+      `${product.name}\nCarbs: ${product.nutrition.carbs}g`,
       [
         { text: 'View Details', onPress: () => router.push('/(tabs)') },
         { text: 'Scan Another', onPress: () => setShowCameraScanner(true) }
@@ -140,7 +140,7 @@ export default function CameraLandingPage() {
             <Camera size={48} color="#FFFFFF" />
             <Text style={styles.instructionTitle}>Point camera at food</Text>
             <Text style={styles.instructionSubtitle}>
-              AI will analyze nutrition and calculate insulin
+              AI will analyze nutrition
             </Text>
           </View>
         </View>
@@ -172,20 +172,20 @@ export default function CameraLandingPage() {
 
         {/* Quick Features */}
         <View style={styles.quickFeatures}>
-          <TouchableOpacity 
-            style={styles.quickFeature}
-            onPress={() => router.push('/(tabs)/insulin')}
-          >
-            <Target size={20} color="#2563EB" />
-            <Text style={styles.quickFeatureText}>Insulin Calculator</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.quickFeature}
             onPress={() => router.push('/(tabs)/health')}
           >
             <Zap size={20} color="#059669" />
             <Text style={styles.quickFeatureText}>Health Monitor</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.quickFeature}
+            onPress={() => router.push('/(tabs)/reports')}
+          >
+            <Target size={20} color="#2563EB" />
+            <Text style={styles.quickFeatureText}>View Reports</Text>
           </TouchableOpacity>
         </View>
       </View>
