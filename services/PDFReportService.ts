@@ -1,6 +1,8 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
+import { MealSummaryGenerator } from './MealSummaryGenerator';
+import { PatternAnalysisService } from './PatternAnalysisService';
 
 export interface MealLogEntry {
   id: string;
@@ -339,6 +341,53 @@ export class PDFReportService {
 </body>
 </html>
     `;
+  }
+
+  /**
+   * Generate AI-powered insights for PDF report (FDA-SAFE)
+   * EDUCATIONAL ONLY - no medical advice
+   */
+  static async generateAIInsights(userId: string, daysBack: number = 30): Promise<string[]> {
+    try {
+      const insights: string[] = [];
+
+      const pattern = await PatternAnalysisService.analyzeMealPatterns(userId, daysBack);
+      const distribution = await PatternAnalysisService.analyzeCarbDistribution(userId, daysBack);
+
+      insights.push(
+        `📊 Over the past ${daysBack} days, you logged ${pattern.totalMeals} meals with an average of ${pattern.averageCarbs.toFixed(1)}g carbs per meal.`
+      );
+
+      if (pattern.carbTrend === 'increasing') {
+        insights.push(
+          `📈 Your carb intake has been trending upward. This is descriptive information only - discuss any dietary changes with your healthcare provider.`
+        );
+      } else if (pattern.carbTrend === 'decreasing') {
+        insights.push(
+          `📉 Your carb intake has been trending downward. Review this pattern with your healthcare team to ensure it aligns with your nutrition plan.`
+        );
+      } else {
+        insights.push(`➡️ Your carb intake has been relatively stable over this period.`);
+      }
+
+      if (distribution.length > 0) {
+        const mostFrequent = distribution.sort((a, b) => b.mealCount - a.count)[0];
+        insights.push(
+          `🍽️ Most of your meals (${mostFrequent.percentage.toFixed(0)}%) were logged as "${mostFrequent.mealType}".`
+        );
+      }
+
+      insights.push(
+        `💡 Note: These are descriptive statistics based on your logged data. This information is for awareness only and does not constitute medical advice. Consult your healthcare provider for personalized dietary guidance.`
+      );
+
+      return insights;
+    } catch (error) {
+      console.error('Error generating AI insights:', error);
+      return [
+        'Unable to generate insights for this period. Please ensure you have sufficient meal data logged.',
+      ];
+    }
   }
 
   static async generatePDF(data: ReportData): Promise<{ uri: string; success: boolean; error?: string }> {
