@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
-import { Camera, Hop as Home, Heart, Calculator, ChefHat, FileText, Pill, TriangleAlert as AlertTriangle, Crown, User, Settings } from 'lucide-react-native';
+import { Camera, Hop as Home, Heart, Calculator, ChefHat, FileText, Pill, TriangleAlert as AlertTriangle, Crown, User, Settings, Activity, Droplet, Trophy } from 'lucide-react-native';
 
 function TabBarIcon({ IconComponent, color }: { IconComponent: any; color: string }) {
   return <IconComponent size={20} color={color} />;
@@ -83,10 +83,43 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="exercise"
+        options={{
+          title: 'Exercise',
+          tabBarIcon: ({ color }) => <TabBarIcon IconComponent={Activity} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="hydration"
+        options={{
+          title: 'Hydration',
+          tabBarIcon: ({ color }) => <TabBarIcon IconComponent={Droplet} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="achievements"
+        options={{
+          title: 'Achievements',
+          tabBarIcon: ({ color }) => <TabBarIcon IconComponent={Trophy} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <TabBarIcon IconComponent={Settings} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="terms-of-service"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="privacy-policy"
+        options={{
+          href: null,
         }}
       />
     </Tabs>
