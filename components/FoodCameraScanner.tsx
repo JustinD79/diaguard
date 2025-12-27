@@ -15,9 +15,12 @@ import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera, X, FlipHorizontal, Slash as Flash, Image as ImageIcon, Zap, Target, CircleCheck as CheckCircle, RefreshCw } from 'lucide-react-native';
 import { FoodAPIService, Product, DiabetesInsights } from '@/services/FoodAPIService';
+import { AIVisionFoodAnalyzer, AIVisionAnalysisResult } from '@/services/AIVisionFoodAnalyzer';
 import { useScanLimit } from '@/contexts/ScanLimitContext';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import CarbExplanationModal from '@/components/nutrition/CarbExplanationModal';
+import EstimateDetailModal from '@/components/nutrition/EstimateDetailModal';
 
 const { width, height } = Dimensions.get('window');
 
@@ -40,7 +43,10 @@ export default function FoodCameraScanner({
   const [analysisResult, setAnalysisResult] = useState<{
     product: Product;
     insights: DiabetesInsights;
+    aiResult: AIVisionAnalysisResult;
   } | null>(null);
+  const [showCarbExplanation, setShowCarbExplanation] = useState(false);
+  const [showEstimateDetail, setShowEstimateDetail] = useState(false);
   const cameraRef = useRef<CameraView>(null);
   const { useScan, canScan } = useScanLimit();
 
@@ -117,40 +123,44 @@ export default function FoodCameraScanner({
 
   const analyzeFood = async (imageUri: string, base64?: string) => {
     setAnalyzing(true);
-    
+
     try {
-      // Simulate AI food recognition and analysis
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock analysis result - in production this would call actual AI service
-      const mockProduct: Product = {
+      // Call real AI Vision service (Claude or OpenAI)
+      const aiResult: AIVisionAnalysisResult = await AIVisionFoodAnalyzer.analyzeFoodImage(
+        imageUri,
+        base64
+      );
+
+      // Convert AI result to Product format for compatibility
+      const firstFood = aiResult.foods[0];
+      const product: Product = {
         id: `food_${Date.now()}`,
-        name: 'Grilled Chicken Breast with Rice',
-        brand: 'Homemade',
+        name: firstFood.name,
+        brand: 'AI Analyzed',
         nutrition: {
-          calories: 320,
-          carbs: 28,
-          protein: 35,
-          fat: 6,
-          fiber: 2,
-          sugars: 1,
-          sodium: 180,
+          calories: aiResult.totalNutrition.calories,
+          carbs: aiResult.totalNutrition.totalCarbs,
+          protein: aiResult.totalNutrition.protein,
+          fat: aiResult.totalNutrition.fat,
+          fiber: aiResult.totalNutrition.fiber,
+          sugars: aiResult.totalNutrition.sugars,
+          sodium: 0, // Not provided by AI
         },
-        servingSize: '1 plate (250g)',
-        servingWeight: 250,
+        servingSize: `${firstFood.portionWeight}${firstFood.portionUnit}`,
+        servingWeight: firstFood.portionWeight,
         verified: true,
-        source: 'AI Recognition',
+        source: `AI Vision (${aiResult.apiProvider})`,
         imageUrl: imageUri,
       };
 
-      const insights = FoodAPIService.generateDiabetesInsights(mockProduct.nutrition);
-      
-      setAnalysisResult({ product: mockProduct, insights });
+      const insights = FoodAPIService.generateDiabetesInsights(product.nutrition);
+
+      setAnalysisResult({ product, insights, aiResult });
     } catch (error) {
       console.error('Error analyzing food:', error);
       Alert.alert(
         'Analysis Failed',
-        'Failed to analyze the food image. Please try again or enter food information manually.'
+        'Failed to analyze the food image with AI. Please try again or enter food information manually.'
       );
     } finally {
       setAnalyzing(false);
@@ -218,6 +228,7 @@ export default function FoodCameraScanner({
   }
 
   return (
+    <>
     <Modal visible={visible} animationType="slide">
       <SafeAreaView style={styles.container}>
         {!capturedImage ? (
@@ -325,20 +336,28 @@ export default function FoodCameraScanner({
                   </View>
                 </Card>
 
-                <Card style={styles.insulinCard}>
-                  <View style={styles.insulinHeader}>
+                <Card style={styles.carbInfoCard}>
+                  <View style={styles.carbInfoHeader}>
                     <Target size={20} color="#2563EB" />
-                    <Text style={styles.cardTitle}>Insulin Recommendation</Text>
+                    <Text style={styles.cardTitle}>Carbohydrate Information</Text>
                   </View>
-                  <View style={styles.insulinInfo}>
-                    <Text style={styles.insulinDose}>
-                      {analysisResult.insights.estimatedInsulinUnits} units
-                    </Text>
-                    <Text style={styles.insulinNote}>
-                      Based on {analysisResult.product.nutrition.carbs}g carbs (1:15 ratio)
-                    </Text>
-                    <Text style={styles.insulinWarning}>
-                      ⚠️ Always verify with your healthcare provider
+                  <View style={styles.carbInfoContent}>
+                    <View style={styles.carbInfoRow}>
+                      <Text style={styles.carbInfoLabel}>Total Carbs:</Text>
+                      <Text style={styles.carbInfoValue}>{analysisResult.product.nutrition.carbs}g</Text>
+                    </View>
+                    <View style={styles.carbInfoRow}>
+                      <Text style={styles.carbInfoLabel}>Net Carbs:</Text>
+                      <Text style={styles.carbInfoValue}>
+                        {analysisResult.product.nutrition.carbs - analysisResult.product.nutrition.fiber}g
+                      </Text>
+                    </View>
+                    <View style={styles.carbInfoRow}>
+                      <Text style={styles.carbInfoLabel}>Fiber:</Text>
+                      <Text style={styles.carbInfoValue}>{analysisResult.product.nutrition.fiber}g</Text>
+                    </View>
+                    <Text style={styles.carbInfoNote}>
+                      💡 Consult your healthcare provider for personalized dietary guidance
                     </Text>
                   </View>
                 </Card>
@@ -373,6 +392,24 @@ export default function FoodCameraScanner({
                   </View>
                 </Card>
 
+                {/* Explanation Buttons */}
+                <View style={styles.explanationButtons}>
+                  <TouchableOpacity
+                    style={styles.explanationButton}
+                    onPress={() => setShowCarbExplanation(true)}
+                  >
+                    <Target size={18} color="#2563EB" />
+                    <Text style={styles.explanationButtonText}>Carb Breakdown</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.explanationButton}
+                    onPress={() => setShowEstimateDetail(true)}
+                  >
+                    <CheckCircle size={18} color="#059669" />
+                    <Text style={styles.explanationButtonText}>Why This Estimate?</Text>
+                  </TouchableOpacity>
+                </View>
+
                 <View style={styles.actionButtons}>
                   <Button
                     title="Log This Meal"
@@ -392,6 +429,23 @@ export default function FoodCameraScanner({
         )}
       </SafeAreaView>
     </Modal>
+
+      {/* Explanation Modals */}
+      {analysisResult?.aiResult && (
+        <>
+          <CarbExplanationModal
+            visible={showCarbExplanation}
+            onClose={() => setShowCarbExplanation(false)}
+            analysisResult={analysisResult.aiResult}
+          />
+          <EstimateDetailModal
+            visible={showEstimateDetail}
+            onClose={() => setShowEstimateDetail(false)}
+            analysisResult={analysisResult.aiResult}
+          />
+        </>
+      )}
+    </>
   );
 }
 
@@ -677,39 +731,49 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     color: '#6B7280',
   },
-  insulinCard: {
+  carbInfoCard: {
     padding: 20,
     backgroundColor: '#EBF4FF',
     borderWidth: 2,
     borderColor: '#2563EB',
   },
-  insulinHeader: {
+  carbInfoHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     marginBottom: 16,
   },
-  insulinInfo: {
+  carbInfoContent: {
+    gap: 12,
+  },
+  carbInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
   },
-  insulinDose: {
-    fontSize: 32,
-    fontFamily: 'Inter-Bold',
-    color: '#2563EB',
-    marginBottom: 8,
-  },
-  insulinNote: {
+  carbInfoLabel: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#374151',
-    marginBottom: 8,
-    textAlign: 'center',
+    color: '#6B7280',
   },
-  insulinWarning: {
+  carbInfoValue: {
+    fontSize: 18,
+    fontFamily: 'Inter-Bold',
+    color: '#2563EB',
+  },
+  carbInfoNote: {
     fontSize: 12,
     fontFamily: 'Inter-Regular',
-    color: '#DC2626',
+    color: '#6B7280',
     textAlign: 'center',
+    marginTop: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
   },
   insightsCard: {
     padding: 20,
@@ -735,6 +799,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
     color: '#111827',
+  },
+  explanationButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  explanationButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+  },
+  explanationButtonText: {
+    fontSize: 13,
+    fontFamily: 'Inter-SemiBold',
+    color: '#374151',
   },
   actionButtons: {
     flexDirection: 'row',

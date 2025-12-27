@@ -7,12 +7,14 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useScanLimit } from '@/contexts/ScanLimitContext';
+import { useAuth } from '@/contexts/AuthContext';
 import ScanLimitBanner from '@/components/notifications/ScanLimitBanner';
 import FoodCameraScanner from '@/components/FoodCameraScanner';
 import FoodLogger from '@/components/FoodLogger';
 import CarbTracker from '@/components/CarbTracker';
 import RealTimeDashboard from '@/components/analytics/RealTimeDashboard';
 import { Product, DiabetesInsights } from '@/services/FoodAPIService';
+import { MealLoggingService } from '@/services/MealLoggingService';
 
 interface QuickStat {
   id: string;
@@ -35,6 +37,7 @@ interface RecentActivity {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { user } = useAuth();
   const { hasActiveSubscription, isPremiumFeature } = useSubscription();
   const { canScan, scansRemaining } = useScanLimit();
   const [showFoodScanner, setShowFoodScanner] = useState(false);
@@ -350,16 +353,55 @@ export default function HomeScreen() {
     </Card>
   );
 
-  const handleFoodScanned = (product: any, insights: any) => {
-    Alert.alert(
-      'Food Scanned Successfully!',
-      `${product.name}\nCarbs: ${product.nutrition.carbs}g`,
-      [
-        { text: 'Open Food Logger', onPress: () => setShowFoodLogger(true) },
-        { text: 'OK', style: 'cancel' }
-      ]
-    );
-    setShowFoodScanner(false);
+  const handleFoodScanned = async (product: Product, insights: DiabetesInsights) => {
+    if (!user) {
+      Alert.alert('Error', 'You must be logged in to log meals');
+      return;
+    }
+
+    try {
+      // Determine meal type based on current time
+      const hour = currentTime.getHours();
+      let mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack' = 'snack';
+      if (hour >= 6 && hour < 11) mealType = 'breakfast';
+      else if (hour >= 11 && hour < 16) mealType = 'lunch';
+      else if (hour >= 16 && hour < 22) mealType = 'dinner';
+
+      // Log meal to database (FDA-SAFE: no insulin field)
+      await MealLoggingService.logMeal(
+        {
+          user_id: user.id,
+          meal_type: mealType,
+          timestamp: new Date().toISOString(),
+          total_carbs: product.nutrition.carbs,
+          total_calories: product.nutrition.calories,
+          total_insulin: 0, // Not used - FDA compliance
+          notes: `AI scanned: ${product.source}`,
+        },
+        [
+          {
+            food_name: product.name,
+            nutrition_data: product.nutrition,
+            quantity: 1,
+            scan_method: 'camera',
+            confidence_score: 0.85,
+          },
+        ]
+      );
+
+      Alert.alert(
+        'Meal Logged Successfully!',
+        `${product.name}\n${product.nutrition.carbs}g carbs, ${product.nutrition.calories} calories\n\nSaved to your meal history.`,
+        [{ text: 'OK' }]
+      );
+      setShowFoodScanner(false);
+    } catch (error) {
+      console.error('Error saving meal:', error);
+      Alert.alert(
+        'Error Saving Meal',
+        'Failed to save meal to database. Please try again.'
+      );
+    }
   };
 
   return (

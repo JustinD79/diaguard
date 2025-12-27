@@ -41,61 +41,49 @@ export class AIVisionFoodAnalyzer {
   }
 
   /**
-   * Build comprehensive analysis prompt
+   * Build FDA-safe nutritional analysis prompt
+   * NO medical advice, treatment recommendations, or diagnostic features
    */
   private static buildAnalysisPrompt(): string {
-    return `You are an advanced AI nutritional analysis system specializing in diabetic and hypoglycemic dietary management.
+    return `You are a nutrition analysis AI assistant providing ESTIMATED nutritional information for educational and awareness purposes ONLY.
 
-Analyze this food image and provide:
+CRITICAL RULES:
+- NEVER provide medical advice, diagnosis, or treatment recommendations
+- NEVER calculate or suggest insulin doses
+- NEVER interpret blood glucose data
+- NEVER suggest medication timing or dosages
+- NEVER use directive language ("you should", "you must", "take", "avoid")
+- ALWAYS label estimates as "estimated" or "approximate"
+- ALWAYS include disclaimers when discussing health topics
+- If asked for medical guidance, respond: "Consult your healthcare provider for medical decisions"
 
-**STEP 1: VISUAL FOOD ANALYSIS**
-- Identify all food components with 95%+ accuracy
+Analyze this food image and provide DESCRIPTIVE nutritional information:
+
+**STEP 1: VISUAL FOOD IDENTIFICATION**
+- Identify all food components visible in the image
 - Estimate portion sizes using visual reference points (utensils, plates, hands)
-- Calculate total weight/volume of each ingredient
-- Account for cooking methods affecting nutritional content
+- Note cooking methods that may affect nutritional content
 
-**STEP 2: COMPREHENSIVE NUTRITIONAL BREAKDOWN**
-Provide for the ENTIRE item:
-- Total carbohydrates (net carbs, fiber, sugar alcohols)
-- Glycemic index (0-100 scale) and glycemic load
+**STEP 2: NUTRITIONAL CONTENT ESTIMATION**
+For the ENTIRE meal, provide estimates for:
+- Total carbohydrates (with fiber and sugar breakdown)
+- Net carbohydrates (total carbs minus fiber)
 - Protein and fat content
-- Estimated insulin requirements for Type 1 diabetics:
-  * Ratio 1:10 (1 unit per 10g carbs)
-  * Ratio 1:15 (1 unit per 15g carbs)
-  * Ratio 1:20 (1 unit per 20g carbs)
-- Blood glucose impact timeline:
-  * Immediate response (0-30 min)
-  * 2-hour projection
-  * 4-hour projection
+- Calories
+- Glycemic Index (reference value, 0-100 scale) - educational reference only
+- Glycemic Load (calculated value) - educational reference only
 
-**STEP 3: PORTION SEGMENTATION**
-Break down into quarters (1/4 portions):
-- Carbs per quarter
-- Insulin units per quarter for each ratio (1:10, 1:15, 1:20)
-- Recommended eating pace for glucose management
+**STEP 3: PORTION INFORMATION**
+Break down into quarter (1/4) portions for awareness:
+- Estimated carbohydrates per quarter
+- This helps users understand portion sizes - not a recommendation
 
-**STEP 4: PERSONALIZED RECOMMENDATIONS**
-For Type 1 Diabetics:
-- Bolus timing (how many minutes before eating)
-- Correction factors if glucose is high
-- Exercise considerations
-
-For Type 2 Diabetics:
-- Portion control suggestions
-- Medication timing recommendations
-- Alternative food swaps for better control
-
-For Hypoglycemic individuals:
-- Safe consumption amounts
-- Food pairing suggestions (protein/fat to slow absorption)
-- Timing recommendations
-
-**STEP 5: ADVANCED OPTIMIZATION STRATEGIES**
-- Food sequencing for optimal glucose response (e.g., vegetables first, then protein, then carbs)
-- Combination therapies (food pairing to reduce glycemic impact)
-- Pre-bolusing strategies with precise timing
-- Alternative preparation methods to reduce glycemic load
-- Micro-dosing techniques for large meals
+**STEP 4: EDUCATIONAL CONTEXT (NON-DIRECTIVE)**
+Provide general nutrition education:
+- Carb density description (low/medium/high)
+- Digestion speed information (fast/moderate/slow digesting carbs)
+- Food pairing educational notes (e.g., "protein and fat slow carb absorption")
+- Preparation method impact on nutrition (general information)
 
 **OUTPUT FORMAT:**
 Respond in valid JSON format with this structure:
@@ -106,7 +94,8 @@ Respond in valid JSON format with this structure:
       "confidence": 0.95,
       "portionWeight": 150,
       "portionUnit": "grams",
-      "visualCues": ["plate reference", "fork size comparison"]
+      "visualCues": ["plate reference", "fork size comparison"],
+      "estimationMethod": "visual analysis of standard portion"
     }
   ],
   "totalNutrition": {
@@ -121,69 +110,73 @@ Respond in valid JSON format with this structure:
     "glycemicIndex": 55,
     "glycemicLoad": 23
   },
-  "insulinRecommendations": {
-    "ratio1to10": {"units": 4.5, "timing": "15 min before eating"},
-    "ratio1to15": {"units": 3.0, "timing": "10-15 min before eating"},
-    "ratio1to20": {"units": 2.3, "timing": "10 min before eating"}
-  },
-  "glucoseImpactTimeline": {
-    "immediate": {"minutes": "0-30", "expectedRise": "10-15 mg/dL", "description": "Minimal impact"},
-    "twoHour": {"minutes": "30-120", "expectedPeak": "140-160 mg/dL", "description": "Peak glucose response"},
-    "fourHour": {"minutes": "120-240", "expectedLevel": "110-120 mg/dL", "description": "Return toward baseline"}
-  },
   "quarterPortions": [
     {
       "quarter": 1,
       "carbs": 11.3,
-      "insulin1to10": 1.1,
-      "insulin1to15": 0.8,
-      "insulin1to20": 0.6,
-      "recommendation": "Start with this quarter to assess glucose response"
+      "description": "One quarter of the total meal"
+    },
+    {
+      "quarter": 2,
+      "carbs": 11.3,
+      "description": "Two quarters (half) of the total meal"
+    },
+    {
+      "quarter": 3,
+      "carbs": 11.3,
+      "description": "Three quarters of the total meal"
+    },
+    {
+      "quarter": 4,
+      "carbs": 11.3,
+      "description": "Complete meal"
     }
   ],
-  "type1Recommendations": {
-    "bolusTimingMinutes": 15,
-    "correctionFactor": "Use your personal correction factor if BG > 120",
-    "exerciseNote": "Reduce dose by 25% if exercising within 2 hours"
+  "educationalContext": {
+    "carbDensity": "medium",
+    "carbDensityExplanation": "This meal contains a moderate amount of carbohydrates per serving",
+    "digestionSpeed": "moderate",
+    "digestionExplanation": "Contains mix of simple and complex carbohydrates. Protein and fat present which typically slow digestion.",
+    "foodPairingNote": "Balanced meal with protein, carbs, and vegetables",
+    "preparationImpact": "Cooking method: grilled/steamed. These methods generally preserve nutritional content.",
+    "portionContext": "This appears to be a standard restaurant-style portion"
   },
-  "type2Recommendations": {
-    "portionControl": "Consider eating only 75% of this portion",
-    "medicationTiming": "Take medication 30 minutes before eating",
-    "betterSwaps": ["Swap white rice for cauliflower rice to reduce carbs by 80%"]
-  },
-  "hypoglycemicRecommendations": {
-    "safeAmount": "Start with 1/4 portion and monitor for 30 minutes",
-    "pairingAdvice": "Add 2 tbsp almond butter for sustained energy",
-    "timingAdvice": "Consume during mid-morning when insulin sensitivity is optimal"
-  },
-  "optimizationStrategies": {
-    "foodSequencing": "Eat protein and vegetables first, then carbs last to reduce spike by 30%",
-    "preBolusingStrategy": "Dose 15 minutes early for high-GI foods; at meal time for low-GI",
-    "preparationTips": "Cooling pasta after cooking reduces GI by 15-20%",
-    "microDosingTechnique": "Split into 2 smaller meals 90 minutes apart for better control"
-  },
-  "warnings": [
-    "⚠️ High glycemic load - monitor closely for 3 hours",
-    "⚠️ Large portion - consider splitting meal"
+  "nutritionalHighlights": [
+    "Good source of protein from chicken",
+    "Contains dietary fiber from vegetables",
+    "Moderate carbohydrate content primarily from rice"
   ],
-  "emergencyProtocols": [
-    "If BG drops below 70 mg/dL, consume 15g fast-acting carbs immediately",
-    "If BG rises above 250 mg/dL, check ketones and contact healthcare provider"
+  "generalAwarenessNotes": [
+    "Portion sizes can vary - these are estimates",
+    "Individual needs vary by many factors",
+    "Consult healthcare provider for personalized nutrition guidance"
   ],
-  "confidenceInterval": {
-    "carbs": "±5g (90% confidence)",
-    "portions": "±10g (85% confidence)",
-    "insulinDose": "±0.5 units (individualized)"
+  "confidenceIntervals": {
+    "carbEstimate": "±6g (88% confidence)",
+    "portionEstimate": "±15g (85% confidence)",
+    "explanation": "Estimates based on visual analysis. Actual values may vary based on specific ingredients, preparation methods, and portion accuracy."
+  },
+  "estimationFactors": {
+    "visualClarity": "good",
+    "portionVisibility": "mostly visible",
+    "uncertaintyReasons": ["rice portion partially hidden", "sauce content estimated"],
+    "improvementTips": ["photo from directly above helps accuracy", "include size reference like fork or phone"]
   },
   "metadata": {
     "analysisDate": "2025-01-01T12:00:00Z",
-    "cookingMethod": "grilled",
-    "freshness": "fresh/cooked today",
-    "temperature": "hot"
-  }
+    "cookingMethod": "grilled and steamed",
+    "freshness": "appears freshly prepared",
+    "temperature": "appears hot/warm"
+  },
+  "disclaimer": "This is an educational nutrition estimate only. Not medical advice. Consult your healthcare provider for personalized dietary guidance. Individual nutritional needs vary based on many factors including health conditions, medications, activity level, and metabolic differences."
 }
 
-CRITICAL: Always include medical disclaimers and encourage consulting healthcare providers. Provide ranges rather than absolute values. Account for individual metabolic variations.`;
+REMEMBER:
+- This is INFORMATIONAL and EDUCATIONAL only
+- NO medical advice, treatment, or diagnostic features
+- ALL values are ESTIMATES with uncertainty ranges
+- ALWAYS include disclaimer
+- Use descriptive language, not prescriptive language`;
   }
 
   /**
@@ -312,7 +305,7 @@ CRITICAL: Always include medical disclaimers and encourage consulting healthcare
   }
 
   /**
-   * Fallback mock analysis when no API keys are configured
+   * Fallback mock analysis when no API keys are configured - FDA-SAFE
    */
   private static fallbackMockAnalysis(imageUri: string): Promise<string> {
     console.warn('No AI API keys configured - using fallback mock analysis');
@@ -325,6 +318,7 @@ CRITICAL: Always include medical disclaimers and encourage consulting healthcare
           portionWeight: 350,
           portionUnit: 'grams',
           visualCues: ['standard dinner plate', '8-inch plate diameter'],
+          estimationMethod: 'visual analysis of standard portion',
         },
       ],
       totalNutrition: {
@@ -339,110 +333,65 @@ CRITICAL: Always include medical disclaimers and encourage consulting healthcare
         glycemicIndex: 58,
         glycemicLoad: 26,
       },
-      insulinRecommendations: {
-        ratio1to10: { units: 4.8, timing: '15 min before eating' },
-        ratio1to15: { units: 3.2, timing: '10-15 min before eating' },
-        ratio1to20: { units: 2.4, timing: '10 min before eating' },
-      },
-      glucoseImpactTimeline: {
-        immediate: {
-          minutes: '0-30',
-          expectedRise: '10-15 mg/dL',
-          description: 'Minimal initial impact due to protein and fat',
-        },
-        twoHour: {
-          minutes: '30-120',
-          expectedPeak: '155-175 mg/dL',
-          description: 'Peak glucose response from carbohydrate absorption',
-        },
-        fourHour: {
-          minutes: '120-240',
-          expectedLevel: '115-130 mg/dL',
-          description: 'Gradual return toward baseline with sustained energy from protein',
-        },
-      },
       quarterPortions: [
         {
           quarter: 1,
           carbs: 12,
-          insulin1to10: 1.2,
-          insulin1to15: 0.8,
-          insulin1to20: 0.6,
-          recommendation: 'Start with this quarter to assess initial glucose response',
+          description: 'One quarter of the total meal',
         },
         {
           quarter: 2,
           carbs: 12,
-          insulin1to10: 1.2,
-          insulin1to15: 0.8,
-          insulin1to20: 0.6,
-          recommendation: 'Continue after 15-20 minutes if glucose stable',
+          description: 'Two quarters (half) of the total meal',
         },
         {
           quarter: 3,
           carbs: 12,
-          insulin1to10: 1.2,
-          insulin1to15: 0.8,
-          insulin1to20: 0.6,
-          recommendation: 'Monitor glucose trend before consuming',
+          description: 'Three quarters of the total meal',
         },
         {
           quarter: 4,
           carbs: 12,
-          insulin1to10: 1.2,
-          insulin1to15: 0.8,
-          insulin1to20: 0.6,
-          recommendation: 'Consider saving for later if feeling satisfied',
+          description: 'Complete meal',
         },
       ],
-      type1Recommendations: {
-        bolusTimingMinutes: 15,
-        correctionFactor: 'Use your personal correction factor if BG > 120 mg/dL',
-        exerciseNote: 'Reduce insulin dose by 25% if exercising within 2 hours of eating',
+      educationalContext: {
+        carbDensity: 'medium',
+        carbDensityExplanation: 'This meal contains a moderate amount of carbohydrates per serving',
+        digestionSpeed: 'moderate',
+        digestionExplanation: 'Contains mix of simple and complex carbohydrates. Protein and fat present which typically slow digestion.',
+        foodPairingNote: 'Balanced meal with protein, carbs, and vegetables',
+        preparationImpact: 'Cooking method: grilled and steamed. These methods generally preserve nutritional content.',
+        portionContext: 'This appears to be a standard restaurant-style portion',
       },
-      type2Recommendations: {
-        portionControl: 'Consider eating 75% of this portion for better glucose control',
-        medicationTiming: 'Take metformin 30 minutes before eating',
-        betterSwaps: [
-          'Swap white rice for cauliflower rice to reduce carbs by 85%',
-          'Use brown rice instead of white to lower glycemic index by 15 points',
-        ],
-      },
-      hypoglycemicRecommendations: {
-        safeAmount: 'Start with 1/4 portion and monitor glucose for 30 minutes',
-        pairingAdvice: 'Good balance of protein and carbs - suitable for glucose stability',
-        timingAdvice: 'Best consumed during mid-morning or early afternoon',
-      },
-      optimizationStrategies: {
-        foodSequencing:
-          'Eat vegetables first, then chicken, then rice last to reduce glucose spike by 30-40%',
-        preBolusingStrategy:
-          'Dose 12-15 minutes early due to moderate glycemic load; adjust based on current glucose',
-        preparationTips:
-          'Cooling rice after cooking and reheating can reduce glycemic index by 10-15%',
-        microDosingTechnique:
-          'For sensitive individuals: split into 2 servings 90 minutes apart with half insulin at each',
-      },
-      warnings: [
-        '⚠️ Moderate glycemic load - monitor glucose at 1 and 2 hours post-meal',
-        '⚠️ Rice contributes majority of carbs - consider reducing portion if glucose control is difficult',
+      nutritionalHighlights: [
+        'Good source of protein from chicken',
+        'Contains dietary fiber from vegetables',
+        'Moderate carbohydrate content primarily from rice',
       ],
-      emergencyProtocols: [
-        'If glucose drops below 70 mg/dL: consume 15g fast-acting carbs (3-4 glucose tablets or 4oz juice)',
-        'If glucose exceeds 250 mg/dL: check for ketones, increase water intake, contact provider if persistent',
-        'Keep emergency contact and glucagon kit accessible',
+      generalAwarenessNotes: [
+        'Portion sizes can vary - these are estimates',
+        'Individual needs vary by many factors',
+        'Consult healthcare provider for personalized nutrition guidance',
       ],
-      confidenceInterval: {
-        carbs: '±6g (88% confidence) - rice portion estimation has 10% variance',
-        portions: '±15g (85% confidence) - visual estimation without precise weighing',
-        insulinDose: '±0.5 units - adjust based on individual insulin sensitivity',
+      confidenceIntervals: {
+        carbEstimate: '±6g (88% confidence)',
+        portionEstimate: '±15g (85% confidence)',
+        explanation: 'Estimates based on visual analysis. Actual values may vary based on specific ingredients, preparation methods, and portion accuracy.',
+      },
+      estimationFactors: {
+        visualClarity: 'good',
+        portionVisibility: 'mostly visible',
+        uncertaintyReasons: ['rice portion partially hidden', 'sauce content estimated'],
+        improvementTips: ['photo from directly above helps accuracy', 'include size reference like fork or phone'],
       },
       metadata: {
         analysisDate: new Date().toISOString(),
         cookingMethod: 'grilled and steamed',
-        freshness: 'freshly prepared',
-        temperature: 'hot/warm',
+        freshness: 'appears freshly prepared',
+        temperature: 'appears hot/warm',
       },
+      disclaimer: 'This is an educational nutrition estimate only. Not medical advice. Consult your healthcare provider for personalized dietary guidance. Individual nutritional needs vary based on many factors including health conditions, medications, activity level, and metabolic differences.',
     };
 
     return Promise.resolve(JSON.stringify(mockResponse));
@@ -484,23 +433,20 @@ export class AIVisionError extends Error {
   }
 }
 
-// Type Definitions
+// Type Definitions - FDA-Safe (No Medical Advice)
 
 export interface AIVisionAnalysisResult {
   success: boolean;
   foods: FoodItem[];
   totalNutrition: TotalNutrition;
-  insulinRecommendations: InsulinRecommendations;
-  glucoseImpactTimeline: GlucoseImpactTimeline;
   quarterPortions: QuarterPortion[];
-  type1Recommendations: Type1Recommendations;
-  type2Recommendations: Type2Recommendations;
-  hypoglycemicRecommendations: HypoglycemicRecommendations;
-  optimizationStrategies: OptimizationStrategies;
-  warnings: string[];
-  emergencyProtocols: string[];
-  confidenceInterval: ConfidenceInterval;
+  educationalContext: EducationalContext;
+  nutritionalHighlights: string[];
+  generalAwarenessNotes: string[];
+  confidenceIntervals: ConfidenceIntervals;
+  estimationFactors: EstimationFactors;
   metadata: AnalysisMetadata;
+  disclaimer: string;
   processingTime: number;
   apiProvider: 'claude' | 'openai' | 'mock';
 }
@@ -511,6 +457,7 @@ export interface FoodItem {
   portionWeight: number;
   portionUnit: string;
   visualCues: string[];
+  estimationMethod: string;
 }
 
 export interface TotalNutrition {
@@ -526,69 +473,33 @@ export interface TotalNutrition {
   glycemicLoad: number;
 }
 
-export interface InsulinRecommendations {
-  ratio1to10: InsulinRatio;
-  ratio1to15: InsulinRatio;
-  ratio1to20: InsulinRatio;
-}
-
-export interface InsulinRatio {
-  units: number;
-  timing: string;
-}
-
-export interface GlucoseImpactTimeline {
-  immediate: TimelinePhase;
-  twoHour: TimelinePhase;
-  fourHour: TimelinePhase;
-}
-
-export interface TimelinePhase {
-  minutes: string;
-  expectedRise?: string;
-  expectedPeak?: string;
-  expectedLevel?: string;
-  description: string;
-}
-
 export interface QuarterPortion {
   quarter: number;
   carbs: number;
-  insulin1to10: number;
-  insulin1to15: number;
-  insulin1to20: number;
-  recommendation: string;
+  description: string;
 }
 
-export interface Type1Recommendations {
-  bolusTimingMinutes: number;
-  correctionFactor: string;
-  exerciseNote: string;
+export interface EducationalContext {
+  carbDensity: 'low' | 'medium' | 'high';
+  carbDensityExplanation: string;
+  digestionSpeed: 'fast' | 'moderate' | 'slow';
+  digestionExplanation: string;
+  foodPairingNote: string;
+  preparationImpact: string;
+  portionContext: string;
 }
 
-export interface Type2Recommendations {
-  portionControl: string;
-  medicationTiming: string;
-  betterSwaps: string[];
+export interface ConfidenceIntervals {
+  carbEstimate: string;
+  portionEstimate: string;
+  explanation: string;
 }
 
-export interface HypoglycemicRecommendations {
-  safeAmount: string;
-  pairingAdvice: string;
-  timingAdvice: string;
-}
-
-export interface OptimizationStrategies {
-  foodSequencing: string;
-  preBolusingStrategy: string;
-  preparationTips: string;
-  microDosingTechnique: string;
-}
-
-export interface ConfidenceInterval {
-  carbs: string;
-  portions: string;
-  insulinDose: string;
+export interface EstimationFactors {
+  visualClarity: 'poor' | 'fair' | 'good' | 'excellent';
+  portionVisibility: 'partially visible' | 'mostly visible' | 'fully visible';
+  uncertaintyReasons: string[];
+  improvementTips: string[];
 }
 
 export interface AnalysisMetadata {
