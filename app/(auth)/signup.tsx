@@ -87,7 +87,7 @@ export default function SignupScreen() {
               <Heart size={40} color="#2563EB" />
             </View>
             <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Join DiaGaurd with your access code</Text>
+            <Text style={styles.subtitle}>Join NutriTrack to start tracking nutrition</Text>
           </View>
 
           <View style={styles.form}>

@@ -33,7 +33,7 @@ export default function CameraLandingHeader() {
       </TouchableOpacity>
       
       <View style={styles.headerCenter}>
-        <Text style={styles.headerTitle}>DiaGaurd</Text>
+        <Text style={styles.headerTitle}>NutriTrack</Text>
         <View style={[styles.statusBadge, { backgroundColor: getStatusColor() }]}>
           <Text style={styles.statusText}>{getStatusText()}</Text>
         </View>

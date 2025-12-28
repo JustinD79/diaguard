@@ -51,7 +51,7 @@ export default function OnboardingFlow({ visible, onComplete }: OnboardingFlowPr
 
   const steps = [
     {
-      title: 'Welcome to DiaGaurd',
+      title: 'Welcome to NutriTrack',
       subtitle: 'Track your nutrition with AI-powered food analysis',
       component: 'welcome'
     },
@@ -124,7 +124,7 @@ export default function OnboardingFlow({ visible, onComplete }: OnboardingFlowPr
       <View style={styles.welcomeIcon}>
         <Heart size={48} color="#2563EB" />
       </View>
-      <Text style={styles.welcomeTitle}>Welcome to DiaGaurd</Text>
+      <Text style={styles.welcomeTitle}>Welcome to NutriTrack</Text>
       <Text style={styles.welcomeDescription}>
         We'll help you manage your diabetes with AI-powered food recognition, 
         insulin calculations, and personalized insights. Let's get started by 
@@ -313,7 +313,7 @@ export default function OnboardingFlow({ visible, onComplete }: OnboardingFlowPr
       </View>
       <Text style={styles.completeTitle}>Setup Complete!</Text>
       <Text style={styles.completeDescription}>
-        Your profile has been configured. You can now start using DiaGaurd 
+        Your profile has been configured. You can now start using NutriTrack 
         to manage your diabetes with personalized insights and recommendations.
       </Text>
       <View style={styles.nextSteps}>

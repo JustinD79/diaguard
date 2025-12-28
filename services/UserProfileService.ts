@@ -8,8 +8,7 @@ export interface UserProfile {
   phone?: string;
   height?: string;
   weight?: string;
-  diabetes_type?: 'type1' | 'type2' | 'gestational' | 'prediabetes' | 'none';
-  diagnosis_date?: string;
+  activity_level?: 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extra_active';
   profile_image_url?: string;
   created_at?: string;
   updated_at?: string;

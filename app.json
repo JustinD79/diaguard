@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "diabetes-care-app",
-    "slug": "diabetes-care-app",
+    "name": "NutriTrack",
+    "slug": "nutritrack-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "diabetes-care-app",
+    "scheme": "nutritrack-app",
     "sdkVersion": "53.0.0",
     "platforms": ["ios", "android", "web"],
     "splash": {
@@ -19,14 +19,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.diabetescare.app"
+      "bundleIdentifier": "com.nutritrack.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.diabetescare.app"
+      "package": "com.nutritrack.app"
     },
     "web": {
       "favicon": "./assets/images/favicon.png",
