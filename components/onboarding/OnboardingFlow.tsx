@@ -23,12 +23,8 @@ interface OnboardingFlowProps {
 
 interface OnboardingData {
   profile: Partial<UserProfile>;
-  medicalInfo: {
-    diabetes_type: string;
-    carb_ratio: number;
-    correction_factor: number;
-    target_bg_min: number;
-    target_bg_max: number;
+  preferences: {
+    diabetes_type?: string;
   };
   emergencyContact: {
     name: string;
@@ -43,12 +39,8 @@ export default function OnboardingFlow({ visible, onComplete }: OnboardingFlowPr
   const [loading, setLoading] = useState(false);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     profile: {},
-    medicalInfo: {
-      diabetes_type: 'type2',
-      carb_ratio: 15,
-      correction_factor: 50,
-      target_bg_min: 80,
-      target_bg_max: 180,
+    preferences: {
+      diabetes_type: undefined,
     },
     emergencyContact: {
       name: '',
@@ -60,7 +52,7 @@ export default function OnboardingFlow({ visible, onComplete }: OnboardingFlowPr
   const steps = [
     {
       title: 'Welcome to DiaGaurd',
-      subtitle: 'Let\'s set up your profile for personalized diabetes management',
+      subtitle: 'Track your nutrition with AI-powered food analysis',
       component: 'welcome'
     },
     {
@@ -69,9 +61,9 @@ export default function OnboardingFlow({ visible, onComplete }: OnboardingFlowPr
       component: 'personal'
     },
     {
-      title: 'Medical Information',
-      subtitle: 'Configure your diabetes management settings',
-      component: 'medical'
+      title: 'Preferences',
+      subtitle: 'Optional context for educational personalization',
+      component: 'preferences'
     },
     {
       title: 'Emergency Contact',
@@ -80,7 +72,7 @@ export default function OnboardingFlow({ visible, onComplete }: OnboardingFlowPr
     },
     {
       title: 'Setup Complete',
-      subtitle: 'You\'re ready to start managing your diabetes!',
+      subtitle: 'You\'re ready to start tracking your nutrition!',
       component: 'complete'
     }
   ];
@@ -102,14 +94,12 @@ export default function OnboardingFlow({ visible, onComplete }: OnboardingFlowPr
 
     setLoading(true);
     try {
-      // Save profile
+      // Save profile with optional diabetes type for context
       await UserProfileService.createOrUpdateProfile({
         user_id: user.id,
-        ...onboardingData.profile
+        ...onboardingData.profile,
+        diabetes_type: onboardingData.preferences.diabetes_type as any,
       });
-
-      // Save medical profile
-      await UserProfileService.updateMedicalProfile(user.id, onboardingData.medicalInfo);
 
       // Save emergency contact
       if (onboardingData.emergencyContact.name) {

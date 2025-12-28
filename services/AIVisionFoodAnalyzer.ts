@@ -2,7 +2,7 @@
  * AI Vision Food Analyzer
  *
  * Real AI-powered food image analysis using Claude Vision API or OpenAI GPT-4 Vision
- * Provides comprehensive nutritional analysis with medical-grade accuracy
+ * Provides comprehensive nutritional analysis for educational and awareness purposes
  */
 
 export class AIVisionFoodAnalyzer {

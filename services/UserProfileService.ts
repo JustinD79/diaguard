@@ -8,24 +8,9 @@ export interface UserProfile {
   phone?: string;
   height?: string;
   weight?: string;
-  diabetes_type?: 'type1' | 'type2' | 'gestational' | 'prediabetes';
+  diabetes_type?: 'type1' | 'type2' | 'gestational' | 'prediabetes' | 'none';
   diagnosis_date?: string;
-  target_a1c?: number;
   profile_image_url?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface UserMedication {
-  id?: string;
-  user_id: string;
-  name: string;
-  dosage: string;
-  frequency: string;
-  times: string[];
-  reminder_enabled: boolean;
-  notes?: string;
-  is_active: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -78,82 +63,6 @@ export class UserProfileService {
     } catch (error) {
       console.error('Error saving user profile:', error);
       throw new Error('Failed to save user profile');
-    }
-  }
-
-  // Medication Management
-  static async getUserMedications(userId: string): Promise<UserMedication[]> {
-    try {
-      const { data, error } = await supabase
-        .from('user_medications')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        throw error;
-      }
-
-      return data || [];
-    } catch (error) {
-      console.error('Error fetching medications:', error);
-      throw new Error('Failed to fetch medications');
-    }
-  }
-
-  static async addMedication(medication: Omit<UserMedication, 'id' | 'created_at' | 'updated_at'>): Promise<UserMedication> {
-    try {
-      const { data, error } = await supabase
-        .from('user_medications')
-        .insert(medication)
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error adding medication:', error);
-      throw new Error('Failed to add medication');
-    }
-  }
-
-  static async updateMedication(id: string, updates: Partial<UserMedication>): Promise<UserMedication> {
-    try {
-      const { data, error } = await supabase
-        .from('user_medications')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error updating medication:', error);
-      throw new Error('Failed to update medication');
-    }
-  }
-
-  static async deleteMedication(id: string): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('user_medications')
-        .update({ is_active: false })
-        .eq('id', id);
-
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      console.error('Error deleting medication:', error);
-      throw new Error('Failed to delete medication');
     }
   }
 
@@ -254,45 +163,6 @@ export class UserProfileService {
     } catch (error) {
       console.error('Error deleting emergency contact:', error);
       throw new Error('Failed to delete emergency contact');
-    }
-  }
-
-  // Medical Profile from existing table
-  static async getMedicalProfile(userId: string) {
-    try {
-      const { data, error } = await supabase
-        .from('user_medical_profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error fetching medical profile:', error);
-      throw new Error('Failed to fetch medical profile');
-    }
-  }
-
-  static async updateMedicalProfile(userId: string, updates: any) {
-    try {
-      const { data, error } = await supabase
-        .from('user_medical_profiles')
-        .upsert({ user_id: userId, ...updates }, { onConflict: 'user_id' })
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error updating medical profile:', error);
-      throw new Error('Failed to update medical profile');
     }
   }
 }

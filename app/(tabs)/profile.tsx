@@ -23,11 +23,10 @@ interface UserProfile {
   email: string;
   phone: string;
   dateOfBirth: string;
-  diabetesType: string;
-  diagnosisDate: string;
+  diabetesType?: string;
+  diagnosisDate?: string;
   height: string;
   weight: string;
-  targetA1C: string;
   profileImage?: string;
 }
 
@@ -51,7 +50,6 @@ export default function ProfileScreen() {
     diagnosisDate: '2019-06-20',
     height: '5\'10"',
     weight: '175 lbs',
-    targetA1C: '7.0%',
     profileImage: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400',
   });
 
@@ -62,15 +60,15 @@ export default function ProfileScreen() {
     {
       id: '1',
       title: '7-Day Streak',
-      description: 'Logged glucose readings for 7 consecutive days',
+      description: 'Logged meals for 7 consecutive days',
       icon: '🔥',
       earned: true,
       earnedDate: '2024-12-15',
     },
     {
       id: '2',
-      title: 'Target A1C',
-      description: 'Achieved your target A1C goal',
+      title: 'Nutrition Aware',
+      description: 'Completed 30 days of nutrition tracking',
       icon: '🎯',
       earned: true,
       earnedDate: '2024-11-20',

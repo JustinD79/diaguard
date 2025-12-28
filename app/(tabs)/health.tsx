@@ -1,34 +1,59 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import MedicalDisclaimer from '@/components/ui/MedicalDisclaimer';
+import { Activity, Utensils, TrendingUp, Droplet } from 'lucide-react-native';
 
 export default function HealthScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>Health Monitor</Text>
-          <Text style={styles.subtitle}>Track your vital metrics</Text>
+          <Text style={styles.title}>Nutrition Overview</Text>
+          <Text style={styles.subtitle}>Track your daily nutrition awareness</Text>
+        </View>
+
+        <MedicalDisclaimer style={styles.disclaimer} variant="info" />
+
+        <View style={styles.metricsGrid}>
+          <View style={styles.metricCard}>
+            <Utensils size={24} color="#2563EB" style={styles.metricIcon} />
+            <Text style={styles.metricValue}>156g</Text>
+            <Text style={styles.metricLabel}>Total Carbs</Text>
+            <Text style={styles.metricUnit}>Today</Text>
+          </View>
+
+          <View style={styles.metricCard}>
+            <Activity size={24} color="#059669" style={styles.metricIcon} />
+            <Text style={styles.metricValue}>1,850</Text>
+            <Text style={styles.metricLabel}>Calories</Text>
+            <Text style={styles.metricUnit}>Today</Text>
+          </View>
         </View>
 
         <View style={styles.metricsGrid}>
           <View style={styles.metricCard}>
-            <Text style={styles.metricValue}>120</Text>
-            <Text style={styles.metricLabel}>Current BG</Text>
-            <Text style={styles.metricUnit}>mg/dL</Text>
+            <TrendingUp size={24} color="#D97706" style={styles.metricIcon} />
+            <Text style={styles.metricValue}>85g</Text>
+            <Text style={styles.metricLabel}>Protein</Text>
+            <Text style={styles.metricUnit}>Today</Text>
           </View>
-          
+
           <View style={styles.metricCard}>
-            <Text style={styles.metricValue}>78%</Text>
-            <Text style={styles.metricLabel}>Time in Range</Text>
-            <Text style={styles.metricUnit}>Last 30 days</Text>
+            <Droplet size={24} color="#0EA5E9" style={styles.metricIcon} />
+            <Text style={styles.metricValue}>62g</Text>
+            <Text style={styles.metricLabel}>Fat</Text>
+            <Text style={styles.metricUnit}>Today</Text>
           </View>
         </View>
 
         <View style={styles.trendCard}>
-          <Text style={styles.cardTitle}>Recent Trends</Text>
+          <Text style={styles.cardTitle}>Nutrition Summary</Text>
           <Text style={styles.cardText}>
-            Your glucose levels have been stable this week. Keep up the great work!
+            You have logged 3 meals today. Your nutrition data is being tracked for awareness and educational purposes.
+          </Text>
+          <Text style={styles.cardNote}>
+            Note: All nutritional estimates are approximate. Consult your healthcare provider for personalized dietary guidance.
           </Text>
         </View>
       </ScrollView>
@@ -45,7 +70,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
   title: {
     fontSize: 32,
@@ -57,10 +82,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#6B7280',
   },
+  disclaimer: {
+    marginBottom: 24,
+  },
   metricsGrid: {
     flexDirection: 'row',
     gap: 16,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   metricCard: {
     flex: 1,
@@ -74,10 +102,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  metricIcon: {
+    marginBottom: 8,
+  },
   metricValue: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2563EB',
+    color: '#111827',
     marginBottom: 4,
   },
   metricLabel: {
@@ -99,6 +130,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    marginTop: 8,
   },
   cardTitle: {
     fontSize: 18,
@@ -110,5 +142,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
     lineHeight: 24,
+    marginBottom: 12,
+  },
+  cardNote: {
+    fontSize: 13,
+    color: '#9CA3AF',
+    lineHeight: 20,
+    fontStyle: 'italic',
   },
 });

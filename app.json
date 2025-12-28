@@ -38,7 +38,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to scan food items for diabetes management."
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to estimate nutritional content of food items."
         }
       ],
       "expo-font"

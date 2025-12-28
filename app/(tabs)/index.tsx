@@ -28,7 +28,7 @@ interface QuickStat {
 
 interface RecentActivity {
   id: string;
-  type: 'meal' | 'medication';
+  type: 'meal' | 'exercise' | 'hydration';
   description: string;
   time: string;
   value?: string;
