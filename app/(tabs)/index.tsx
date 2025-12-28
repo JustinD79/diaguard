@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Camera, Calculator, Droplet, Plus, TrendingUp, Clock, TriangleAlert as AlertTriangle, Heart, Utensils, Pill, Target, Activity, Scan, Zap, BookOpen } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -15,6 +15,9 @@ import CarbTracker from '@/components/CarbTracker';
 import RealTimeDashboard from '@/components/analytics/RealTimeDashboard';
 import { Product, DiabetesInsights } from '@/services/FoodAPIService';
 import { MealLoggingService } from '@/services/MealLoggingService';
+import { useRealTimeAnalytics } from '@/hooks/useRealTimeAnalytics';
+import { UserActionTrackingService } from '@/services/UserActionTrackingService';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface QuickStat {
   id: string;
@@ -45,27 +48,55 @@ export default function HomeScreen() {
   const [showCarbTracker, setShowCarbTracker] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const { dailyStats, weeklyTrends, userGoals, loading, error, refreshData } = useRealTimeAnalytics();
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      UserActionTrackingService.initializeSession(user.id);
+      UserActionTrackingService.trackScreenView(user.id, 'home_dashboard');
+    }
+    return () => {
+      if (user) {
+        UserActionTrackingService.endSession(user.id);
+      }
+    };
+  }, [user]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshData();
+    setRefreshing(false);
+  };
+
+  const carbPercentage = userGoals.dailyCarbGoal > 0
+    ? Math.round((dailyStats.totalCarbs / userGoals.dailyCarbGoal) * 100)
+    : 0;
+
+  const caloriePercentage = userGoals.dailyCalorieGoal > 0
+    ? Math.round((dailyStats.totalCalories / userGoals.dailyCalorieGoal) * 100)
+    : 0;
+
   const quickStats: QuickStat[] = [
     {
       id: 'carbs',
       label: 'Carbs Today',
-      value: '85',
-      unit: 'grams',
-      trend: 'up',
-      color: '#059669',
+      value: Math.round(dailyStats.totalCarbs).toString(),
+      unit: `/${userGoals.dailyCarbGoal}g`,
+      trend: carbPercentage > 100 ? 'up' : carbPercentage > 50 ? 'stable' : 'down',
+      color: carbPercentage > 100 ? '#DC2626' : '#059669',
       icon: Utensils
     },
     {
       id: 'meals',
       label: 'Meals Logged',
-      value: '3',
-      unit: 'meals',
+      value: dailyStats.mealsLogged.toString(),
+      unit: 'today',
       trend: 'stable',
       color: '#2563EB',
       icon: Activity
@@ -73,17 +104,17 @@ export default function HomeScreen() {
     {
       id: 'calories',
       label: 'Calories',
-      value: '1,850',
-      unit: 'kcal',
-      trend: 'up',
-      color: '#D97706',
+      value: Math.round(dailyStats.totalCalories).toLocaleString(),
+      unit: `/${userGoals.dailyCalorieGoal}`,
+      trend: caloriePercentage > 100 ? 'up' : 'stable',
+      color: caloriePercentage > 100 ? '#DC2626' : '#D97706',
       icon: Zap
     },
     {
-      id: 'nutrition_score',
-      label: 'Nutrition Score',
-      value: '8.2',
-      unit: '/10',
+      id: 'streak',
+      label: 'Current Streak',
+      value: dailyStats.currentStreak.toString(),
+      unit: dailyStats.currentStreak === 1 ? 'day' : 'days',
       trend: 'up',
       color: '#8B5CF6',
       icon: Target
@@ -163,7 +194,7 @@ export default function HomeScreen() {
     return (
       <View style={styles.welcomeHeader}>
         <Text style={styles.greeting}>{greeting}</Text>
-        <Text style={styles.welcomeText}>Welcome to your diabetes dashboard</Text>
+        <Text style={styles.welcomeText}>Track your nutrition and wellness goals</Text>
       </View>
     );
   };
@@ -404,9 +435,26 @@ export default function HomeScreen() {
     }
   };
 
+  if (loading && dailyStats.totalCarbs === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <LoadingSpinner />
+          <Text style={styles.loadingText}>Loading your dashboard...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {renderWelcomeHeader()}
 
         <ScanLimitBanner />
@@ -916,5 +964,17 @@ const styles = StyleSheet.create({
   },
   testingButton: {
     backgroundColor: '#2563EB',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
   },
 });
