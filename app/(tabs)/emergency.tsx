@@ -21,13 +21,9 @@ interface EmergencyContact {
   isPrimary: boolean;
 }
 
-interface MedicalInfo {
-  diabetesType: string;
-  allergies: string[];
+interface EmergencyInfo {
   emergencyInstructions: string;
-  bloodType: string;
-  doctorName: string;
-  doctorPhone: string;
+  additionalNotes: string;
 }
 
 export default function EmergencyScreen() {
@@ -55,13 +51,9 @@ export default function EmergencyScreen() {
     },
   ]);
 
-  const [medicalInfo] = useState<MedicalInfo>({
-    diabetesType: 'Type 2',
-    allergies: ['Penicillin', 'Shellfish'],
-    emergencyInstructions: 'Follow emergency plan provided by healthcare provider. Call 911 for medical emergencies.',
-    bloodType: 'O+',
-    doctorName: 'Dr. Sarah Johnson',
-    doctorPhone: '+1 (555) 123-4567',
+  const [emergencyInfo] = useState<EmergencyInfo>({
+    emergencyInstructions: 'In case of emergency, call 911 or contact emergency services immediately. This app is for nutrition tracking only and does not provide medical advice or emergency guidance.',
+    additionalNotes: 'Consult your healthcare provider for personalized emergency plans.',
   });
 
   const makeCall = (phoneNumber: string) => {
@@ -111,7 +103,12 @@ export default function EmergencyScreen() {
 
         <TouchableOpacity
           style={[styles.quickAction, styles.doctorAction]}
-          onPress={() => makeCall(medicalInfo.doctorPhone)}
+          onPress={() => {
+            const doctor = emergencyContacts.find(c => c.relationship === 'Endocrinologist');
+            if (doctor) {
+              makeCall(doctor.phone);
+            }
+          }}
           accessibilityRole="button"
           accessible={true}
           accessibilityLabel="Call Doctor"
@@ -158,47 +155,29 @@ export default function EmergencyScreen() {
     </Card>
   );
 
-  const renderMedicalID = () => (
+  const renderEmergencyInstructions = () => (
     <Card style={styles.medicalIdCard}>
       <View style={styles.medicalIdHeader}>
         <Shield size={24} color="#DC2626" />
-        <Text style={styles.sectionTitle}>Medical ID</Text>
+        <Text style={styles.sectionTitle}>Emergency Information</Text>
       </View>
 
       <View style={styles.medicalInfoGrid}>
         <View style={styles.medicalInfoItem}>
-          <Text style={styles.medicalInfoLabel}>Condition</Text>
-          <Text style={styles.medicalInfoValue}>Diabetes {medicalInfo.diabetesType}</Text>
-        </View>
-
-        <View style={styles.medicalInfoItem}>
-          <Text style={styles.medicalInfoLabel}>Blood Type</Text>
-          <Text style={styles.medicalInfoValue}>{medicalInfo.bloodType}</Text>
-        </View>
-
-        <View style={styles.medicalInfoItem}>
-          <Text style={styles.medicalInfoLabel}>Allergies</Text>
-          {medicalInfo.allergies.map((allergy, index) => (
-            <Text key={index} style={[styles.medicalInfoValue, styles.allergyText]}>• {allergy}</Text>
-          ))}
+          <Text style={styles.medicalInfoLabel}>Important</Text>
+          <Text style={styles.medicalInfoValue}>{emergencyInfo.emergencyInstructions}</Text>
         </View>
 
         <View style={styles.medicalInfoItem}>
           <Text style={styles.medicalInfoLabel}>Note</Text>
+          <Text style={styles.medicalInfoValue}>{emergencyInfo.additionalNotes}</Text>
+        </View>
+
+        <View style={styles.medicalInfoItem}>
+          <Text style={styles.medicalInfoLabel}>Medical Information</Text>
           <Text style={styles.medicalInfoValue}>
-            Track medications with your healthcare provider. Always carry your prescription list during emergencies.
+            For detailed medical information, allergies, medications, and emergency protocols, consult with your healthcare provider and use a dedicated medical ID system.
           </Text>
-        </View>
-
-        <View style={styles.medicalInfoItem}>
-          <Text style={styles.medicalInfoLabel}>Emergency Instructions</Text>
-          <Text style={styles.medicalInfoValue}>{medicalInfo.emergencyInstructions}</Text>
-        </View>
-
-        <View style={styles.medicalInfoItem}>
-          <Text style={styles.medicalInfoLabel}>Primary Doctor</Text>
-          <Text style={styles.medicalInfoValue}>{medicalInfo.doctorName}</Text>
-          <Text style={styles.medicalInfoValue}>{medicalInfo.doctorPhone}</Text>
         </View>
       </View>
     </Card>
@@ -278,8 +257,8 @@ export default function EmergencyScreen() {
           {renderQuickActions()}
         </View>
         
-        <View accessibilityRole="complementary" accessible={true} accessibilityLabel="Medical identification information">
-          {renderMedicalID()}
+        <View accessibilityRole="complementary" accessible={true} accessibilityLabel="Emergency instructions and information">
+          {renderEmergencyInstructions()}
         </View>
         
         <View accessibilityRole="region" accessible={true} accessibilityLabel="Emergency contacts list">

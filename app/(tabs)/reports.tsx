@@ -89,30 +89,30 @@ export default function ReportsScreen() {
   const renderProviderReportsView = () => (
     <View style={styles.reportsView}>
       <Card style={styles.reportActionsCard}>
-        <Text style={styles.sectionTitle}>Healthcare Provider Reports</Text>
+        <Text style={styles.sectionTitle}>Nutrition Reports</Text>
         <Text style={styles.cardDescription}>
-          Generate comprehensive reports to share with your healthcare team during appointments.
+          Generate comprehensive nutrition summaries to discuss with your healthcare provider during appointments.
         </Text>
-        
+
         <View style={styles.reportActions}>
           <Button
-            title="Generate Report for Doctor"
+            title="Generate Nutrition Summary"
             onPress={() => setShowProviderReport(true)}
             style={styles.reportButton}
           />
-          
+
           <View style={styles.reportFeatures}>
             <View style={styles.reportFeature}>
               <Target size={16} color="#2563EB" />
-              <Text style={styles.reportFeatureText}>Glucose trends and time-in-range analysis</Text>
+              <Text style={styles.reportFeatureText}>Carb and macro trends analysis</Text>
             </View>
             <View style={styles.reportFeature}>
               <Activity size={16} color="#2563EB" />
-              <Text style={styles.reportFeatureText}>Medication adherence tracking</Text>
+              <Text style={styles.reportFeatureText}>Meal logging consistency tracking</Text>
             </View>
             <View style={styles.reportFeature}>
               <TrendingUp size={16} color="#2563EB" />
-              <Text style={styles.reportFeatureText}>AI-powered insights and recommendations</Text>
+              <Text style={styles.reportFeatureText}>AI-powered nutrition insights</Text>
             </View>
           </View>
         </View>
@@ -130,28 +130,28 @@ export default function ReportsScreen() {
       <Card style={styles.familyAccessCard}>
         <Text style={styles.sectionTitle}>Family & Caregiver Access</Text>
         <Text style={styles.cardDescription}>
-          Share your diabetes management data with family members and caregivers for better support.
+          Share your nutrition tracking data with family members for mutual support and accountability.
         </Text>
-        
+
         <View style={styles.familyActions}>
           <Button
             title="View Family Dashboard"
             onPress={() => setShowFamilyDashboard(true)}
             style={styles.familyButton}
           />
-          
+
           <View style={styles.familyFeatures}>
             <View style={styles.familyFeature}>
               <Users size={16} color="#059669" />
-              <Text style={styles.familyFeatureText}>Real-time health status sharing</Text>
+              <Text style={styles.familyFeatureText}>Share nutrition logs with family</Text>
             </View>
             <View style={styles.familyFeature}>
               <Share size={16} color="#059669" />
-              <Text style={styles.familyFeatureText}>Automatic alerts for critical events</Text>
+              <Text style={styles.familyFeatureText}>Collaborative meal planning</Text>
             </View>
             <View style={styles.familyFeature}>
               <Calendar size={16} color="#059669" />
-              <Text style={styles.familyFeatureText}>Medication reminder coordination</Text>
+              <Text style={styles.familyFeatureText}>Meal logging reminders</Text>
             </View>
           </View>
         </View>

@@ -1,5 +1,6 @@
 {
-  "name": "diabetes-care-app",
+  "name": "nutritrack-app",
+  "description": "AI-powered nutrition tracking and awareness app",
   "main": "index.js",
   "version": "1.0.0",
   "scripts": {

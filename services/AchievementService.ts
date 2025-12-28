@@ -6,7 +6,7 @@ export interface Achievement {
   achievement_id: string;
   achievement_name: string;
   achievement_description: string;
-  achievement_type: 'logging_streak' | 'meal_milestone' | 'glucose_control' | 'exercise' | 'hydration' | 'special';
+  achievement_type: 'logging_streak' | 'meal_milestone' | 'exercise' | 'hydration' | 'special';
   icon: string;
   earned_at: string;
   metadata?: Record<string, any>;
