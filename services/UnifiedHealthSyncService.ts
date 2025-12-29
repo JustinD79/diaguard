@@ -205,13 +205,7 @@ export class UnifiedHealthSyncService {
   ): Promise<boolean> {
     try {
       if (provider === 'apple_health') {
-        await Promise.all([
-          AppleHealthIntegrationService.importGlucoseReadings(
-            userId,
-            new Date(Date.now() - 24 * 60 * 60 * 1000)
-          ),
-          AppleHealthIntegrationService.syncActivityData(userId),
-        ]);
+        await AppleHealthIntegrationService.syncActivityData(userId);
       } else if (provider === 'google_fit') {
         await GoogleFitIntegrationService.syncActivityData(userId);
       }
@@ -274,38 +268,6 @@ export class UnifiedHealthSyncService {
     }
   }
 
-  static async importGlucoseReadings(
-    userId: string,
-    startDate: Date = new Date(Date.now() - 24 * 60 * 60 * 1000)
-  ): Promise<any[]> {
-    try {
-      const connections = await this.getActiveConnections(userId);
-      const allReadings: any[] = [];
-
-      for (const connection of connections) {
-        try {
-          if (connection.provider === 'apple_health') {
-            const readings =
-              await AppleHealthIntegrationService.importGlucoseReadings(
-                userId,
-                startDate
-              );
-            allReadings.push(...readings);
-          }
-        } catch (error) {
-          console.error(
-            `Error importing from ${connection.provider}:`,
-            error
-          );
-        }
-      }
-
-      return allReadings;
-    } catch (error) {
-      console.error('Error importing glucose readings:', error);
-      return [];
-    }
-  }
 
   static async getActivitySummary(userId: string): Promise<any> {
     try {

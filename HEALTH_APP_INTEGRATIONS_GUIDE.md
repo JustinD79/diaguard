@@ -10,14 +10,13 @@ The Health App Integrations system provides seamless bi-directional data synchro
 
 **Features:**
 - ✅ Export meal data (nutrition information)
-- ✅ Import glucose readings from CGM devices
 - ✅ Sync activity data (steps, calories, heart rate)
 - ✅ Real-time data updates
 - ✅ Automatic background sync
 
 **Supported Data Types:**
 - **Export:** Calories, Carbs, Protein, Fat, Fiber, Sugar, Water intake
-- **Import:** Blood glucose, Steps, Active calories, Basal calories, Heart rate, Weight
+- **Import:** Steps, Active calories, Basal calories, Heart rate, Weight
 
 ### ✅ Google Fit (Android)
 
@@ -100,19 +99,7 @@ const success = await AppleHealthIntegrationService.exportMealToHealthKit(
 );
 ```
 
-### 3. Import Glucose Readings
-
-```typescript
-const startDate = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
-const readings = await AppleHealthIntegrationService.importGlucoseReadings(
-  userId,
-  startDate
-);
-
-console.log(`Imported ${readings.length} glucose readings`);
-```
-
-### 4. Setup Google Fit Integration
+### 3. Setup Google Fit Integration
 
 ```typescript
 import { GoogleFitIntegrationService } from '@/services/GoogleFitIntegrationService';
@@ -125,7 +112,7 @@ if (connected) {
 }
 ```
 
-### 5. Sync Activity Data
+### 4. Sync Activity Data
 
 ```typescript
 const activityData = await GoogleFitIntegrationService.syncActivityData(userId);
@@ -137,7 +124,7 @@ console.log('Activity Summary:', {
 });
 ```
 
-### 6. Unified Health Sync Service
+### 5. Unified Health Sync Service
 
 ```typescript
 import { UnifiedHealthSyncService } from '@/services/UnifiedHealthSyncService';
@@ -173,7 +160,7 @@ Export Tracking Table
 Sync History
 ```
 
-### Import Flow (Glucose/Activity)
+### Import Flow (Activity Data)
 
 ```
 External Health App
@@ -184,7 +171,7 @@ Data Validation & Deduplication
     ↓
 Import Tracking Table
     ↓
-Local Database (glucose_readings, exercise_logs)
+Local Database (exercise_logs)
     ↓
 Sync History
 ```
@@ -195,7 +182,7 @@ Sync History
 
 - **Apple Health:**
   - Export: Nutrition data (meals)
-  - Import: Glucose readings, Activity data
+  - Import: Activity data
   - Frequency: Every 60 minutes
   - Auto-sync: Enabled
 
@@ -337,9 +324,7 @@ checkAvailability(): Promise<boolean>
 exportMealToHealthKit(userId: string, mealData: MealData): Promise<boolean>
 
 // Import
-importGlucoseReadings(userId: string, startDate: Date, endDate?: Date): Promise<any[]>
 syncActivityData(userId: string): Promise<any>
-getLatestGlucoseReading(userId: string): Promise<number | null>
 ```
 
 ### GoogleFitIntegrationService
@@ -375,7 +360,6 @@ deleteConnection(connectionId: string): Promise<boolean>
 syncAllActiveConnections(userId: string): Promise<void>
 syncConnection(userId: string, provider: string): Promise<boolean>
 exportMealToHealthApps(userId: string, mealData: MealData): Promise<ExportResult>
-importGlucoseReadings(userId: string, startDate?: Date): Promise<any[]>
 getActivitySummary(userId: string): Promise<ActivitySummary>
 
 // Configuration
