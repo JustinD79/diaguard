@@ -11,6 +11,23 @@ export interface HealthKitConfig {
   };
 }
 
+export interface GlucoseReading {
+  id: string;
+  value: number;
+  unit: 'mg/dL' | 'mmol/L';
+  timestamp: Date;
+  source: string;
+  mealContext?: 'fasting' | 'before_meal' | 'after_meal' | 'random';
+}
+
+export interface HealthSyncSummary {
+  lastSyncAt: string | null;
+  totalExported: number;
+  totalImported: number;
+  isConnected: boolean;
+  pendingSyncs: number;
+}
+
 export class AppleHealthIntegrationService {
   private static readonly PERMISSIONS: HealthKitPermissions = {
     permissions: {
@@ -26,6 +43,10 @@ export class AppleHealthIntegrationService {
         AppleHealthKit.Constants.Permissions.BasalEnergyBurned,
         AppleHealthKit.Constants.Permissions.HeartRate,
         AppleHealthKit.Constants.Permissions.Weight,
+        AppleHealthKit.Constants.Permissions.BloodGlucose,
+        AppleHealthKit.Constants.Permissions.InsulinDelivery,
+        AppleHealthKit.Constants.Permissions.BodyMassIndex,
+        AppleHealthKit.Constants.Permissions.WaistCircumference,
       ],
       write: [
         AppleHealthKit.Constants.Permissions.DietaryEnergyConsumed,
@@ -35,6 +56,7 @@ export class AppleHealthIntegrationService {
         AppleHealthKit.Constants.Permissions.DietarySugar,
         AppleHealthKit.Constants.Permissions.DietaryFiber,
         AppleHealthKit.Constants.Permissions.Water,
+        AppleHealthKit.Constants.Permissions.BloodGlucose,
       ],
     },
   };
@@ -203,6 +225,316 @@ export class AppleHealthIntegrationService {
       console.error('Error syncing activity data:', error);
       return null;
     }
+  }
+
+  static async importGlucoseReadings(
+    userId: string,
+    startDate: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    endDate: Date = new Date()
+  ): Promise<GlucoseReading[]> {
+    try {
+      const connection = await this.getActiveConnection(userId);
+      if (!connection) {
+        throw new Error('No active HealthKit connection');
+      }
+
+      const syncHistoryId = await this.createSyncHistory(
+        userId,
+        connection.id,
+        'import_only',
+        'glucose'
+      );
+
+      const glucoseData = await this.getBloodGlucose(startDate, endDate);
+
+      if (!glucoseData || glucoseData.length === 0) {
+        await this.completeSyncHistory(syncHistoryId, 'completed', 0, 0);
+        return [];
+      }
+
+      const readings: GlucoseReading[] = glucoseData.map((reading: any) => ({
+        id: reading.id || `hk_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        value: reading.value,
+        unit: 'mg/dL',
+        timestamp: new Date(reading.startDate),
+        source: reading.sourceId || 'apple_health',
+        mealContext: this.determineMealContext(new Date(reading.startDate)),
+      }));
+
+      for (const reading of readings) {
+        await this.recordImportedGlucose(userId, connection.id, syncHistoryId, reading);
+      }
+
+      await this.completeSyncHistory(syncHistoryId, 'completed', readings.length, readings.length);
+
+      return readings;
+    } catch (error) {
+      console.error('Error importing glucose readings:', error);
+      return [];
+    }
+  }
+
+  static async getLatestGlucose(userId: string): Promise<GlucoseReading | null> {
+    try {
+      const connection = await this.getActiveConnection(userId);
+      if (!connection) return null;
+
+      const endDate = new Date();
+      const startDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+      const glucoseData = await this.getBloodGlucose(startDate, endDate);
+
+      if (!glucoseData || glucoseData.length === 0) return null;
+
+      const latest = glucoseData.sort(
+        (a: any, b: any) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      )[0];
+
+      return {
+        id: latest.id || `hk_${Date.now()}`,
+        value: latest.value,
+        unit: 'mg/dL',
+        timestamp: new Date(latest.startDate),
+        source: latest.sourceId || 'apple_health',
+        mealContext: this.determineMealContext(new Date(latest.startDate)),
+      };
+    } catch (error) {
+      console.error('Error getting latest glucose:', error);
+      return null;
+    }
+  }
+
+  static async exportWaterIntake(
+    userId: string,
+    amountMl: number,
+    timestamp: Date = new Date()
+  ): Promise<boolean> {
+    try {
+      const connection = await this.getActiveConnection(userId);
+      if (!connection) {
+        throw new Error('No active HealthKit connection');
+      }
+
+      await this.saveWater(amountMl, timestamp);
+      return true;
+    } catch (error) {
+      console.error('Error exporting water intake:', error);
+      return false;
+    }
+  }
+
+  static async getWeight(
+    userId: string,
+    startDate: Date = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+    endDate: Date = new Date()
+  ): Promise<any[]> {
+    try {
+      const connection = await this.getActiveConnection(userId);
+      if (!connection) return [];
+
+      return new Promise((resolve) => {
+        const options = {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          ascending: false,
+          limit: 30,
+        };
+
+        AppleHealthKit.getWeightSamples(
+          options,
+          (error: string, results: any[]) => {
+            if (error) {
+              console.error('Error getting weight:', error);
+              resolve([]);
+            } else {
+              resolve(results || []);
+            }
+          }
+        );
+      });
+    } catch (error) {
+      console.error('Error getting weight samples:', error);
+      return [];
+    }
+  }
+
+  static async getSyncSummary(userId: string): Promise<HealthSyncSummary> {
+    try {
+      const connection = await this.getActiveConnection(userId);
+
+      if (!connection) {
+        return {
+          lastSyncAt: null,
+          totalExported: 0,
+          totalImported: 0,
+          isConnected: false,
+          pendingSyncs: 0,
+        };
+      }
+
+      const { data: exportedCount } = await supabase
+        .from('exported_health_data')
+        .select('*', { count: 'exact', head: true })
+        .eq('connection_id', connection.id);
+
+      const { data: importedCount } = await supabase
+        .from('imported_health_data')
+        .select('*', { count: 'exact', head: true })
+        .eq('connection_id', connection.id);
+
+      const { data: pendingQueue } = await supabase
+        .from('health_sync_queue')
+        .select('*', { count: 'exact', head: true })
+        .eq('connection_id', connection.id)
+        .eq('status', 'queued');
+
+      return {
+        lastSyncAt: connection.last_sync_at,
+        totalExported: exportedCount || 0,
+        totalImported: importedCount || 0,
+        isConnected: connection.is_active,
+        pendingSyncs: pendingQueue || 0,
+      };
+    } catch (error) {
+      console.error('Error getting sync summary:', error);
+      return {
+        lastSyncAt: null,
+        totalExported: 0,
+        totalImported: 0,
+        isConnected: false,
+        pendingSyncs: 0,
+      };
+    }
+  }
+
+  static async disconnectHealthKit(userId: string): Promise<boolean> {
+    try {
+      await supabase
+        .from('health_app_connections')
+        .update({
+          is_active: false,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', userId)
+        .eq('provider', 'apple_health');
+
+      return true;
+    } catch (error) {
+      console.error('Error disconnecting HealthKit:', error);
+      return false;
+    }
+  }
+
+  static async syncAllHealthData(userId: string): Promise<{
+    activity: any;
+    glucose: GlucoseReading[];
+    success: boolean;
+  }> {
+    try {
+      const [activity, glucose] = await Promise.all([
+        this.syncActivityData(userId),
+        this.importGlucoseReadings(userId),
+      ]);
+
+      await supabase.rpc('update_connection_last_sync', {
+        p_connection_id: (await this.getActiveConnection(userId))?.id,
+      });
+
+      return {
+        activity,
+        glucose,
+        success: true,
+      };
+    } catch (error) {
+      console.error('Error syncing all health data:', error);
+      return {
+        activity: null,
+        glucose: [],
+        success: false,
+      };
+    }
+  }
+
+  private static async getBloodGlucose(
+    startDate: Date,
+    endDate: Date
+  ): Promise<any[]> {
+    return new Promise((resolve) => {
+      const options = {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        ascending: false,
+        limit: 100,
+      };
+
+      AppleHealthKit.getBloodGlucoseSamples(
+        options,
+        (error: string, results: any[]) => {
+          if (error) {
+            console.error('Error getting glucose samples:', error);
+            resolve([]);
+          } else {
+            resolve(results || []);
+          }
+        }
+      );
+    });
+  }
+
+  private static async saveWater(amountMl: number, date: Date): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const options = {
+        value: amountMl / 1000,
+        startDate: date.toISOString(),
+        endDate: date.toISOString(),
+      };
+
+      AppleHealthKit.saveWater(
+        options,
+        (error: string, result: string) => {
+          if (error) {
+            reject(new Error(error));
+          } else {
+            resolve();
+          }
+        }
+      );
+    });
+  }
+
+  private static determineMealContext(
+    timestamp: Date
+  ): 'fasting' | 'before_meal' | 'after_meal' | 'random' {
+    const hour = timestamp.getHours();
+
+    if (hour >= 5 && hour < 8) return 'fasting';
+    if (hour >= 11 && hour < 12) return 'before_meal';
+    if (hour >= 17 && hour < 18) return 'before_meal';
+    if (hour >= 13 && hour < 15) return 'after_meal';
+    if (hour >= 19 && hour < 21) return 'after_meal';
+
+    return 'random';
+  }
+
+  private static async recordImportedGlucose(
+    userId: string,
+    connectionId: string,
+    syncHistoryId: string,
+    reading: GlucoseReading
+  ): Promise<void> {
+    await supabase.from('imported_health_data').upsert({
+      user_id: userId,
+      connection_id: connectionId,
+      sync_history_id: syncHistoryId,
+      data_type: 'glucose',
+      external_record_id: reading.id,
+      imported_data: reading,
+      import_status: 'stored',
+      imported_at: new Date().toISOString(),
+      processed_at: new Date().toISOString(),
+    }, {
+      onConflict: 'connection_id,external_record_id,data_type',
+    });
   }
 
 
