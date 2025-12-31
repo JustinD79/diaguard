@@ -9,21 +9,25 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { Activity, Plus, TrendingUp, Zap } from 'lucide-react-native';
+import { Activity, Plus, TrendingUp, Zap, Calendar, Clock, Flame, Target, ChevronRight, AlertCircle } from 'lucide-react-native';
 import { useAuth } from '../../contexts/AuthContext';
-import { ExerciseTrackingService, ExerciseLog } from '../../services/ExerciseTrackingService';
+import { ExerciseTrackingService, ExerciseLog, ExerciseStats, GlucoseCorrelation, ExerciseTimeRecommendation, PostExerciseCarbNeed } from '../../services/ExerciseTrackingService';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 export default function ExerciseScreen() {
   const { user } = useAuth();
   const [logs, setLogs] = useState<ExerciseLog[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<ExerciseStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const [bestTimes, setBestTimes] = useState<ExerciseTimeRecommendation[]>([]);
+  const [carbNeeds, setCarbNeeds] = useState<PostExerciseCarbNeed | null>(null);
   const [formData, setFormData] = useState({
     exercise_type: 'walking',
     intensity: 'moderate',
     duration_minutes: 30,
+    glucose_before: '',
     notes: '',
   });
 
@@ -38,18 +42,32 @@ export default function ExerciseScreen() {
 
     setLoading(true);
     try {
-      const [exerciseLogs, exerciseStats] = await Promise.all([
+      const [exerciseLogs, exerciseStats, exerciseStreak, timesData] = await Promise.all([
         ExerciseTrackingService.getExerciseLogs(user.id),
         ExerciseTrackingService.getExerciseStats(user.id, 30),
+        ExerciseTrackingService.calculateStreak(user.id),
+        ExerciseTrackingService.getBestExerciseTimes(user.id),
       ]);
 
       setLogs(exerciseLogs.slice(0, 10));
       setStats(exerciseStats);
+      setStreak(exerciseStreak);
+      setBestTimes(timesData.slice(0, 2));
     } catch (error) {
       console.error('Error loading exercise data:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateCarbNeeds = (exerciseType: string, duration: number, intensity: string) => {
+    const needs = ExerciseTrackingService.calculatePostExerciseCarbNeeds(
+      exerciseType as any,
+      duration,
+      intensity as any,
+      formData.glucose_before ? parseInt(formData.glucose_before) : undefined
+    );
+    setCarbNeeds(needs);
   };
 
   const handleAddExercise = async () => {
@@ -60,6 +78,7 @@ export default function ExerciseScreen() {
         exercise_type: formData.exercise_type as any,
         intensity: formData.intensity as any,
         duration_minutes: Number(formData.duration_minutes),
+        glucose_before: formData.glucose_before ? parseInt(formData.glucose_before) : undefined,
         notes: formData.notes,
         exercise_time: new Date().toISOString(),
       });
@@ -69,8 +88,10 @@ export default function ExerciseScreen() {
         exercise_type: 'walking',
         intensity: 'moderate',
         duration_minutes: 30,
+        glucose_before: '',
         notes: '',
       });
+      setCarbNeeds(null);
       loadData();
       Alert.alert('Success', 'Exercise logged successfully!');
     } catch (error) {
@@ -117,10 +138,36 @@ export default function ExerciseScreen() {
               <Text style={styles.statLabel}>Calories</Text>
             </View>
             <View style={styles.statCard}>
-              <Calendar size={24} color="#5856D6" />
-              <Text style={styles.statValue}>{stats.average_duration}m</Text>
-              <Text style={styles.statLabel}>Avg Duration</Text>
+              <Flame size={24} color="#ef4444" />
+              <Text style={styles.statValue}>{streak}</Text>
+              <Text style={styles.statLabel}>Day Streak</Text>
             </View>
+          </View>
+        )}
+
+        {bestTimes.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Best Times to Exercise</Text>
+            {bestTimes.map((time, index) => (
+              <View key={index} style={styles.timeCard}>
+                <View style={styles.timeHeader}>
+                  <Clock size={18} color="#2563eb" />
+                  <Text style={styles.timeTitle}>{time.time_of_day.charAt(0).toUpperCase() + time.time_of_day.slice(1)}</Text>
+                  <View style={styles.stabilityBadge}>
+                    <Text style={styles.stabilityText}>{time.glucose_stability_score}% stable</Text>
+                  </View>
+                </View>
+                <Text style={styles.timeRange}>{time.hour_range}</Text>
+                <Text style={styles.timeReason}>{time.reasoning}</Text>
+                <View style={styles.recommendedTypes}>
+                  {time.recommended_types.slice(0, 3).map((type, i) => (
+                    <View key={i} style={styles.typeTag}>
+                      <Text style={styles.typeTagText}>{type}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ))}
           </View>
         )}
 
@@ -218,12 +265,49 @@ export default function ExerciseScreen() {
             <TextInput
               style={styles.input}
               value={String(formData.duration_minutes)}
-              onChangeText={(text) =>
-                setFormData({ ...formData, duration_minutes: Number(text) || 0 })
-              }
+              onChangeText={(text) => {
+                const duration = Number(text) || 0;
+                setFormData({ ...formData, duration_minutes: duration });
+                updateCarbNeeds(formData.exercise_type, duration, formData.intensity);
+              }}
               keyboardType="number-pad"
               placeholder="30"
             />
+
+            <Text style={styles.label}>Current Glucose (mg/dL) - Optional</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.glucose_before}
+              onChangeText={(text) => {
+                setFormData({ ...formData, glucose_before: text });
+                if (text) {
+                  updateCarbNeeds(formData.exercise_type, formData.duration_minutes, formData.intensity);
+                }
+              }}
+              keyboardType="number-pad"
+              placeholder="Enter if tracking glucose impact"
+            />
+
+            {carbNeeds && (
+              <View style={styles.carbNeedsCard}>
+                <View style={styles.carbNeedsHeader}>
+                  <AlertCircle size={18} color={carbNeeds.hypo_risk_level === 'high' ? '#dc2626' : carbNeeds.hypo_risk_level === 'moderate' ? '#f59e0b' : '#22c55e'} />
+                  <Text style={styles.carbNeedsTitle}>Post-Exercise Carb Needs</Text>
+                </View>
+                <Text style={styles.carbAmount}>{carbNeeds.recommended_carbs_grams}g carbs recommended</Text>
+                <Text style={styles.carbTiming}>{carbNeeds.timing_advice}</Text>
+                <View style={styles.carbSources}>
+                  {carbNeeds.carb_sources.slice(0, 3).map((source, i) => (
+                    <Text key={i} style={styles.carbSource}>- {source}</Text>
+                  ))}
+                </View>
+                <View style={[styles.riskBadge, { backgroundColor: carbNeeds.hypo_risk_level === 'high' ? '#fef2f2' : carbNeeds.hypo_risk_level === 'moderate' ? '#fef3c7' : '#f0fdf4' }]}>
+                  <Text style={[styles.riskText, { color: carbNeeds.hypo_risk_level === 'high' ? '#dc2626' : carbNeeds.hypo_risk_level === 'moderate' ? '#d97706' : '#16a34a' }]}>
+                    {carbNeeds.hypo_risk_level.toUpperCase()} HYPO RISK
+                  </Text>
+                </View>
+              </View>
+            )}
 
             <Text style={styles.label}>Notes (optional)</Text>
             <TextInput
@@ -477,5 +561,111 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#FFF',
+  },
+  timeCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2563eb',
+  },
+  timeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  timeTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1f2937',
+    flex: 1,
+  },
+  stabilityBadge: {
+    backgroundColor: '#dcfce7',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  stabilityText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#16a34a',
+  },
+  timeRange: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 4,
+  },
+  timeReason: {
+    fontSize: 13,
+    color: '#4b5563',
+    marginBottom: 8,
+    lineHeight: 18,
+  },
+  recommendedTypes: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  typeTag: {
+    backgroundColor: '#eff6ff',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  typeTagText: {
+    fontSize: 12,
+    color: '#2563eb',
+    fontWeight: '500',
+  },
+  carbNeedsCard: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  carbNeedsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  carbNeedsTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  carbAmount: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1f2937',
+    marginBottom: 4,
+  },
+  carbTiming: {
+    fontSize: 13,
+    color: '#6b7280',
+    marginBottom: 8,
+  },
+  carbSources: {
+    marginBottom: 8,
+  },
+  carbSource: {
+    fontSize: 13,
+    color: '#4b5563',
+    marginBottom: 2,
+  },
+  riskBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  riskText: {
+    fontSize: 11,
+    fontWeight: '700',
   },
 });
